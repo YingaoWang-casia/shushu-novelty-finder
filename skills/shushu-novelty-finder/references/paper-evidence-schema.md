@@ -8,19 +8,51 @@ Use this schema for every paper used as evidence. A paper title alone is not eno
 Title:
 Year:
 Venue or source:
-Paper type: method / benchmark / dataset / survey / system / analysis / preprint
+Paper type:
 URL, DOI, or arXiv id:
 Task:
-Main contribution:
 Dataset:
 Metric:
+Main contribution:
 Why it is relevant:
-Evidence role: trend / limitation / baseline / benchmark / method / negative signal
+Evidence role:
 Used to support which claim:
 Confidence:
 ```
 
-## Evidence quality levels
+## Evidence Roles
+
+Use one or more of these roles:
+
+```text
+task anchor
+method baseline
+benchmark baseline
+dataset source
+metric source
+limitation evidence
+follow-up work
+contrary evidence
+survey support
+```
+
+## Paper Types
+
+Recommended paper type labels:
+
+```text
+method
+benchmark
+dataset
+survey
+system
+analysis
+preprint
+position
+negative result
+```
+
+## Evidence Quality Levels
 
 ### Strong
 
@@ -36,8 +68,38 @@ Only loosely related, unverified venue, unclear method, missing source link, or 
 
 ## Rules
 
-- Do not use unverifiable papers as evidence.
-- Mark preprints separately.
+- Do not use unverifiable papers as core evidence.
+- Do not support a claim with only a paper title.
+- Preprints must be marked as preprints.
 - Separate survey conclusions from original experimental evidence.
-- Do not use one paper to claim a field-wide trend.
+- One paper cannot support a field-wide trend.
 - If only weak evidence exists, downgrade the novelty recommendation.
+- A paper can have multiple evidence roles, but each role must say which claim it supports.
+- Contrary evidence should be included when it weakens or narrows the novelty claim.
+
+## Bad Evidence Pattern
+
+```text
+This is novel because Paper X did not solve it.
+```
+
+Why bad: it does not say what Paper X studied, what evidence role it has, whether it is accepted or preprint, or whether follow-up work solved the limitation.
+
+## Good Evidence Pattern
+
+```text
+Paper Evidence Card:
+Title: <verified paper>
+Year: <year>
+Venue or source: <venue>
+Paper type: benchmark
+URL, DOI, or arXiv id: <identifier>
+Task: citation correctness evaluation for RAG answers
+Dataset: <dataset>
+Metric: citation precision
+Main contribution: introduces an evaluation protocol for citation support
+Why it is relevant: closest benchmark baseline for the proposed multi-axis evaluation
+Evidence role: benchmark baseline; contrary evidence
+Used to support which claim: checks whether the proposed benchmark is actually new
+Confidence: moderate
+```
