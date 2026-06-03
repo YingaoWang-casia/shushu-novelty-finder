@@ -1,23 +1,33 @@
 # Evals
 
-This folder defines lightweight checks for shushu-novelty-finder outputs.
+This folder defines lightweight checks for `shushu-novelty-finder` outputs.
 
-The goal is not to score scientific truth automatically. The goal is to check whether a run follows the Skill's evidence and paper-readiness discipline.
+The goal is not to automatically judge scientific truth. The goal is to check whether a run follows the Skill's evidence, novelty-ranking, and paper-readiness discipline.
 
-## Required checks
+## Files
+
+- `cases/rag-evaluation.md` - Direction Mode eval case for RAG evaluation.
+- `cases/seed-paper.md` - Seed Paper Mode eval case.
+- `checks/output-checklist.md` - required output checklist.
+- `checklist.md` - legacy checklist kept for compatibility.
+
+## Required Checks
 
 A valid output should include:
 
-- input mode: Lite, Research, or Paper;
-- Research Scope Card;
-- concrete paper names for trends;
+- input mode;
+- Research Scope Card or Seed Paper Card;
+- concrete paper names or explicit `placeholder / unverified` labels;
 - Paper Evidence Cards for key papers;
+- Literature Timeline and Trend Matrix in Research / Paper Mode;
 - gap evidence labels;
 - weak / medium / strong novelty ranking;
-- risks and minimum experiments;
-- paper-readiness verdict for top ideas in Paper Mode.
+- minimum experiments;
+- baseline plan for top ideas;
+- risks and reviewer reject reasons;
+- paper-readiness verdict.
 
-## Failure checks
+## Failure Checks
 
 A bad output should be flagged if it:
 
@@ -26,4 +36,10 @@ A bad output should be flagged if it:
 - gives innovation ideas without feasibility or risks;
 - ignores baselines;
 - treats preprints as accepted papers;
-- produces a paper plan without a falsifiable claim.
+- produces a paper plan without a falsifiable claim;
+- uses a seed paper title without extracting task, input, output, dataset, metric, and claim;
+- calls an ordinary pipeline a new method without a controlled comparison.
+
+## Usage
+
+Use these checks after generating an output. If any required item is missing, downgrade the answer quality and ask the Skill to repair the missing section instead of accepting the report.
