@@ -9,29 +9,47 @@ Goal: paper-oriented project.
 Constraints: 2 months, limited compute.
 ```
 
-## Expected behavior
+## Expected Behavior
 
-The Skill should not search all RAG papers. It should first narrow the scope into one or more of:
+The Skill should not search all RAG papers blindly. It should first narrow the scope into one or more of:
 
 - retrieval quality;
+- reranking;
 - answer faithfulness;
-- citation accuracy;
+- citation correctness;
 - robustness;
 - long-context comparison;
-- production cost and latency;
-- human preference alignment.
+- domain-specific RAG;
+- agentic RAG;
+- production cost and latency.
 
-## Required output checks
+If the scope remains too broad, the Skill should ask at most 5 questions. If the user does not answer, it should continue with explicit assumptions.
 
-- Research Scope Card exists.
-- Venue clusters include NLP and IR.
-- Trend Matrix is not just a paper list.
-- Gaps have evidence labels.
-- At least one novelty idea is downgraded because of feasibility or weak evidence.
-- Top idea includes paper thesis and minimum experiment.
+## Required Output Checks
 
-## Failure signs
+- has input mode: Direction Mode / Research Mode or Paper Mode
+- has Research Scope Card
+- has concrete paper names or marks placeholder / unverified
+- has Paper Evidence Cards
+- venue clusters include NLP and IR where relevant
+- Trend Matrix is not just a paper list
+- gaps have evidence labels
+- novelty candidates are ranked weak / medium / strong
+- at least one idea is downgraded because of feasibility, weak evidence, or overlap risk
+- top idea includes Paper Thesis Card or clear thesis claim
+- top idea includes minimum experiment and baseline plan
+- paper-readiness verdict uses an allowed label
 
-- Claims that no RAG evaluation benchmark exists.
-- Mixes retrieval, generation, and agent evaluation without separation.
-- Gives strong novelty without baselines or metrics.
+## Failure Signs
+
+- claims that no RAG evaluation benchmark exists without evidence
+- mixes retrieval failure, generation failure, citation failure, and agent failure without separation
+- gives strong novelty without baselines or metrics
+- compares only against weak baselines
+- ignores latency and cost when the claim is deployment-oriented
+- treats arXiv preprints as accepted papers
+- calls a pipeline a new method without isolating what is new
+
+## Passing Pattern
+
+A passing output can say: `Current confidence is weak because the literature search is incomplete; this is pilot-ready, not workshop-ready yet.` Honest uncertainty is better than unsupported novelty.
