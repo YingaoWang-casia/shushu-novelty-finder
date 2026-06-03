@@ -8,21 +8,34 @@ Seed paper: <title and abstract>.
 Find novelty ideas based on this paper.
 ```
 
-## Expected behavior
+## Expected Behavior
 
-The Skill should first build a Seed Paper Card before recommending ideas.
+The Skill should first build a Seed Paper Card before recommending ideas. It should use the seed paper to anchor the task boundary, not as proof that the paper's claims are correct.
 
-## Required output checks
+## Required Output Checks
 
-- Seed Paper Card exists.
-- Task, input, output, dataset, metric, and claimed contribution are extracted or marked unknown.
-- Prior work, follow-up work, and sibling work are searched separately.
-- The seed paper is not treated as automatically authoritative.
-- Suggested ideas distinguish explicit limitations from inferred gaps.
-- Top ideas include paper-readiness verdicts.
+- has input mode: Seed Paper Mode
+- Seed Paper Card exists
+- Title, year, venue/source, and paper type are extracted or marked unknown
+- task, input, output, dataset, metric, method, and claimed contribution are extracted or marked unknown
+- limitations are separated into stated limitations and inferred limitations
+- expansion keywords and excluded directions are listed
+- prior work, follow-up work, and sibling work are searched or planned separately
+- Paper Evidence Cards exist for key papers or are explicitly marked placeholder / unverified
+- suggested ideas distinguish explicit limitations from inferred gaps
+- novelty candidates are ranked weak / medium / strong
+- top ideas include baseline plan, minimum experiment, risks, and paper-readiness verdict
 
-## Failure signs
+## Failure Signs
 
-- Jumps directly to innovation ideas.
-- Uses the seed paper title only.
-- Ignores whether the seed paper is a survey, benchmark, method, dataset, or system paper.
+- jumps directly to innovation ideas
+- uses only the seed paper title
+- treats the seed paper as automatically authoritative
+- ignores whether the seed paper is a survey, benchmark, method, dataset, system paper, or preprint
+- proposes a strong idea without checking follow-up work
+- gives an extension idea without a baseline or falsifiable claim
+- does not separate accepted papers from preprints
+
+## Passing Pattern
+
+A passing output can downgrade its own confidence: `This is only pilot-ready until follow-up work confirms that the limitation remains open.`
