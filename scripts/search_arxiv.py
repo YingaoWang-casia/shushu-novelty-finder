@@ -9,7 +9,6 @@ conference or journal papers without separate verification.
 import argparse
 import json
 import re
-import sys
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -70,8 +69,10 @@ def record_from_entry(entry):
         "dataset": "unknown",
         "metric": "unknown",
         "main_contribution": main_contribution(entry),
-        "why_relevant": "matched arXiv query",
-        "evidence_role": "candidate paper",
+        "why_relevant": "matched arXiv query; must be verified before use as evidence",
+        "evidence_status": "candidate",
+        "evidence_role": "task anchor",
+        "used_to_support_which_claim": "candidate only; do not use to support a claim until verified",
         "confidence": "weak",
     }
 
@@ -101,10 +102,10 @@ def main():
 
     try:
         payload = search_arxiv(args.query, args.max_results, args.start, args.sort_by, args.sort_order)
+        root = ET.fromstring(payload)
     except Exception as exc:  # network and XML errors should be visible to CLI users
         raise SystemExit(f"arXiv request failed: {exc}") from exc
 
-    root = ET.fromstring(payload)
     for entry in root.findall(ATOM_NS + "entry"):
         print(json.dumps(record_from_entry(entry), ensure_ascii=False))
 
