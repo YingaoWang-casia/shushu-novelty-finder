@@ -57,7 +57,10 @@ Required output:
 - Paper Thesis Card;
 - Experiment Card;
 - Baseline Plan;
+- Claim-Evidence Map;
 - Related Work Argument Map;
+- Reviewer Objection Pre-Mortem;
+- Kill / Continue Criteria;
 - Threats to Validity;
 - Paper-readiness Verdict.
 
@@ -65,19 +68,24 @@ Required output:
 
 1. Route the input.
 2. Clarify if needed.
-3. Build a Research Scope Card or Seed Paper Card.
-4. Search and review related literature.
-5. Build paper evidence cards for important papers.
-6. Build a timeline across roughly the last decade, emphasizing the last five years.
-7. Build a trend matrix.
-8. Audit gaps with evidence labels.
-9. Rank novelty ideas as weak, medium, or strong.
-10. For top ideas, create a Paper Thesis Card.
-11. For top ideas, create an Experiment Card.
-12. For top ideas, define a baseline protocol.
-13. Recommend the best 1-3 directions with risks and minimum experiments.
-14. Give a paper-readiness verdict.
-15. Run eval checks if output quality is uncertain.
+3. Narrow broad directions before search.
+4. Build a Research Scope Card or Seed Paper Card.
+5. Search and review related literature.
+6. Build Paper Evidence Cards for important papers.
+7. Build a Claim-Evidence Map for top claims.
+8. Build a timeline across roughly the last decade, emphasizing the last five years.
+9. Build a trend matrix.
+10. Audit gaps with evidence labels.
+11. Rank novelty ideas as weak, medium, or strong.
+12. Route each top idea to a paper type and fallback type.
+13. For top ideas, create a Paper Thesis Card.
+14. For top ideas, create an Experiment Card.
+15. For top ideas, use the baseline decision tree to define minimum and strong baselines.
+16. Run reviewer objection pre-mortem.
+17. Apply kill / continue criteria.
+18. Recommend the best 1-3 directions with risks and minimum experiments.
+19. Give a paper-readiness verdict.
+20. Run eval checks if output quality is uncertain.
 
 ## Evidence Rules
 
@@ -86,6 +94,7 @@ Required output:
 - Every important paper must have a Paper Evidence Card.
 - Every Paper Evidence Card must state evidence status, evidence role, and which claim the paper supports.
 - Candidate or placeholder papers must not be used as verified support for novelty claims.
+- Every top claim must have a Claim-Evidence Map.
 - Every gap must be marked as one of: explicit limitation, future work, cross-paper pattern, benchmark absence, implementation absence, or inferred gap.
 - Every novelty idea must include evidence, evidence type, feasibility, risk, baseline plan, and minimum validation experiment.
 - Mark arXiv and other preprints separately from accepted conference or journal papers.
@@ -111,18 +120,24 @@ Use the reference files when needed:
 - `references/input-router.md` for routing and clarification policy.
 - `references/usage-modes.md` for mode behavior.
 - `references/scope-card.md` for Research Scope Card and Seed Paper Card formats.
+- `references/scope-narrowing-playbook.md` for turning broad directions into scoped tasks.
 - `references/search-protocol.md` for literature search strategy.
 - `references/paper-evidence-schema.md` for Paper Evidence Cards.
+- `references/claim-evidence-map.md` for binding papers to claims.
 - `references/trend-matrix.md` for timeline and trend synthesis.
 - `references/gap-taxonomy.md` for gap categories.
 - `references/novelty-rubric.md` for weak/medium/strong novelty grading.
+- `references/paper-type-router.md` for deciding method / benchmark / analysis / system / dataset / report fit.
 - `references/paper-thesis.md` for thesis construction.
 - `references/experiment-design.md` for experiment design.
 - `references/baseline-protocol.md` for baseline planning.
+- `references/baseline-decision-tree.md` for selecting minimum and strong baselines.
 - `references/related-work-argument-map.md` for positioning against prior work.
+- `references/reviewer-objection-bank.md` for reviewer pre-mortem.
 - `references/paper-story-checklist.md` for paper narrative checks.
 - `references/threats-to-validity.md` for validity risks.
 - `references/negative-result-strategy.md` for useful negative results.
+- `references/kill-criteria.md` for continue / narrow / downgrade / kill decisions.
 - `references/paper-readiness.md` for readiness verdicts.
 - `references/rag-domain.md` for RAG-specific traps, metrics, and baselines.
 - `references/speech-domain.md` for speech-specific traps, metrics, and baselines.
