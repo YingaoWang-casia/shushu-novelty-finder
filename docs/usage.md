@@ -4,6 +4,55 @@ This guide explains how to use `shushu-novelty-finder` as a CS paper idea audito
 
 The Skill should always prefer a scoped, evidence-bound answer over a long list of plausible but unsupported ideas.
 
+## 0. Activate the Skill in Codex
+
+Install the Skill by copying the Skill folder into your Codex skills directory.
+
+macOS / Linux:
+
+```bash
+git clone https://github.com/YingaoWang-casia/shushu-novelty-finder.git
+mkdir -p ~/.codex/skills
+cp -R shushu-novelty-finder/skills/shushu-novelty-finder ~/.codex/skills/
+```
+
+Windows PowerShell:
+
+```powershell
+git clone https://github.com/YingaoWang-casia/shushu-novelty-finder.git
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills" | Out-Null
+Copy-Item -Recurse -Force "shushu-novelty-finder\skills\shushu-novelty-finder" "$env:USERPROFILE\.codex\skills\"
+```
+
+Restart Codex or open a new Codex session. Then activate the Skill by naming it in the prompt:
+
+```text
+Use shushu-novelty-finder.
+Direction: RAG evaluation.
+Goal: paper-oriented research project.
+First lock the scope, then produce a literature-backed novelty audit and paper-readiness verdict.
+```
+
+For a seed paper:
+
+```text
+Use shushu-novelty-finder.
+Seed paper: <paper title / abstract / arXiv / DOI / PDF>.
+First build a Seed Paper Card, then search prior work, follow-up work, and sibling work.
+```
+
+If it does not activate, verify that the Skill file exists:
+
+```text
+~/.codex/skills/shushu-novelty-finder/SKILL.md
+```
+
+On Windows:
+
+```text
+%USERPROFILE%\.codex\skills\shushu-novelty-finder\SKILL.md
+```
+
 ## 1. Direction Mode
 
 Use Direction Mode when the user only has a research direction, for example:
