@@ -10,6 +10,8 @@ Give the best 1-3 recommended ideas first.
 Recommended idea:
 Novelty level: weak / medium / strong
 Paper-readiness verdict: not ready / pilot-ready / workshop-ready / main-track candidate / technical-report-only
+Best paper type:
+Fallback paper type:
 Why this is the best option:
 Evidence basis:
 Minimum experiment:
@@ -17,6 +19,7 @@ Baseline plan:
 Main risk:
 Likely accept reason:
 Likely reject reason:
+Continue / narrow / downgrade / kill:
 ```
 
 ## 1. Input Mode
@@ -87,7 +90,24 @@ Used to support which claim:
 Confidence:
 ```
 
-## 5. Literature Timeline
+## 5. Claim-Evidence Map
+
+For each top claim:
+
+```text
+Claim:
+Claim type: novelty / feasibility / limitation / baseline / evaluation / task importance
+Supporting papers:
+Contrary papers:
+Background papers:
+Evidence strength:
+What can be safely claimed:
+What must not be claimed:
+Confidence:
+Next verification step:
+```
+
+## 6. Literature Timeline
 
 Group representative papers by time stage.
 
@@ -100,7 +120,7 @@ Dataset / metric pattern:
 What changed from previous stage:
 ```
 
-## 6. Trend Matrix
+## 7. Trend Matrix
 
 Use this table:
 
@@ -108,7 +128,7 @@ Use this table:
 Time period | Representative papers | Task shift | Method shift | Dataset/metric shift | Open gap
 ```
 
-## 7. Gap Audit
+## 8. Gap Audit
 
 For each gap:
 
@@ -122,7 +142,7 @@ Why it may be a bad idea:
 Confidence:
 ```
 
-## 8. Novelty Candidates
+## 9. Novelty Candidates
 
 Separate into weak, medium, and strong ideas.
 
@@ -140,7 +160,21 @@ Risks:
 Best target output:
 ```
 
-## 9. Paper Thesis Card
+## 10. Paper Type Routing
+
+For each top idea:
+
+```text
+Best paper type:
+Fallback paper type:
+Why this type fits:
+Required evidence:
+Required baselines:
+Main reviewer risk:
+Readiness verdict:
+```
+
+## 11. Paper Thesis Card
 
 For the top idea:
 
@@ -155,7 +189,7 @@ What evidence supports the claim:
 What reviewers may reject:
 ```
 
-## 10. Experiment Card
+## 12. Experiment Card
 
 For the top idea:
 
@@ -171,17 +205,17 @@ Robustness checks:
 Falsification result:
 ```
 
-## 11. Baseline Plan
+## 13. Baseline Decision
 
 ```text
 Minimum baselines:
 Strong baselines:
 Why each baseline is necessary:
 What result would make the idea look weak:
-What result would make the idea look publishable:
+What result would make the idea publishable:
 ```
 
-## 12. Related Work Argument Map
+## 14. Related Work Argument Map
 
 ```text
 Closest prior work:
@@ -192,7 +226,32 @@ How the proposed idea differs:
 What should not be claimed:
 ```
 
-## 13. Threats to Validity
+## 15. Reviewer Objection Pre-Mortem
+
+For each top idea, include at least three objections.
+
+```text
+Likely reviewer objection:
+Why the objection is plausible:
+Evidence needed to answer it:
+Current defense:
+Weakness in current defense:
+Action to strengthen:
+Verdict impact: no change / downgrade / kill
+```
+
+## 16. Kill / Continue Criteria
+
+```text
+Continue condition:
+Narrow condition:
+Downgrade condition:
+Kill condition:
+Next checkpoint:
+Smallest next action that changes the decision:
+```
+
+## 17. Threats to Validity
 
 ```text
 Internal validity:
@@ -203,7 +262,7 @@ Reproducibility risk:
 Reviewer concern:
 ```
 
-## 14. Next-Step Plan
+## 18. Next-Step Plan
 
 Give a concrete plan:
 
@@ -213,6 +272,6 @@ Give a concrete plan:
 - first experiment;
 - decision checkpoint.
 
-## 15. Uncertainty and Search Limits
+## 19. Uncertainty and Search Limits
 
 State what the search may have missed. Do not hide weak evidence. If no verified search has been performed, mark all paper names as `placeholder`, `candidate`, or `unverified`.
