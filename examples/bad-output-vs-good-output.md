@@ -1,17 +1,17 @@
 # Bad Output vs Good Output
 
-This example shows the value of the Skill discipline.
+This example shows why the Skill must act like a paper idea auditor rather than a generic prompt pack.
 
-## User input
+## User Input
 
 ```text
 I want to find novelty ideas around RAG evaluation.
 ```
 
-## Bad output pattern
+## Bad Output
 
 ```text
-RAG evaluation is underexplored. You can build a new benchmark for factuality, robustness, and citation accuracy. This is a strong innovation because no existing work fully solves it.
+RAG evaluation is underexplored. You can build a new benchmark. This is strong novelty.
 ```
 
 Why this is bad:
@@ -19,31 +19,40 @@ Why this is bad:
 - no scope lock;
 - no concrete papers;
 - no evidence type;
-- overclaims that the gap is unsolved;
-- no baseline or minimum experiment;
-- no risk analysis.
+- no baseline;
+- no falsifiable claim;
+- overclaims novelty.
 
-## Good output pattern
+More specifically, it never says whether `RAG evaluation` means retrieval quality, answer faithfulness, citation correctness, robustness, latency, cost, long-context comparison, or agentic RAG. It also claims strength without showing a paper timeline, benchmark overlap search, or a minimum experiment.
+
+## Good Output
 
 ```text
 Mode: Research Mode
-Scope: RAG evaluation for LLM question answering, not general retrieval or long-context evaluation.
+
+Scope:
+RAG evaluation for LLM question answering with citations. Exclude retriever training, generic long-context evaluation, and broad agent evaluation.
 
 Evidence plan:
-- collect accepted papers and benchmark papers from NLP, IR, and LLM system venues;
-- separate faithfulness, citation correctness, retrieval quality, and end-to-end answer utility;
-- mark preprints separately.
+1. Search accepted NLP / IR / LLM systems papers and benchmark papers from the last 10 years.
+2. Build Paper Evidence Cards for retrieval metrics, faithfulness metrics, citation correctness, and end-to-end answer utility.
+3. Mark arXiv preprints separately and do not treat them as accepted papers.
+4. Run contrary-evidence search for existing benchmarks that already separate these axes.
 
 Candidate gap:
-Existing RAG evaluations often mix retrieval quality, answer correctness, and citation quality into one end-to-end score.
-Evidence type: cross-paper pattern, to be verified by literature matrix.
+RAG evaluations may mix retrieval quality, citation correctness, and answer utility into one end-to-end score.
+
+Evidence type:
+Cross-paper pattern plus benchmark absence. Current confidence is weak until the literature matrix is populated.
 
 Medium idea:
-Design an evaluation protocol that reports retrieval support, citation support, and answer utility as separate axes.
+Create a multi-axis RAG evaluation protocol that reports retrieval support, citation support, answer utility, latency, and cost separately, then test whether system rankings change across axes.
+
 Minimum experiment:
-Run several RAG pipelines on a shared QA set and show that system rankings change across axes.
-Risk:
-If existing benchmarks already separate these axes well, downgrade to a reproduction or analysis project.
+Compare lexical retrieval, dense retrieval, reranker vs no reranker, prompt-only / closed-book, and long-context baseline if relevant on one shared QA dataset.
+
+Reject risk:
+If existing accepted benchmark papers already separate these axes with comparable baselines, downgrade the idea to a reproduction, analysis report, or technical note.
 ```
 
-The good output is not longer for its own sake. It is better because it makes claims auditable.
+The good output is better because it locks scope, states the evidence plan, avoids unsupported novelty claims, and gives a falsifiable experiment.
