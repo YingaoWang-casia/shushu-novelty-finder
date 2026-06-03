@@ -20,7 +20,9 @@ FIELDS = [
     "metric",
     "main_contribution",
     "why_relevant",
+    "evidence_status",
     "evidence_role",
+    "used_to_support_which_claim",
     "confidence",
 ]
 
