@@ -33,12 +33,14 @@ This is a prompt-first Skill workflow. It can guide literature search, organize 
 3. Build a Research Scope Card or Seed Paper Card.
 4. Guide and organize prior work, follow-up work, and sibling work search.
 5. Build Paper Evidence Cards that bind papers to claims.
-6. Build a Literature Timeline for roughly the last decade, with extra attention to the last five years.
-7. Build a Trend Matrix that separates task shift, method shift, dataset/metric shift, and open gaps.
+6. Build a Claim-Evidence Map for top claims.
+7. Build a Literature Timeline and Trend Matrix.
 8. Audit gaps with evidence labels.
 9. Rank novelty candidates as weak, medium, or strong.
-10. Attach paper evidence, evidence type, feasibility, risks, baselines, and minimum experiments.
-11. Produce a paper-readiness verdict: `not ready`, `pilot-ready`, `workshop-ready`, `main-track candidate`, or `technical-report-only`.
+10. Route ideas to paper types: method, benchmark, analysis, system, dataset, negative result, or technical report.
+11. Attach feasibility, risks, baselines, reviewer objections, and minimum experiments.
+12. Apply kill / continue criteria.
+13. Produce a paper-readiness verdict: `not ready`, `pilot-ready`, `workshop-ready`, `main-track candidate`, or `technical-report-only`.
 
 ## Usage Modes
 
@@ -58,7 +60,7 @@ The Skill first creates a Seed Paper Card, then searches or plans prior work, fo
 
 Use when you already have an idea and want to know whether it can become a paper.
 
-The Skill produces a Paper Thesis Card, Experiment Card, Baseline Plan, Related Work Argument Map, Threats to Validity, and a paper-readiness verdict.
+The Skill produces a Paper Thesis Card, Experiment Card, Baseline Plan, Claim-Evidence Map, Reviewer Objection Pre-Mortem, Kill / Continue Criteria, Related Work Argument Map, Threats to Validity, and a paper-readiness verdict.
 
 ## Shortest Prompt
 
@@ -89,6 +91,8 @@ Rank ideas as weak / medium / strong and give a paper-readiness verdict.
 
 ## Output Examples
 
+- [Strong user prompts](examples/strong-user-prompts.md)
+- [Verified RAG mini audit](examples/verified-rag-mini-audit.md)
 - [RAG evaluation output](examples/rag-evaluation-output.md)
 - [Seed paper output](examples/seed-paper-output.md)
 - [Bad output vs good output](examples/bad-output-vs-good-output.md)
@@ -161,12 +165,17 @@ On Windows, check:
 ## Current Capabilities
 
 - Routes input into Direction, Seed Paper, Hybrid, and Paper-Readiness modes.
+- Narrows broad directions into task / input / output / dataset / metric scopes.
 - Builds Research Scope Cards, Seed Paper Cards, Paper Thesis Cards, and Experiment Cards.
 - Uses Paper Evidence Cards instead of title-only citations.
 - Separates evidence status from evidence role so candidate papers are not mistaken for verified support.
+- Builds Claim-Evidence Maps that state which paper supports or weakens which claim.
 - Guides literature timeline and trend matrix construction.
 - Labels gap evidence as explicit limitation, future work, cross-paper pattern, benchmark absence, implementation absence, or inferred gap.
 - Ranks ideas as weak / medium / strong with feasibility, risks, baselines, and minimum experiments.
+- Routes ideas to paper types and fallback types.
+- Generates reviewer objection pre-mortems.
+- Applies kill / continue criteria so users know when to continue, narrow, downgrade, or stop.
 - Marks preprints separately from accepted papers.
 - Provides RAG and speech domain packs for common fake novelty traps, metrics, and minimum baselines.
 - Includes eval checklists for catching unsupported novelty claims and missing paper-readiness evidence.
@@ -176,7 +185,7 @@ On Windows, check:
 - Add more domain packs for LLM agents, multimodal learning, ML systems, security, and data engineering.
 - Add richer paper metadata normalization for Semantic Scholar, OpenAlex, and DBLP inputs.
 - Add automatic report validation against the eval checklist.
-- Add more full examples for Seed Paper Mode and Paper-Readiness Mode.
+- Add more verified mini-audits for Seed Paper Mode and Paper-Readiness Mode.
 - Add venue-specific readiness rubrics for ACL, EMNLP, SIGIR, CHI, ICML, NeurIPS, ICLR, KDD, and systems venues.
 
 ## Philosophy
