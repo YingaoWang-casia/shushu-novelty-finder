@@ -9,6 +9,8 @@ Get a literature-backed novelty audit, trend matrix, and paper-readiness verdict
 
 It is designed to behave like a strict CS paper idea auditor / paper-readiness reviewer: lock the task first, check the literature line, separate evidence from inference, then recommend ideas with baselines, risks, and minimum experiments.
 
+This is a prompt-first Skill workflow. It can guide literature search, organize evidence, and enforce paper-readiness checks. The included scripts are lightweight helpers, not a full automatic literature-mining system.
+
 ## Who It Is For
 
 - CS students looking for a paper-oriented project direction.
@@ -22,19 +24,21 @@ It is designed to behave like a strict CS paper idea auditor / paper-readiness r
 - Not a random innovation-point generator.
 - Not a replacement for an advisor, reviewer, or literature-search by a domain expert.
 - Not a tool that can prove novelty without search coverage and concrete evidence.
+- Not a complete citation-graph crawler or fully automatic systematic review engine.
 
 ## Core Workflow
 
 1. Route the input into Direction Mode, Seed Paper Mode, Hybrid Mode, or Paper-Readiness Mode.
 2. Lock the research scope before broad search.
 3. Build a Research Scope Card or Seed Paper Card.
-4. Search and organize prior work, follow-up work, and sibling work.
-5. Build a Literature Timeline for roughly the last decade, with extra attention to the last five years.
-6. Build a Trend Matrix that separates task shift, method shift, dataset/metric shift, and open gaps.
-7. Audit gaps with evidence labels.
-8. Rank novelty candidates as weak, medium, or strong.
-9. Attach paper evidence, evidence type, feasibility, risks, baselines, and minimum experiments.
-10. Produce a paper-readiness verdict: `not ready`, `pilot-ready`, `workshop-ready`, `main-track candidate`, or `technical-report-only`.
+4. Guide and organize prior work, follow-up work, and sibling work search.
+5. Build Paper Evidence Cards that bind papers to claims.
+6. Build a Literature Timeline for roughly the last decade, with extra attention to the last five years.
+7. Build a Trend Matrix that separates task shift, method shift, dataset/metric shift, and open gaps.
+8. Audit gaps with evidence labels.
+9. Rank novelty candidates as weak, medium, or strong.
+10. Attach paper evidence, evidence type, feasibility, risks, baselines, and minimum experiments.
+11. Produce a paper-readiness verdict: `not ready`, `pilot-ready`, `workshop-ready`, `main-track candidate`, or `technical-report-only`.
 
 ## Usage Modes
 
@@ -48,7 +52,7 @@ The Skill first checks whether the direction is too broad. If so, it asks up to 
 
 Use when you provide a paper title, abstract, arXiv link, DOI, URL, or PDF.
 
-The Skill first creates a Seed Paper Card, then searches prior work, follow-up work, and sibling work. It does not treat the seed paper as authoritative just because the user supplied it.
+The Skill first creates a Seed Paper Card, then searches or plans prior work, follow-up work, and sibling work. It does not treat the seed paper as authoritative just because the user supplied it.
 
 ### Paper-Readiness Mode
 
@@ -118,14 +122,15 @@ First lock the scope, then produce a literature-backed novelty audit and paper-r
 - `examples/` - sample requests and full output examples.
 - `evals/` - lightweight quality checks and eval cases.
 - `scripts/normalize_papers.py` - converts JSONL paper records into Paper Evidence Cards.
-- `scripts/search_arxiv.py` - lightweight arXiv API search helper.
+- `scripts/search_arxiv.py` - lightweight arXiv API search helper that emits candidate preprint records.
 
 ## Current Capabilities
 
 - Routes input into Direction, Seed Paper, Hybrid, and Paper-Readiness modes.
 - Builds Research Scope Cards, Seed Paper Cards, Paper Thesis Cards, and Experiment Cards.
-- Uses paper evidence cards instead of title-only citations.
-- Builds literature timelines and trend matrices.
+- Uses Paper Evidence Cards instead of title-only citations.
+- Separates evidence status from evidence role so candidate papers are not mistaken for verified support.
+- Guides literature timeline and trend matrix construction.
 - Labels gap evidence as explicit limitation, future work, cross-paper pattern, benchmark absence, implementation absence, or inferred gap.
 - Ranks ideas as weak / medium / strong with feasibility, risks, baselines, and minimum experiments.
 - Marks preprints separately from accepted papers.
