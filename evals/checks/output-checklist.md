@@ -6,6 +6,9 @@ A qualified `shushu-novelty-finder` output must satisfy the following checks.
 - has scope card
 - has concrete paper names or explicitly marks placeholder / unverified
 - has paper evidence cards
+- has evidence status for key papers
+- has evidence role for key papers
+- states which claim each key paper supports
 - has trend matrix
 - has gap evidence labels
 - has weak / medium / strong novelty ranking
@@ -15,6 +18,7 @@ A qualified `shushu-novelty-finder` output must satisfy the following checks.
 - has paper-readiness verdict
 - does not claim "nobody has done this" without evidence
 - separates preprints from accepted papers
+- does not use candidate or placeholder papers as verified support
 
 ## Additional Paper-Readiness Checks
 
@@ -28,6 +32,8 @@ A qualified `shushu-novelty-finder` output must satisfy the following checks.
 
 - scope is broad and no clarification questions were asked
 - output lists paper titles but no evidence roles
+- output lists papers but never says which claim they support
+- candidate search results are treated as verified evidence
 - gap is stated as a fact but evidence type is missing
 - idea is called strong without a baseline plan
 - arXiv preprint is described as an accepted paper
