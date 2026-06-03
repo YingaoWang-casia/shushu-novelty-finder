@@ -97,13 +97,27 @@ Rank ideas as weak / medium / strong and give a paper-readiness verdict.
 
 ## Installation
 
+macOS / Linux:
+
 ```bash
 git clone https://github.com/YingaoWang-casia/shushu-novelty-finder.git
 mkdir -p ~/.codex/skills
 cp -R shushu-novelty-finder/skills/shushu-novelty-finder ~/.codex/skills/
 ```
 
-Then use it in Codex:
+Windows PowerShell:
+
+```powershell
+git clone https://github.com/YingaoWang-casia/shushu-novelty-finder.git
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills" | Out-Null
+Copy-Item -Recurse -Force "shushu-novelty-finder\skills\shushu-novelty-finder" "$env:USERPROFILE\.codex\skills\"
+```
+
+## Activate in Codex
+
+After copying the Skill folder, restart Codex or open a new Codex session so the new Skill can be discovered.
+
+Then activate it by naming the Skill in your prompt:
 
 ```text
 Use shushu-novelty-finder.
@@ -111,6 +125,26 @@ Direction: RAG evaluation.
 Goal: paper-oriented research project.
 Constraints: 2 months, limited compute.
 First lock the scope, then produce a literature-backed novelty audit and paper-readiness verdict.
+```
+
+You can also trigger it with a seed paper:
+
+```text
+Use shushu-novelty-finder.
+Seed paper: <paper title / abstract / arXiv / DOI / PDF>.
+First build a Seed Paper Card, then give a literature-backed novelty audit.
+```
+
+If Codex does not seem to load the Skill, check that this file exists:
+
+```text
+~/.codex/skills/shushu-novelty-finder/SKILL.md
+```
+
+On Windows, check:
+
+```text
+%USERPROFILE%\.codex\skills\shushu-novelty-finder\SKILL.md
 ```
 
 ## Repository Layout
