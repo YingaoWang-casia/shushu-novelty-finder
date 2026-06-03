@@ -1,85 +1,145 @@
 # shushu-novelty-finder
 
-A Codex Skill for computer science paper novelty discovery.
+Paste a CS research direction or seed paper.
+Get a literature-backed novelty audit, trend matrix, and paper-readiness verdict.
 
-This repository contains a Skill workflow for analyzing a computer science research direction or seed paper, reviewing related work, and producing evidence-grounded novelty candidates.
+输入一个计算机研究方向或种子论文，输出近十年趋势、研究空白、创新点分级和可投稿性判断。
 
-## Goal
+`shushu-novelty-finder` is a Codex Skill for auditing computer science paper ideas. It helps a student, new researcher, or engineering-oriented researcher turn a vague direction into an evidence-bound research scope, gap analysis, novelty ranking, and paper-readiness decision.
 
-The goal is to help users move from a vague research direction to a scoped research idea. The workflow emphasizes task definition, literature evidence, trend analysis, gap auditing, novelty ranking, and feasibility checking.
+It is designed to behave like a strict CS paper idea auditor / paper-readiness reviewer: lock the task first, check the literature line, separate evidence from inference, then recommend ideas with baselines, risks, and minimum experiments.
 
-This is not a random paper idea generator. It should behave more like a strict senior reviewer: define the task first, verify the literature line, separate evidence from speculation, then recommend possible innovations.
+## Who It Is For
 
-## Main capabilities
+- CS students looking for a paper-oriented project direction.
+- Research beginners who need help moving from "interesting topic" to scoped research task.
+- Engineering researchers who want to test whether an implementation idea has paper potential.
+- Users who already have a seed paper and need prior work, follow-up work, sibling work, and gap analysis.
 
-- Route user input into Direction Mode, Seed Paper Mode, or Hybrid Mode.
-- Ask clarifying questions when the research scope is too broad.
-- Build Research Scope Cards and Seed Paper Cards.
-- Select likely CS venue clusters instead of searching all fields.
-- Review related work by prior work, follow-up work, and sibling work.
-- Build a literature timeline and trend matrix.
-- Classify research gaps by dataset, benchmark, metric, method, system, robustness, interpretability, and negative-result gaps.
-- Rank novelty ideas as weak, medium, or strong.
-- Attach evidence type, feasibility, risk, and minimum experiments to every idea.
-- Detect fake gaps, scope drift, shallow novelty, and feasibility blindness.
+## What It Is Not
 
-## Workflow
+- Not a paper summarizer.
+- Not a random innovation-point generator.
+- Not a replacement for an advisor, reviewer, or literature-search by a domain expert.
+- Not a tool that can prove novelty without search coverage and concrete evidence.
 
-1. Parse the user input.
-2. Ask clarifying questions if the direction is too broad.
-3. Build a research scope card.
-4. Select likely CS venue clusters.
-5. Review related papers by time stage.
-6. Build a trend matrix.
-7. Identify research gaps.
-8. Rank novelty ideas as weak, medium, or strong.
-9. Provide risks and minimum experiments.
-10. Recommend the best 1-3 directions.
+## Core Workflow
 
-## Core rules
+1. Route the input into Direction Mode, Seed Paper Mode, Hybrid Mode, or Paper-Readiness Mode.
+2. Lock the research scope before broad search.
+3. Build a Research Scope Card or Seed Paper Card.
+4. Search and organize prior work, follow-up work, and sibling work.
+5. Build a Literature Timeline for roughly the last decade, with extra attention to the last five years.
+6. Build a Trend Matrix that separates task shift, method shift, dataset/metric shift, and open gaps.
+7. Audit gaps with evidence labels.
+8. Rank novelty candidates as weak, medium, or strong.
+9. Attach paper evidence, evidence type, feasibility, risks, baselines, and minimum experiments.
+10. Produce a paper-readiness verdict: `not ready`, `pilot-ready`, `workshop-ready`, `main-track candidate`, or `technical-report-only`.
 
-- If the scope is unclear, ask the user before broad search.
-- If the user gives a seed paper, first parse the task, data, metric, method, and claim.
-- Every trend must be supported by concrete paper names.
-- Every gap must be marked as explicit limitation, future work, cross-paper pattern, benchmark absence, implementation absence, or inferred gap.
-- Do not claim that nobody has done something without strong search evidence.
-- Strong ideas must include failure risks and minimum validation experiments.
-- Preprints must be marked separately from accepted conference or journal papers.
-- Every recommended idea should include one main reason to accept and one main reason to reject.
+## Usage Modes
 
-## Repository layout
+### Direction Mode
 
-- `skills/shushu-novelty-finder/SKILL.md`
-- `skills/shushu-novelty-finder/agents/openai.yaml`
-- `skills/shushu-novelty-finder/references/input-router.md`
-- `skills/shushu-novelty-finder/references/scope-card.md`
-- `skills/shushu-novelty-finder/references/venue-map.md`
-- `skills/shushu-novelty-finder/references/search-protocol.md`
-- `skills/shushu-novelty-finder/references/trend-matrix.md`
-- `skills/shushu-novelty-finder/references/gap-taxonomy.md`
-- `skills/shushu-novelty-finder/references/novelty-rubric.md`
-- `skills/shushu-novelty-finder/references/reviewer-heuristics.md`
-- `skills/shushu-novelty-finder/references/failure-modes.md`
-- `skills/shushu-novelty-finder/references/output-template.md`
-- `examples/`
+Use when you only have a direction, such as `RAG evaluation`, `speech turn-taking`, `LLM-as-a-Judge`, or `multimodal agent memory`.
 
-## Example prompt
+The Skill first checks whether the direction is too broad. If so, it asks up to five scope-locking questions before searching.
+
+### Seed Paper Mode
+
+Use when you provide a paper title, abstract, arXiv link, DOI, URL, or PDF.
+
+The Skill first creates a Seed Paper Card, then searches prior work, follow-up work, and sibling work. It does not treat the seed paper as authoritative just because the user supplied it.
+
+### Paper-Readiness Mode
+
+Use when you already have an idea and want to know whether it can become a paper.
+
+The Skill produces a Paper Thesis Card, Experiment Card, Baseline Plan, Related Work Argument Map, Threats to Validity, and a paper-readiness verdict.
+
+## Shortest Prompt
 
 ```text
 Use shushu-novelty-finder.
-I want to find novelty ideas around RAG evaluation.
-My constraints are 2-3 months, limited compute, and a paper-oriented project.
-First lock the scope, then review related work and propose weak / medium / strong novelty ideas.
+Direction: RAG evaluation.
 ```
 
-Or:
+## Complete Prompt
 
 ```text
 Use shushu-novelty-finder.
-Here is a seed paper: <title / abstract / link>.
-Analyze what task it solves, review related work from the last decade, and propose weak / medium / strong novelty ideas.
+Direction: RAG evaluation.
+Goal: paper-oriented research project.
+Constraints: 2 months, limited compute.
+First lock the scope, then produce a literature-backed novelty audit and paper-readiness verdict.
 ```
+
+For a seed paper:
+
+```text
+Use shushu-novelty-finder.
+Seed paper: <title / abstract / arXiv / DOI / PDF>.
+Goal: find paper-worthy extension ideas.
+First build a Seed Paper Card, then search prior work, follow-up work, and sibling work.
+Rank ideas as weak / medium / strong and give a paper-readiness verdict.
+```
+
+## Output Examples
+
+- [RAG evaluation output](examples/rag-evaluation-output.md)
+- [Seed paper output](examples/seed-paper-output.md)
+- [Bad output vs good output](examples/bad-output-vs-good-output.md)
+- [RAG evaluation request](examples/rag-evaluation-request.md)
+- [Seed paper request](examples/seed-paper-request.md)
+
+## Installation
+
+```bash
+git clone https://github.com/YingaoWang-casia/shushu-novelty-finder.git
+mkdir -p ~/.codex/skills
+cp -R shushu-novelty-finder/skills/shushu-novelty-finder ~/.codex/skills/
+```
+
+Then use it in Codex:
+
+```text
+Use shushu-novelty-finder.
+Direction: RAG evaluation.
+Goal: paper-oriented research project.
+Constraints: 2 months, limited compute.
+First lock the scope, then produce a literature-backed novelty audit and paper-readiness verdict.
+```
+
+## Repository Layout
+
+- `skills/shushu-novelty-finder/SKILL.md` - main Skill instructions.
+- `skills/shushu-novelty-finder/agents/openai.yaml` - agent configuration.
+- `skills/shushu-novelty-finder/references/` - workflow references and domain packs.
+- `docs/usage.md` - detailed usage guide.
+- `examples/` - sample requests and full output examples.
+- `evals/` - lightweight quality checks and eval cases.
+- `scripts/normalize_papers.py` - converts JSONL paper records into Paper Evidence Cards.
+- `scripts/search_arxiv.py` - lightweight arXiv API search helper.
+
+## Current Capabilities
+
+- Routes input into Direction, Seed Paper, Hybrid, and Paper-Readiness modes.
+- Builds Research Scope Cards, Seed Paper Cards, Paper Thesis Cards, and Experiment Cards.
+- Uses paper evidence cards instead of title-only citations.
+- Builds literature timelines and trend matrices.
+- Labels gap evidence as explicit limitation, future work, cross-paper pattern, benchmark absence, implementation absence, or inferred gap.
+- Ranks ideas as weak / medium / strong with feasibility, risks, baselines, and minimum experiments.
+- Marks preprints separately from accepted papers.
+- Provides RAG and speech domain packs for common fake novelty traps, metrics, and minimum baselines.
+- Includes eval checklists for catching unsupported novelty claims and missing paper-readiness evidence.
+
+## Roadmap
+
+- Add more domain packs for LLM agents, multimodal learning, ML systems, security, and data engineering.
+- Add richer paper metadata normalization for Semantic Scholar, OpenAlex, and DBLP inputs.
+- Add automatic report validation against the eval checklist.
+- Add more full examples for Seed Paper Mode and Paper-Readiness Mode.
+- Add venue-specific readiness rubrics for ACL, EMNLP, SIGIR, CHI, ICML, NeurIPS, ICLR, KDD, and systems venues.
 
 ## Philosophy
 
-The Skill is designed to make research ideation more evidence-bound and less random. It cannot guarantee a publishable idea. It can help users avoid shallow novelty, fake gaps, unsupported claims, and ideas that sound strong but cannot be validated.
+Good research ideation is not just "find something new." It is a chain of scoped claims, literature evidence, reviewer objections, feasible experiments, and honest uncertainty. This Skill is built to make that chain visible.
