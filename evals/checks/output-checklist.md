@@ -9,11 +9,15 @@ A qualified `shushu-novelty-finder` output must satisfy the following checks.
 - has evidence status for key papers
 - has evidence role for key papers
 - states which claim each key paper supports
+- has claim-evidence map for top claims
 - has trend matrix
 - has gap evidence labels
 - has weak / medium / strong novelty ranking
+- has paper type routing for top ideas
 - has minimum experiments
 - has baseline plan for top ideas
+- has reviewer objection pre-mortem
+- has kill / continue criteria
 - has risks
 - has paper-readiness verdict
 - does not claim "nobody has done this" without evidence
@@ -26,6 +30,7 @@ A qualified `shushu-novelty-finder` output must satisfy the following checks.
 - top idea has an Experiment Card
 - top idea has baseline, ablation, robustness, and falsification plans
 - top idea has at least one accept reason and one reject reason
+- top idea has at least one downgrade condition and one kill condition
 - verdict uses one of: `not ready`, `pilot-ready`, `workshop-ready`, `main-track candidate`, `technical-report-only`
 
 ## Common Failure Patterns
@@ -36,5 +41,7 @@ A qualified `shushu-novelty-finder` output must satisfy the following checks.
 - candidate search results are treated as verified evidence
 - gap is stated as a fact but evidence type is missing
 - idea is called strong without a baseline plan
+- idea is called paper-ready without reviewer objections
+- no condition is given for stopping or downgrading the idea
 - arXiv preprint is described as an accepted paper
 - novelty claim depends on private data without reproducible benchmark plan
