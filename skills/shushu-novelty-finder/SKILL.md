@@ -84,6 +84,8 @@ Required output:
 - Never claim `nobody has done this` unless the search coverage is strong and explicitly described.
 - Every trend must cite or name concrete representative papers.
 - Every important paper must have a Paper Evidence Card.
+- Every Paper Evidence Card must state evidence status, evidence role, and which claim the paper supports.
+- Candidate or placeholder papers must not be used as verified support for novelty claims.
 - Every gap must be marked as one of: explicit limitation, future work, cross-paper pattern, benchmark absence, implementation absence, or inferred gap.
 - Every novelty idea must include evidence, evidence type, feasibility, risk, baseline plan, and minimum validation experiment.
 - Mark arXiv and other preprints separately from accepted conference or journal papers.
