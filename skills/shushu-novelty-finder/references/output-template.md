@@ -1,6 +1,6 @@
 # Output Template
 
-Use this report format for full novelty-finding tasks. The output should read like a CS paper idea audit, not a generic brainstorm.
+Use this report format for full novelty-finding tasks. The output should read like a CS paper idea generator plus a strict reasonableness audit, not a generic brainstorm.
 
 ## 0. Executive Recommendation
 
@@ -9,11 +9,14 @@ Give the best 1-3 recommended ideas first.
 ```text
 Recommended idea:
 Novelty level: weak / medium / strong
+Reasonableness verdict: not reasonable yet / weak but useful / reasonable but underspecified / reasonable / high-risk but worth piloting
 Paper-readiness verdict: not ready / pilot-ready / workshop-ready / main-track candidate / technical-report-only
 Best paper type:
 Fallback paper type:
 Why this is the best option:
 Evidence basis:
+Strongest reason for:
+Strongest reason against:
 Minimum experiment:
 Baseline plan:
 Main risk:
@@ -144,23 +147,54 @@ Confidence:
 
 ## 9. Novelty Candidates
 
-Separate into weak, medium, and strong ideas.
+Generate concrete ideas and separate them into weak, medium, and strong.
 
 For each idea:
 
 ```text
 Idea:
 Novelty level:
+Novelty mechanism:
+Core claim:
 Evidence:
 Evidence type:
+Closest prior work:
+Why it is not already solved:
+Why it may be unreasonable:
 Feasibility:
 Minimum experiment:
 Baseline plan:
 Risks:
+Reasonableness verdict:
 Best target output:
 ```
 
-## 10. Paper Type Routing
+## 10. Idea Reasonableness Audit
+
+For each top idea, test whether the idea actually stands up.
+
+```text
+Idea:
+One-sentence thesis:
+Novelty mechanism:
+Why now:
+Assumptions:
+Evidence that supports the idea:
+Evidence that weakens the idea:
+Closest prior work:
+Difference from closest prior work:
+Who would care:
+Minimum experiment:
+What result would support it:
+What result would weaken it:
+What result would kill it:
+Reasonableness verdict:
+Strongest reason for:
+Strongest reason against:
+Decision: pursue / narrow / verify / downgrade / pivot / stop
+```
+
+## 11. Paper Type Routing
 
 For each top idea:
 
@@ -174,7 +208,7 @@ Main reviewer risk:
 Readiness verdict:
 ```
 
-## 11. Paper Thesis Card
+## 12. Paper Thesis Card
 
 For the top idea:
 
@@ -189,7 +223,7 @@ What evidence supports the claim:
 What reviewers may reject:
 ```
 
-## 12. Experiment Card
+## 13. Experiment Card
 
 For the top idea:
 
@@ -205,7 +239,7 @@ Robustness checks:
 Falsification result:
 ```
 
-## 13. Baseline Decision
+## 14. Baseline Decision
 
 ```text
 Minimum baselines:
@@ -215,7 +249,7 @@ What result would make the idea look weak:
 What result would make the idea publishable:
 ```
 
-## 14. Related Work Argument Map
+## 15. Related Work Argument Map
 
 ```text
 Closest prior work:
@@ -226,7 +260,7 @@ How the proposed idea differs:
 What should not be claimed:
 ```
 
-## 15. Reviewer Objection Pre-Mortem
+## 16. Reviewer Objection Pre-Mortem
 
 For each top idea, include at least three objections.
 
@@ -240,7 +274,7 @@ Action to strengthen:
 Verdict impact: no change / downgrade / kill
 ```
 
-## 16. Kill / Continue Criteria
+## 17. Kill / Continue Criteria
 
 ```text
 Continue condition:
@@ -251,7 +285,7 @@ Next checkpoint:
 Smallest next action that changes the decision:
 ```
 
-## 17. Threats to Validity
+## 18. Threats to Validity
 
 ```text
 Internal validity:
@@ -262,7 +296,7 @@ Reproducibility risk:
 Reviewer concern:
 ```
 
-## 18. Next-Step Plan
+## 19. Next-Step Plan
 
 Give a concrete plan:
 
@@ -272,6 +306,6 @@ Give a concrete plan:
 - first experiment;
 - decision checkpoint.
 
-## 19. Uncertainty and Search Limits
+## 20. Uncertainty and Search Limits
 
 State what the search may have missed. Do not hide weak evidence. If no verified search has been performed, mark all paper names as `placeholder`, `candidate`, or `unverified`.
