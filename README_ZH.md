@@ -4,9 +4,9 @@
 
 # 🚀 shushu-novelty-finder
 
-**一个用于 Codex 的论文创新点生成与合理性审查 Skill。**
+**面向 Codex 的计算机论文创新点生成与可行性审查 Skill。**
 
-输入一个计算机研究方向或种子论文，输出候选创新点、文献证据、合理性推敲、实验方案和可投稿性判断。
+给它一个研究方向或种子论文，它会先收敛研究边界，再生成候选创新点，最后用文献证据、最小实验、审稿人反驳和 kill / continue 标准逐条推敲。
 
 [![Codex Skill](https://img.shields.io/badge/Codex-Skill-111827?style=for-the-badge&logo=openai&logoColor=white)](skills/shushu-novelty-finder/SKILL.md)
 [![创新点生成](https://img.shields.io/badge/Research-Idea%20Generator-2563eb?style=for-the-badge)](#-它能做什么)
@@ -23,9 +23,11 @@
 
 ## ✨ 为什么需要它
 
-很多“帮我想论文创新点”的提示词都会犯同一个问题：听起来很自信，但并不告诉你这个 idea 到底新不新、能不能做、能不能被实验支撑、能不能扛住审稿人质疑。
+很多“帮我想论文创新点”的提示词，最大的问题不是不会想，而是太容易把**听起来合理的脑暴**包装成**看起来很新的贡献**。
 
-`shushu-novelty-finder` 适合这种场景：你手里只有一个方向，比如：
+真正难的是后半段：这个 idea 到底新在哪里？最接近的前人工作是谁？它能不能被实验验证？如果审稿人说“这只是已有方法的组合”，你怎么回答？如果实验结果不显著，应该继续、缩小范围，还是直接停止？
+
+`shushu-novelty-finder` 就是为这种时刻准备的。你可以给它一个模糊方向，例如：
 
 ```text
 RAG evaluation
@@ -34,14 +36,14 @@ speech turn-taking
 multimodal agent memory
 ```
 
-但你不想要一串看起来很潮、实际上落不了地的 topic。你真正想知道的是：
+它不会只给你一串时髦 topic，而是帮你判断：
 
-- 这个方向里有哪些可能的创新点？
-- 哪些是 weak / medium / strong？
-- 最接近的前人工作是什么？
-- 这个 idea 为什么可能不合理？
-- 什么实验能支持、削弱或杀掉它？
-- 它更像课程项目、workshop、主会候选，还是根本没准备好？
+- 这个方向里哪些创新点值得尝试？
+- 哪些 idea 只是 weak novelty，哪些有 medium / strong 潜力？
+- 哪篇论文是最接近的 prior work？
+- 这个 idea 为什么可能站不住？
+- 最小实验应该怎么设计，什么结果会支持、削弱或杀掉它？
+- 它更适合课程项目、技术报告、workshop，还是有主会候选潜力？
 
 ---
 
@@ -51,24 +53,24 @@ multimodal agent memory
 <tr>
 <td width="50%">
 
-### 🧠 生成创新点
+### 🧠 提出创新点
 
-- 把模糊方向收敛成可研究的任务边界；
-- 从文献趋势、种子论文和限制条件中抽取 gap；
-- 生成 safe / medium-risk / ambitious 三类候选方向；
-- 将 idea 分成 weak / medium / strong；
-- 判断每个 idea 更适合什么论文类型。
+- 把宽泛方向收敛成具体研究任务；
+- 从文献趋势、种子论文和约束条件中提取 gap；
+- 生成保守型、中风险型和进取型候选 idea；
+- 将候选 idea 分为 weak / medium / strong；
+- 判断每个 idea 更适合方法、评测、benchmark、系统、分析还是技术报告。
 
 </td>
 <td width="50%">
 
 ### 🧪 推敲合理性
 
-- 找出 closest prior work；
-- 检查真正的 novelty mechanism；
-- 区分“文献证据”和“模型推断”；
-- 设计最小实验、baseline 和 falsification test；
-- 预判 reviewer objection；
+- 找出 closest prior work，避免“假创新”；
+- 明确 novelty mechanism，而不是只堆流行词；
+- 区分文献证据、用户假设和模型推断；
+- 设计最小实验、强 baseline 和 falsification test；
+- 预演 reviewer objection；
 - 给出 continue / narrow / downgrade / kill 条件。
 
 </td>
@@ -81,43 +83,47 @@ multimodal agent memory
 
 | 阶段 | 做什么 | 输出 |
 |---:|---|---|
-| 01 | 锁定用户方向或种子论文边界 | Research Scope Card / Seed Paper Card |
-| 02 | 检查 prior / follow-up / sibling work | Paper Evidence Cards |
+| 01 | 锁定研究范围或解析种子论文 | Research Scope Card / Seed Paper Card |
+| 02 | 梳理 prior、follow-up 和 sibling work | Paper Evidence Cards |
 | 03 | 把论文证据绑定到具体 claim | Claim-Evidence Map |
-| 04 | 抽取趋势、gap 和弱信号 | Literature Timeline + Gap Audit |
+| 04 | 提炼研究趋势、gap 和风险信号 | Literature Timeline + Gap Audit |
 | 05 | 生成候选创新点 | Weak / Medium / Strong idea set |
-| 06 | 推敲每个 idea 是否站得住 | Idea Reasonableness Audit |
+| 06 | 逐条压力测试 idea 是否站得住 | Idea Reasonableness Audit |
 | 07 | 设计最小决定性实验 | Baselines + falsification plan |
-| 08 | 预演审稿人反驳 | Accept / reject reasons |
+| 08 | 预演审稿人可能的反驳 | Accept / reject reasons |
 | 09 | 给出下一步决策 | Pursue / narrow / verify / downgrade / stop |
 
-它不是只负责说“这个很新”。它会把一条研究想法背后的证据链、实验链和风险链都摊开。
+它不是只负责说“这个方向很新”。它会把一个研究想法背后的**证据链、实验链、反驳链和决策链**摊开。
 
 ---
 
 ## ⚡ 使用示例
 
+只有研究方向时：
+
 ```text
 Use shushu-novelty-finder.
-Direction: RAG evaluation.
-Goal: paper-oriented research project.
-Constraints: 2 months, limited compute.
-First lock the scope, then generate novelty ideas and audit whether each idea is reasonable.
+研究方向：RAG evaluation
+目标：面向论文的研究项目
+约束：2 个月，算力有限
+请先锁定范围，再生成创新点，并逐条审查合理性和可投稿性。
 ```
 
-如果你有种子论文：
+如果你已经有种子论文：
 
 ```text
 Use shushu-novelty-finder.
-Seed paper: <paper title / abstract / arXiv / DOI / PDF>.
-Goal: find paper-worthy extension ideas.
-First build a Seed Paper Card, then search prior work, follow-up work, and sibling work.
-Rank ideas as weak / medium / strong, judge whether each top idea is reasonable, and give a paper-readiness verdict.
+Seed paper: <论文标题 / 摘要 / arXiv / DOI / PDF>.
+目标：寻找有论文潜力的扩展方向。
+请先构建 Seed Paper Card，再检索 prior work、follow-up work 和 sibling work。
+最后按 weak / medium / strong 给出创新点分级，并判断每个 top idea 是否合理。
 ```
 
 ---
 
 ## 🧾 输出预览
+
+字段名保留英文，是为了和 Skill 的输出模板保持一致；中文用户可以直接看每个字段后的内容。
 
 ```text
 Recommended idea:
@@ -138,7 +144,9 @@ Next decision: verify closest prior work and run a 2-day pilot
 
 ## 🧩 合理性审查
 
-每个 top idea 都要过这张表：
+`Idea Reasonableness Audit` 不是普通打分表，而是用来防止“幻觉式创新点”的压力测试。
+
+每个 top idea 都需要回答：
 
 ```text
 Idea:
@@ -183,13 +191,13 @@ New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills" | Out
 Copy-Item -Recurse -Force "shushu-novelty-finder\skills\shushu-novelty-finder" "$env:USERPROFILE\.codex\skills\"
 ```
 
-重启 Codex 或打开一个新的 Codex 会话，然后用名字触发：
+重启 Codex 或打开新的 Codex 会话，然后直接用名字触发：
 
 ```text
 Use shushu-novelty-finder.
 ```
 
-检查安装位置：
+检查 Skill 是否安装到正确位置：
 
 ```text
 ~/.codex/skills/shushu-novelty-finder/SKILL.md
@@ -202,11 +210,11 @@ Use shushu-novelty-finder.
 
 | Verdict | 含义 |
 |---|---|
-| `not ready` | idea 太模糊、证据不足、不可行，或很可能已经被解决。 |
-| `pilot-ready` | 值得先做一个小实验，再决定是否继续投入。 |
-| `workshop-ready` | 如果证据和执行扎实，有机会形成 scoped contribution。 |
-| `main-track candidate` | 具备较强 novelty、证据、baseline 和 reviewer defense 潜力。 |
-| `technical-report-only` | 工程或负结果有价值，但不一定构成研究论文。 |
+| `not ready` | 当前 idea 太模糊、证据不足、实验不可行，或很可能已经被解决。 |
+| `pilot-ready` | 值得先做最小实验，用数据决定是否继续投入。 |
+| `workshop-ready` | 如果证据和实验执行扎实，有机会形成 workshop / short paper 级别贡献。 |
+| `main-track candidate` | 具备较强 novelty、证据链、baseline 设计和 reviewer defense 潜力。 |
+| `technical-report-only` | 工程实现、复现或负结果有价值，但暂时不足以支撑研究论文。 |
 
 ---
 
@@ -237,11 +245,11 @@ shushu-novelty-finder/
 
 ---
 
-## 🧭 Philosophy
+## 🧭 设计理念
 
 好的研究 ideation 不是简单地“找一个新东西”。
 
-它是一条链：
+它是一条可以被审查的链：
 
 ```text
 scoped problem -> literature evidence -> candidate idea -> reasonableness audit -> experiment -> reviewer defense -> decision
