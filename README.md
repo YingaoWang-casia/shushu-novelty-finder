@@ -2,22 +2,24 @@
 
 <div align="center">
 
-# shushu-novelty-finder
+# 🚀 shushu-novelty-finder
 
 **A Codex Skill for generating CS paper innovation ideas, then judging whether they actually stand up.**
 
 输入一个计算机研究方向或种子论文，输出候选创新点、文献证据、合理性推敲、实验方案和可投稿性判断。
 
 [![Codex Skill](https://img.shields.io/badge/Codex-Skill-111827?style=for-the-badge&logo=openai&logoColor=white)](skills/shushu-novelty-finder/SKILL.md)
-[![Research Ideas](https://img.shields.io/badge/Research-Idea%20Generator-2563eb?style=for-the-badge)](#what-it-does)
+[![Research Ideas](https://img.shields.io/badge/Research-Idea%20Generator-2563eb?style=for-the-badge)](#-what-it-does)
 [![Reviewer Mode](https://img.shields.io/badge/Reviewer-Reasonableness%20Audit-7c3aed?style=for-the-badge)](skills/shushu-novelty-finder/references/idea-reasonableness-audit.md)
-[![Paper Ready](https://img.shields.io/badge/Paper-Readiness%20Verdict-ec4899?style=for-the-badge)](#paper-readiness-verdicts)
+[![Paper Ready](https://img.shields.io/badge/Paper-Readiness%20Verdict-ec4899?style=for-the-badge)](#-paper-readiness-verdicts)
+
+[✨ Why](#-why-this-exists) · [🔥 Capabilities](#-what-it-does) · [🔁 Core Loop](#-the-core-loop) · [⚡ Prompt](#-example-prompt) · [🛠️ Install](#️-install) · [🎯 Verdicts](#-paper-readiness-verdicts)
 
 </div>
 
 ---
 
-## Why This Exists
+## ✨ Why This Exists
 
 Most research-idea prompts have the same problem: they sound confident, but they do not tell you whether the idea is actually new, feasible, defensible, or publishable.
 
@@ -43,13 +45,13 @@ It should help you answer:
 
 ---
 
-## What It Does
+## 🔥 What It Does
 
 <table>
 <tr>
 <td width="50%">
 
-### Generates Ideas
+### 🧠 Generates Ideas
 
 - turns vague directions into scoped research tasks;
 - extracts gaps from literature trends and seed papers;
@@ -60,7 +62,7 @@ It should help you answer:
 </td>
 <td width="50%">
 
-### Stress-Tests Ideas
+### 🧪 Stress-Tests Ideas
 
 - names closest prior work;
 - checks the novelty mechanism;
@@ -75,7 +77,7 @@ It should help you answer:
 
 ---
 
-## The Core Loop
+## 🔁 The Core Loop
 
 | Stage | What Happens | Output |
 |---:|---|---|
@@ -93,7 +95,7 @@ The Skill is not just trying to say something is novel. It tries to make the who
 
 ---
 
-## Example Prompt
+## ⚡ Example Prompt
 
 ```text
 Use shushu-novelty-finder.
@@ -115,7 +117,7 @@ Rank ideas as weak / medium / strong, judge whether each top idea is reasonable,
 
 ---
 
-## Output Preview
+## 🧾 Output Preview
 
 ```text
 Recommended idea:
@@ -134,7 +136,7 @@ Next decision: verify closest prior work and run a 2-day pilot
 
 ---
 
-## Reasonableness Audit
+## 🧩 Reasonableness Audit
 
 Every top idea should be pushed through this checklist:
 
@@ -163,9 +165,9 @@ See [`idea-reasonableness-audit.md`](skills/shushu-novelty-finder/references/ide
 
 ---
 
-## Install
+## 🛠️ Install
 
-### macOS / Linux
+### 🍎 macOS / Linux
 
 ```bash
 git clone https://github.com/YingaoWang-casia/shushu-novelty-finder.git
@@ -173,7 +175,7 @@ mkdir -p ~/.codex/skills
 cp -R shushu-novelty-finder/skills/shushu-novelty-finder ~/.codex/skills/
 ```
 
-### Windows PowerShell
+### 🪟 Windows PowerShell
 
 ```powershell
 git clone https://github.com/YingaoWang-casia/shushu-novelty-finder.git
@@ -196,7 +198,7 @@ Check installation:
 
 ---
 
-## Paper-Readiness Verdicts
+## 🎯 Paper-Readiness Verdicts
 
 | Verdict | Meaning |
 |---|---|
@@ -208,7 +210,7 @@ Check installation:
 
 ---
 
-## Repository Map
+## 🗺️ Repository Map
 
 ```text
 shushu-novelty-finder/
@@ -224,7 +226,7 @@ shushu-novelty-finder/
 
 ---
 
-## Useful Links
+## 🔗 Useful Links
 
 - [Main Skill](skills/shushu-novelty-finder/SKILL.md)
 - [Usage Guide](docs/usage.md)
@@ -235,7 +237,7 @@ shushu-novelty-finder/
 
 ---
 
-## Philosophy
+## 🧭 Philosophy
 
 Good research ideation is not just "find something new."
 
