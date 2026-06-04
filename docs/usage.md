@@ -1,8 +1,8 @@
 # Usage Guide
 
-This guide explains how to use `shushu-novelty-finder` as a CS paper idea auditor rather than a generic brainstorming prompt.
+This guide explains how to use `shushu-novelty-finder` as a CS paper idea generator and reasonableness auditor.
 
-The Skill should prefer scoped, evidence-bound, decision-useful answers over long lists of plausible but unsupported ideas.
+The Skill should produce concrete innovation-point candidates, then carefully judge whether each idea is reasonable, feasible, evidence-backed, and paper-worthy. It should prefer scoped, evidence-bound, decision-useful answers over long lists of plausible but unsupported ideas.
 
 ## 0. Activate The Skill In Codex
 
@@ -28,7 +28,7 @@ Restart Codex or open a new Codex session, then trigger the Skill by name:
 Use shushu-novelty-finder.
 Direction: RAG evaluation.
 Goal: paper-oriented research project.
-First lock the scope, then produce a literature-backed novelty audit and paper-readiness verdict.
+First lock the scope, then generate novelty ideas and audit whether each idea is reasonable.
 ```
 
 Check installation:
@@ -63,6 +63,7 @@ Literature Timeline:
 Trend Matrix:
 Gap Audit:
 Novelty Candidates:
+Idea Reasonableness Audit:
 Paper Type Routing:
 Baseline Decision:
 Reviewer Objection Pre-Mortem:
@@ -101,6 +102,8 @@ Then search or plan:
 - sibling work: papers solving the same task with different assumptions, methods, data, or metrics;
 - contrary evidence: work that may already solve the proposed extension.
 
+The Skill should then generate extension ideas and audit whether each extension is actually different from prior work.
+
 ## 3. Hybrid Mode
 
 Use when the user gives both a direction and a seed paper. The direction limits the search space. The paper locks the task boundary.
@@ -123,6 +126,7 @@ Paper Thesis Card
 Experiment Card
 Baseline Decision
 Claim-Evidence Map
+Idea Reasonableness Audit
 Paper Type Routing
 Related Work Argument Map
 Reviewer Objection Pre-Mortem
@@ -131,7 +135,15 @@ Threats to Validity
 Paper-readiness Verdict
 ```
 
-Allowed verdicts:
+Allowed reasonableness verdicts:
+
+- `not reasonable yet`
+- `weak but useful`
+- `reasonable but underspecified`
+- `reasonable`
+- `high-risk but worth piloting`
+
+Allowed paper-readiness verdicts:
 
 - `not ready`
 - `pilot-ready`
@@ -142,14 +154,16 @@ Allowed verdicts:
 ## 5. Output Levels
 
 ```text
-Quick Mode: top ideas, key evidence status, next action, and kill / continue checkpoint
-Research Mode: timeline / trend matrix / gap audit / claim-evidence map
+Quick Mode: top ideas, reasonableness verdict, key evidence status, next action, and kill / continue checkpoint
+Research Mode: timeline / trend matrix / gap audit / novelty candidates / claim-evidence map / reasonableness audit
 Paper Mode: thesis / experiment / baseline / reviewer objections / validity / readiness
 ```
 
 ## Evidence Discipline
 
 Every important paper should be represented as a Paper Evidence Card. Every important claim should have a Claim-Evidence Map. Every top idea should include the minimum experiment that could falsify it.
+
+Every recommended idea should include the strongest reason for and strongest reason against pursuing it. If the idea is not reasonable yet, say so directly and explain what must be verified or narrowed.
 
 If the Skill uses placeholders because no real search was performed, it must explicitly mark them as `illustrative placeholder`, `candidate`, or `unverified`.
 
