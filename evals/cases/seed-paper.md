@@ -21,10 +21,12 @@ The Skill should first build a Seed Paper Card before recommending ideas. It sho
 - limitations are separated into stated limitations and inferred limitations
 - expansion keywords and excluded directions are listed
 - prior work, follow-up work, and sibling work are searched or planned separately
-- Paper Evidence Cards exist for key papers or are explicitly marked placeholder / unverified
+- Paper Evidence Cards exist for key papers or are explicitly marked placeholder / candidate / unverified
+- Claim-Evidence Map exists for the seed-paper extension claim
 - suggested ideas distinguish explicit limitations from inferred gaps
 - novelty candidates are ranked weak / medium / strong
-- top ideas include baseline plan, minimum experiment, risks, and paper-readiness verdict
+- top ideas include paper type routing
+- top ideas include baseline decision, minimum experiment, risks, reviewer objections, kill / continue criteria, and paper-readiness verdict
 
 ## Failure Signs
 
@@ -35,6 +37,8 @@ The Skill should first build a Seed Paper Card before recommending ideas. It sho
 - proposes a strong idea without checking follow-up work
 - gives an extension idea without a baseline or falsifiable claim
 - does not separate accepted papers from preprints
+- gives no reviewer objection section
+- gives no downgrade or kill condition
 
 ## Passing Pattern
 
