@@ -2,7 +2,7 @@
 
 This folder defines lightweight checks for `shushu-novelty-finder` outputs.
 
-The goal is not to automatically judge scientific truth. The goal is to check whether a run follows the Skill's evidence, novelty-ranking, reviewer-objection, and paper-readiness discipline.
+The goal is not to automatically judge scientific truth. The goal is to check whether a run generates concrete innovation-point candidates and then follows the Skill's evidence, reasonableness-audit, novelty-ranking, reviewer-objection, and paper-readiness discipline.
 
 ## Files
 
@@ -22,7 +22,12 @@ A valid output should include:
 - Claim-Evidence Map for top claims;
 - Literature Timeline and Trend Matrix in Research / Paper Mode;
 - gap evidence labels;
+- concrete novelty candidates, not only a literature review;
 - weak / medium / strong novelty ranking;
+- novelty mechanism for each top idea;
+- closest prior work for each top idea;
+- reasonableness verdict for each top idea;
+- strongest reason for and strongest reason against each top idea;
 - paper type routing for top ideas;
 - minimum experiments;
 - baseline decision for top ideas;
@@ -36,8 +41,11 @@ A valid output should include:
 A bad output should be flagged if it:
 
 - claims nobody has done something without search evidence;
+- reviews literature but never proposes concrete ideas;
+- lists ideas but never judges whether they are reasonable;
 - lists papers without explaining their evidence role;
 - gives innovation ideas without feasibility or risks;
+- ignores closest prior work;
 - ignores baselines;
 - treats preprints as accepted papers;
 - treats candidate papers as verified support;
