@@ -1,6 +1,6 @@
 # Output Checklist
 
-Use this checklist after a `shushu-novelty-finder` run. It is the human-facing companion to `evals/checks/output-checklist.md`; both should enforce the same standard: the Skill must produce evidence-backed, decision-ready research ideas, not just plausible brainstorming.
+Use this checklist after a `shushu-novelty-finder` run. It is the human-facing companion to `evals/checks/output-checklist.md`; both should enforce the same standard: the Skill must generate evidence-backed research ideas and then decide whether those ideas are reasonable, not just produce plausible brainstorming.
 
 ## Scope and Input Mode
 
@@ -33,12 +33,24 @@ Use this checklist after a `shushu-novelty-finder` run. It is the human-facing c
 - [ ] Inferred gaps are marked as hypotheses.
 - [ ] The output avoids saying "nobody has done this" unless the evidence base justifies it.
 
-## Novelty Candidates
+## Novelty Candidate Generation
 
+- [ ] The output generates concrete innovation-point candidates, not only literature summary.
 - [ ] Ideas are separated into weak, medium, and strong.
+- [ ] Each idea has a novelty mechanism.
 - [ ] Each idea includes evidence, risk, feasibility, and a minimum experiment.
 - [ ] The best 1-3 ideas are recommended with reasons.
 - [ ] Weak ideas are not dressed up as paper-ready contributions.
+
+## Idea Reasonableness Audit
+
+- [ ] Each top idea has a one-sentence thesis.
+- [ ] Each top idea names the closest prior work.
+- [ ] Each top idea explains how it differs from closest prior work.
+- [ ] Each top idea explains why it may be unreasonable.
+- [ ] Each top idea includes the strongest reason for and strongest reason against pursuing it.
+- [ ] Each top idea has a reasonableness verdict: `not reasonable yet`, `weak but useful`, `reasonable but underspecified`, `reasonable`, or `high-risk but worth piloting`.
+- [ ] Each top idea states what result would support, weaken, and kill it.
 
 ## Paper Type Routing
 
