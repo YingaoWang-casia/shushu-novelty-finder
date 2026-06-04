@@ -1,5 +1,5 @@
 interface:
   display_name: Shushu Novelty Finder
-  short_description: Finds evidence-grounded CS paper novelty ideas.
+  short_description: Generates and stress-tests CS paper novelty ideas.
   icon: 🔍
   color: '#2563eb'
