@@ -1,16 +1,24 @@
 # Example Output: RAG Evaluation
 
-This is an illustrative example output. It demonstrates structure and evidence discipline, not a verified literature review. Paper names marked `illustrative placeholder` must be replaced by real papers after search.
+This is an illustrative output example. It demonstrates structure and evidence discipline, not a verified literature review. Paper names marked `illustrative placeholder` must be replaced by real papers after search.
 
 ## Executive Recommendation
 
-Recommended directions:
-
-1. Medium idea: evaluate retrieval support, citation support, and answer utility as separate axes, then test whether RAG system rankings change across axes.
-2. Medium idea: build a low-cost citation correctness audit protocol for RAG answers with explicit failure categories.
-3. Weak idea: run an existing RAG benchmark with additional latency and cost reporting.
-
-Best next action: verify the closest RAG benchmark and citation evaluation papers before claiming novelty.
+```text
+Recommended idea: multi-axis RAG evaluation for retrieval support, citation support, answer utility, latency, and cost
+Novelty level: medium
+Paper-readiness verdict: pilot-ready
+Best paper type: analysis / evaluation paper
+Fallback paper type: technical report
+Why this is the best option: it is testable, useful, and can be scoped to limited compute
+Evidence basis: placeholder papers only; no verified search yet
+Minimum experiment: compare 4-6 RAG variants across separated axes
+Baseline plan: lexical retrieval, dense retrieval, reranker vs no reranker, closed-book, long-context if relevant
+Main risk: existing RAG evaluation benchmarks may already separate these axes
+Likely accept reason: exposes hidden ranking changes across evaluation axes
+Likely reject reason: may duplicate existing RAG evaluation frameworks
+Continue / narrow / downgrade / kill: continue only after closest benchmark papers are verified
+```
 
 ## Research Scope Card
 
@@ -22,170 +30,190 @@ Input: user question, retrieved passages, generated answer, citations
 Output: multi-axis evaluation report and system ranking
 Datasets: existing open-domain QA or domain QA datasets; exact dataset unverified
 Metrics: recall@k, citation precision, answer F1, faithfulness, latency, cost
-Excluded directions: retriever training, long-context-only evaluation, general agent evaluation, private enterprise RAG case studies
-Assumptions: 2 months, limited compute, paper-oriented project
+Included directions: answer support, citation support, retrieval support
+Excluded directions: retriever training, long-context-only evaluation, general agent evaluation
+Constraints: 2 months, limited compute
 ```
 
-## Literature Timeline
-
-### Paper Evidence Card 1
+## Paper Evidence Cards
 
 ```text
 Title: <retrieval benchmark paper A> (illustrative placeholder)
 Year: <year>
-Venue/source: <venue or source>
+Venue or source: <venue or source>
 Paper type: benchmark
+URL, DOI, or arXiv id: <unknown>
+Task: retrieval evaluation
+Dataset: <unknown>
+Metric: recall@k / nDCG
+Main contribution: <placeholder>
+Why it is relevant: anchors retrieval-side evaluation
+Evidence status: placeholder
 Evidence role: benchmark baseline
-Why relevant: anchors retrieval-side evaluation metrics such as recall@k and nDCG
-Confidence: weak until replaced with a verified paper
+Used to support which claim: retrieval support must be evaluated separately
+Confidence: weak
 ```
-
-### Paper Evidence Card 2
 
 ```text
-Title: <RAG faithfulness evaluation paper B> (illustrative placeholder)
+Title: <RAG evaluation framework B> (illustrative placeholder)
 Year: <year>
-Venue/source: <venue or source>
-Paper type: analysis / benchmark
-Evidence role: metric source
-Why relevant: anchors answer faithfulness or groundedness evaluation
-Confidence: weak until replaced with a verified paper
+Venue or source: <venue or source>
+Paper type: evaluation framework
+URL, DOI, or arXiv id: <unknown>
+Task: RAG evaluation
+Dataset: <unknown>
+Metric: faithfulness / answer relevance / context relevance
+Main contribution: <placeholder>
+Why it is relevant: closest contrary evidence candidate
+Evidence status: placeholder
+Evidence role: contrary evidence; metric source
+Used to support which claim: checks whether multi-axis RAG evaluation already exists
+Confidence: weak
 ```
 
-### Paper Evidence Card 3
+## Claim-Evidence Map
 
 ```text
-Title: <citation correctness paper C> (illustrative placeholder)
-Year: <year>
-Venue/source: <venue or source>
-Paper type: method / benchmark
-Evidence role: metric source
-Why relevant: anchors citation-level correctness and attribution checks
-Confidence: weak until replaced with a verified paper
+Claim: RAG system rankings may change when retrieval support, citation support, answer utility, latency, and cost are evaluated separately.
+Claim type: evaluation / novelty
+Supporting papers: <retrieval benchmark paper A> (placeholder)
+Contrary papers: <RAG evaluation framework B> (placeholder)
+Background papers: <RAG method paper C> (placeholder)
+Evidence strength: weak
+What can be safely claimed: this is a candidate idea that requires verified related work.
+What must not be claimed: nobody has done multi-axis RAG evaluation.
+Confidence: weak
+Next verification step: verify closest RAGAS / ARES / ALCE-like evaluation papers.
 ```
 
-### Paper Evidence Card 4
+## Literature Timeline
 
-```text
-Title: <production RAG evaluation paper D> (illustrative placeholder)
-Year: <year>
-Venue/source: <venue or source>
-Paper type: system / analysis
-Evidence role: limitation evidence
-Why relevant: motivates latency, cost, and deployment constraints
-Confidence: weak until replaced with a verified paper
-```
+| Time stage | Representative papers | Main task definition | Dataset / metric pattern | What changed |
+| --- | --- | --- | --- | --- |
+| Retrieval benchmark stage | `<retrieval benchmark paper A>` placeholder | retrieve relevant passages | recall@k, nDCG | retrieval quality becomes measurable |
+| RAG system stage | `<RAG method paper C>` placeholder | answer with retrieved evidence | QA / generation metrics | retrieval and generation become coupled |
+| RAG evaluation stage | `<RAG evaluation framework B>` placeholder | judge RAG output quality | faithfulness, answer relevance | multi-axis evaluation emerges |
 
 ## Trend Matrix
 
 | Time Period | Representative Papers | Task Shift | Method Shift | Dataset/Metric Shift | Open Gap |
 | --- | --- | --- | --- | --- | --- |
-| Earlier retrieval era | `<retrieval benchmark paper A>` (illustrative placeholder) | retrieve relevant passages | lexical and dense retrieval comparisons | recall@k, precision@k, nDCG | retrieval quality is not enough to judge final answer usefulness |
-| Early RAG systems | `<RAG system paper>` (illustrative placeholder) | generate answers using retrieved context | retriever-generator pipelines | answer accuracy and retrieval recall | citation support may be implicit or missing |
-| Recent grounded generation | `<RAG faithfulness evaluation paper B>` (illustrative placeholder) | judge answer support | LLM judges, entailment, human annotation | faithfulness, groundedness | faithfulness may mix retrieval failure and generation failure |
-| Citation-aware evaluation | `<citation correctness paper C>` (illustrative placeholder) | verify cited evidence | citation matching and attribution checks | citation precision, evidence coverage | answer correctness and citation correctness can diverge |
-| Production-oriented RAG | `<production RAG evaluation paper D>` (illustrative placeholder) | deploy under cost and latency constraints | pipeline audits, monitoring, ablations | latency, cost, failure rates | offline benchmark score may not predict deployment utility |
+| Earlier retrieval | placeholders | retrieval only | lexical / dense retrieval | recall@k / nDCG | weak link to final answer utility |
+| RAG systems | placeholders | retrieval + generation | retriever-generator pipelines | answer accuracy | citation support may be implicit |
+| RAG evaluation | placeholders | judge answer support | automated judges / metrics | faithfulness / citation support | axes may still be mixed |
 
 ## Gap Audit
 
-### Gap 1
-
 ```text
-Gap: RAG evaluation often blends retrieval success, answer correctness, and citation support into a single score.
-Gap type: metric gap / benchmark gap
-Evidence type: cross-paper pattern, unverified until literature matrix is populated
-Supporting papers: <retrieval benchmark paper A>, <RAG faithfulness evaluation paper B>, <citation correctness paper C> (illustrative placeholders)
-Why it matters: a system can retrieve relevant passages, cite unsupported text, and still answer correctly. A single score hides the failure mode.
-Why it may be a bad idea: existing benchmark papers may already separate these axes; novelty depends on verified coverage.
-Confidence: weak before real search; medium if verified across accepted papers
-```
-
-### Gap 2
-
-```text
-Gap: Citation correctness may be evaluated without enough attention to retrieval-side availability of supporting evidence.
-Gap type: evaluation protocol gap
-Evidence type: inferred gap, requires contrary-evidence search
-Supporting papers: <citation correctness paper C>, <retrieval benchmark paper A> (illustrative placeholders)
-Why it matters: a citation error caused by missing retrieval evidence is different from a generation-side attribution error.
-Why it may be a bad idea: annotation may be expensive, and reviewers may see the split as engineering rather than research.
+Gap: retrieval support, citation support, answer utility, latency, and cost may be mixed in single evaluation summaries.
+Gap type: metric gap / protocol gap
+Evidence type: cross-paper pattern, currently placeholder-only
+Supporting papers: placeholders
+Why this matters: one score hides whether a failure came from retrieval, attribution, or generation.
+Why it may be a bad idea: existing evaluation frameworks may already separate these dimensions.
 Confidence: weak until verified
 ```
 
 ## Novelty Candidates
 
-### Weak
-
 ```text
-Idea: Re-run several RAG pipelines and report retrieval, citation, answer, latency, and cost metrics.
-Novelty level: weak
-Evidence: common evaluation axes are scattered across retrieval and RAG papers.
-Evidence type: cross-paper pattern, unverified
-Feasibility: high
-Minimum experiment: compare lexical retrieval, dense retrieval, reranker, and closed-book baselines on one QA dataset.
-Risks: likely to be an analysis report unless it reveals a non-obvious ranking change.
-Best target output: technical-report-only or pilot-ready
-```
-
-### Medium
-
-```text
-Idea: Build a multi-axis RAG evaluation protocol that separates retrieval support, citation support, and answer utility, then show that model rankings change across axes.
-Novelty level: medium
-Evidence: retrieval, faithfulness, and citation papers appear to emphasize different axes.
-Evidence type: cross-paper pattern plus benchmark absence, must be verified
+Idea: report separated RAG evaluation axes and test whether rankings change.
+Novelty level: medium after verification; pilot-only before verification
+Evidence: placeholder-only
+Evidence type: suspected cross-paper pattern plus contrary-evidence search
 Feasibility: medium
-Minimum experiment: evaluate 4-6 RAG variants on one shared dataset; report recall@k, citation precision, answer F1, faithfulness, latency, and cost.
-Risks: if existing benchmarks already do this split, downgrade to reproduction or extension.
-Best target output: workshop-ready after verified related work and clean baselines
+Minimum experiment: evaluate 4-6 RAG variants on one shared dataset
+Baseline plan: lexical retrieval, dense retrieval, reranker vs no reranker, closed-book, long-context if relevant
+Risks: duplicate of existing RAG evaluation frameworks; annotation cost
+Best target output: workshop-ready if verified and ranking changes appear
 ```
 
-### Strong
+## Paper Type Routing
 
 ```text
-Idea: Construct a controlled benchmark where retrieval relevance, citation support, and answer utility are independently manipulated.
-Novelty level: strong only if closest benchmarks do not already provide independent controls
-Evidence: would require verified benchmark absence and reviewer-relevant failure modes.
-Evidence type: benchmark absence plus contrary-evidence search
-Feasibility: medium-low
-Minimum experiment: create a small annotated set with controlled evidence availability and compare RAG systems under axis-specific perturbations.
-Risks: annotation burden, benchmark validity, and possible overlap with existing datasets.
-Best target output: main-track candidate only after strong literature verification and annotation quality evidence
+Best paper type: analysis / evaluation paper
+Fallback paper type: technical report
+Why this type fits: contribution is an evaluation protocol and empirical finding, not a new model.
+Required evidence: verified closest evaluation frameworks and benchmark papers
+Required baselines: retrieval, reranking, closed-book, long-context when relevant
+Main reviewer risk: reviewers may say existing frameworks already do this.
+Readiness verdict: pilot-ready
 ```
 
 ## Paper Thesis Card
 
 ```text
 Working title: When RAG Systems Disagree With Themselves: Separating Retrieval Support, Citation Support, and Answer Utility
-Paper type: evaluation / analysis paper
-Core claim: RAG system rankings change when retrieval support, citation support, and answer utility are evaluated separately.
-Why now: RAG systems are widely used, but deployment failures often appear as mixed retrieval-generation-citation errors.
-What existing work assumes: end-to-end answer quality or a single faithfulness score is sufficient for comparing systems.
-What breaks that assumption: a system can score well on one axis and fail another axis.
-What evidence supports the claim: verified paper evidence cards plus ranking-change experiments.
-What reviewers may reject: insufficient novelty if prior benchmarks already separate these axes, or weak annotation if citation support labels are noisy.
+Paper type: analysis / evaluation paper
+Core claim: system rankings change when RAG outputs are evaluated across separated axes.
+Why now: RAG systems are widely used and evaluation failures are often mixed.
+What existing work assumes: a compact evaluation summary is enough to compare systems.
+What breaks that assumption: systems can score well on one axis and fail another.
+What evidence supports the claim: currently none verified; requires pilot experiment.
+What reviewers may reject: insufficient novelty or weak baselines.
 ```
 
 ## Experiment Card
 
 ```text
-Claim: Multi-axis evaluation changes the comparative ranking of RAG systems.
-Independent variable: RAG pipeline variant and evaluation axis.
-Dependent variable: system ranking under retrieval support, citation support, answer utility, latency, and cost.
-Datasets: one open QA dataset plus retrieved evidence corpus; exact dataset to be selected after literature check.
-Metrics: recall@k, nDCG, citation precision, answer F1, faithfulness, latency, cost.
-Baselines: lexical retrieval, dense retrieval, reranker vs no reranker, prompt-only / closed-book, long-context baseline if relevant.
-Ablations: remove reranker, vary top-k, remove citation requirement, use oracle retrieval subset.
-Robustness checks: paraphrased questions, distractor passages, unsupported answer cases.
-Falsification result: if rankings do not change across axes and errors are not axis-specific, the core claim is weakened.
+Claim: multi-axis evaluation changes comparative ranking.
+Independent variable: RAG pipeline and evaluation axis
+Dependent variable: ranking under retrieval support, citation support, answer utility, latency, cost
+Datasets: one open QA or long-form QA dataset
+Metrics: recall@k, nDCG, citation precision, faithfulness, answer F1, latency, cost
+Baselines: lexical retrieval, dense retrieval, reranker, closed-book, long-context if relevant
+Ablations: remove reranker, vary top-k, remove citations
+Robustness checks: distractor passages, unsupported answer cases
+Falsification result: rankings do not change and no axis-specific failure appears
+```
+
+## Reviewer Objection Pre-Mortem
+
+```text
+Likely reviewer objection: existing RAG evaluation frameworks already separate these dimensions.
+Why plausible: RAG evaluation is an active area.
+Evidence needed: closest benchmark and framework comparison.
+Current defense: none until verified.
+Weakness: novelty may collapse.
+Action to strengthen: map exact axes covered by closest frameworks.
+Verdict impact: downgrade if overlap is high.
+```
+
+```text
+Likely reviewer objection: this is engineering-only.
+Why plausible: reporting more metrics may be a tool contribution, not research.
+Evidence needed: show non-obvious ranking changes or failure-mode insight.
+Current defense: minimum experiment can test this.
+Weakness: result may be obvious.
+Action to strengthen: add falsification and contrary-hypothesis analysis.
+Verdict impact: technical-report-only if no insight appears.
+```
+
+```text
+Likely reviewer objection: baselines are too weak.
+Why plausible: RAG has strong recent systems and evaluation frameworks.
+Evidence needed: include strongest feasible evaluation baseline.
+Current defense: baseline plan includes retrieval and long-context alternatives.
+Weakness: no verified strongest baseline yet.
+Action to strengthen: identify closest accepted benchmark protocol.
+Verdict impact: not workshop-ready until done.
+```
+
+## Kill / Continue Criteria
+
+```text
+Continue condition: closest frameworks do not cover the exact scoped axes, and pilot shows ranking changes.
+Narrow condition: overlap exists but one failure mode remains under-tested.
+Downgrade condition: only descriptive metrics are added with no new insight.
+Kill condition: closest verified work already makes the same claim and experiment gives no ranking change.
+Next checkpoint: verify closest RAG evaluation papers and run a 3-system pilot.
+Smallest next action that changes the decision: build a 5-paper Claim-Evidence Map.
 ```
 
 ## Paper-readiness Verdict
 
 Verdict: `pilot-ready`.
 
-Reason: the idea is testable and useful, but the novelty level remains uncertain until real RAG evaluation papers are checked.
+Upgrade path: `workshop-ready` if verified literature shows a scoped gap and the minimum experiment shows ranking changes.
 
-Upgrade path: becomes `workshop-ready` if verified literature shows the axes are not already cleanly separated and the minimum experiment shows ranking changes.
-
-Downgrade path: becomes `technical-report-only` if existing benchmarks already cover the same protocol or if the experiment only confirms obvious behavior.
+Downgrade path: `technical-report-only` if existing frameworks already cover the protocol or the experiment only confirms obvious behavior.
