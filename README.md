@@ -77,17 +77,17 @@ It should help you answer:
 
 ## The Core Loop
 
-```mermaid
-graph LR
-    A[User direction or seed paper] --> B[Scope lock]
-    B --> C[Literature evidence]
-    C --> D[Gap audit]
-    D --> E[Novelty candidates]
-    E --> F[Reasonableness audit]
-    F --> G[Baseline and experiment plan]
-    G --> H[Reviewer objection pre-mortem]
-    H --> I[Paper-readiness verdict]
-```
+| Stage | What Happens | Output |
+|---:|---|---|
+| 01 | Scope the user's direction or seed paper | Research Scope Card / Seed Paper Card |
+| 02 | Inspect prior, follow-up, and sibling work | Paper Evidence Cards |
+| 03 | Bind papers to concrete claims | Claim-Evidence Map |
+| 04 | Extract trends, gaps, and weak signals | Literature Timeline + Gap Audit |
+| 05 | Generate candidate innovation points | Weak / Medium / Strong idea set |
+| 06 | Stress-test whether each idea stands up | Idea Reasonableness Audit |
+| 07 | Design the minimum decisive experiment | Baselines + falsification plan |
+| 08 | Pre-mortem likely reviewer objections | Accept / reject reasons |
+| 09 | Decide what to do next | Pursue / narrow / verify / downgrade / stop |
 
 The Skill is not just trying to say something is novel. It tries to make the whole reasoning chain visible.
 
