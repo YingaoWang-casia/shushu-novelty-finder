@@ -15,6 +15,8 @@
 
 Languages: [English](README.md) | [中文](README_ZH.md)
 
+⭐ If this project helps you, please consider giving it a Star.
+
 [✨ Why](#-why-this-exists) · [🔥 Capabilities](#-what-it-does) · [🔁 Core Loop](#-the-core-loop) · [⚡ Prompt](#-example-prompt) · [🛠️ Install](#️-install) · [🎯 Verdicts](#-paper-readiness-verdicts)
 
 </div>
