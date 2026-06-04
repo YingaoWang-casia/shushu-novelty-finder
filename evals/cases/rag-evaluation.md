@@ -29,15 +29,19 @@ If the scope remains too broad, the Skill should ask at most 5 questions. If the
 
 - has input mode: Direction Mode / Research Mode or Paper Mode
 - has Research Scope Card
-- has concrete paper names or marks placeholder / unverified
+- has concrete paper names or marks placeholder / candidate / unverified
 - has Paper Evidence Cards
+- has Claim-Evidence Map for the top claim
 - venue clusters include NLP and IR where relevant
 - Trend Matrix is not just a paper list
 - gaps have evidence labels
 - novelty candidates are ranked weak / medium / strong
 - at least one idea is downgraded because of feasibility, weak evidence, or overlap risk
+- top idea includes paper type routing
 - top idea includes Paper Thesis Card or clear thesis claim
-- top idea includes minimum experiment and baseline plan
+- top idea includes minimum experiment and baseline decision
+- top idea includes reviewer objection pre-mortem
+- top idea includes kill / continue criteria
 - paper-readiness verdict uses an allowed label
 
 ## Failure Signs
@@ -48,7 +52,10 @@ If the scope remains too broad, the Skill should ask at most 5 questions. If the
 - compares only against weak baselines
 - ignores latency and cost when the claim is deployment-oriented
 - treats arXiv preprints as accepted papers
+- treats candidate papers as verified support
 - calls a pipeline a new method without isolating what is new
+- has no reviewer objection section
+- has no condition for downgrading or killing the idea
 
 ## Passing Pattern
 
