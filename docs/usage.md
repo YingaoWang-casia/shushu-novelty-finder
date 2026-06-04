@@ -2,11 +2,9 @@
 
 This guide explains how to use `shushu-novelty-finder` as a CS paper idea auditor rather than a generic brainstorming prompt.
 
-The Skill should always prefer a scoped, evidence-bound answer over a long list of plausible but unsupported ideas.
+The Skill should prefer scoped, evidence-bound, decision-useful answers over long lists of plausible but unsupported ideas.
 
-## 0. Activate the Skill in Codex
-
-Install the Skill by copying the Skill folder into your Codex skills directory.
+## 0. Activate The Skill In Codex
 
 macOS / Linux:
 
@@ -24,7 +22,7 @@ New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills" | Out
 Copy-Item -Recurse -Force "shushu-novelty-finder\skills\shushu-novelty-finder" "$env:USERPROFILE\.codex\skills\"
 ```
 
-Restart Codex or open a new Codex session. Then activate the Skill by naming it in the prompt:
+Restart Codex or open a new Codex session, then trigger the Skill by name:
 
 ```text
 Use shushu-novelty-finder.
@@ -33,29 +31,16 @@ Goal: paper-oriented research project.
 First lock the scope, then produce a literature-backed novelty audit and paper-readiness verdict.
 ```
 
-For a seed paper:
-
-```text
-Use shushu-novelty-finder.
-Seed paper: <paper title / abstract / arXiv / DOI / PDF>.
-First build a Seed Paper Card, then search prior work, follow-up work, and sibling work.
-```
-
-If it does not activate, verify that the Skill file exists:
+Check installation:
 
 ```text
 ~/.codex/skills/shushu-novelty-finder/SKILL.md
-```
-
-On Windows:
-
-```text
 %USERPROFILE%\.codex\skills\shushu-novelty-finder\SKILL.md
 ```
 
 ## 1. Direction Mode
 
-Use Direction Mode when the user only has a research direction, for example:
+Use when the user only has a research direction, for example:
 
 ```text
 RAG evaluation
@@ -64,35 +49,33 @@ LLM-as-a-Judge
 multimodal agent memory
 ```
 
-The Skill must first decide whether the direction is too broad. If it is too broad, ask at most 5 clarifying questions before broad search. Good questions lock:
+If the direction is too broad, ask at most 5 clarifying questions. Lock subfield, task, input, output, dataset, metric, constraints, and target paper type before broad search.
 
-- subfield and concrete task;
-- target output: workshop paper, main-track paper, technical report, thesis topic, or project;
-- resource constraints: time, compute, data, annotation budget;
-- target venue family or review standard;
-- novelty appetite: safe, medium-risk, or ambitious.
-
-If the user does not answer, continue with explicit assumptions and mark the uncertainty in the Research Scope Card.
-
-Expected Direction Mode output:
+Expected output:
 
 ```text
 Mode:
 Research Scope Card:
-Search Plan:
+Scope narrowing assumptions:
+Paper Evidence Cards:
+Claim-Evidence Map:
 Literature Timeline:
 Trend Matrix:
 Gap Audit:
 Novelty Candidates:
+Paper Type Routing:
+Baseline Decision:
+Reviewer Objection Pre-Mortem:
+Kill / Continue Criteria:
 Paper-readiness Verdict:
 Next Action:
 ```
 
 ## 2. Seed Paper Mode
 
-Use Seed Paper Mode when the user gives a paper title, abstract, arXiv link, DOI, URL, or PDF.
+Use when the user gives a paper title, abstract, arXiv link, DOI, URL, or PDF.
 
-The Skill must first create a Seed Paper Card:
+First create a Seed Paper Card:
 
 ```text
 Title:
@@ -111,21 +94,16 @@ Expansion keywords:
 Excluded directions:
 ```
 
-Only after that should it search:
+Then search or plan:
 
 - prior work: what the paper builds on;
 - follow-up work: what cited, extended, reproduced, or challenged it;
-- sibling work: papers solving the same task with different assumptions, methods, data, or metrics.
-
-The seed paper is an anchor, not proof. If the seed paper is a preprint, survey, benchmark, dataset, method, or system paper, mark that status and adjust the evidence role.
+- sibling work: papers solving the same task with different assumptions, methods, data, or metrics;
+- contrary evidence: work that may already solve the proposed extension.
 
 ## 3. Hybrid Mode
 
-Use Hybrid Mode when the user gives both a direction and a seed paper.
-
-The direction limits the search space. The paper locks the task boundary.
-
-Example:
+Use when the user gives both a direction and a seed paper. The direction limits the search space. The paper locks the task boundary.
 
 ```text
 Use shushu-novelty-finder.
@@ -134,27 +112,26 @@ Seed paper: <paper title and abstract>.
 Goal: find a workshop-ready extension.
 ```
 
-Hybrid Mode should avoid two failure modes:
-
-- following the seed paper so narrowly that no adjacent gaps are considered;
-- using the broad direction so loosely that the seed paper no longer constrains the task.
-
 ## 4. Paper-Readiness Mode
 
-Use Paper-Readiness Mode when the user already has an idea and wants to know whether it can become a paper.
+Use when the user already has an idea and wants to know whether it can become a paper.
 
 Required output:
 
 ```text
 Paper Thesis Card
 Experiment Card
-Baseline Plan
+Baseline Decision
+Claim-Evidence Map
+Paper Type Routing
 Related Work Argument Map
+Reviewer Objection Pre-Mortem
+Kill / Continue Criteria
 Threats to Validity
 Paper-readiness Verdict
 ```
 
-The verdict must use one of these labels:
+Allowed verdicts:
 
 - `not ready`
 - `pilot-ready`
@@ -162,32 +139,18 @@ The verdict must use one of these labels:
 - `main-track candidate`
 - `technical-report-only`
 
-The Skill should explain both why a reviewer might accept the idea and why a reviewer might reject it.
-
 ## 5. Output Levels
 
-The user can request different depths.
-
 ```text
-Quick Mode: 只要 top ideas 和 next action
-Research Mode: 要 timeline / trend matrix / gap audit
-Paper Mode: 要 thesis / experiment / baseline / validity / readiness
+Quick Mode: top ideas, key evidence status, next action, and kill / continue checkpoint
+Research Mode: timeline / trend matrix / gap audit / claim-evidence map
+Paper Mode: thesis / experiment / baseline / reviewer objections / validity / readiness
 ```
-
-### Quick Mode
-
-Use when the user needs fast triage. It should still include scope, evidence status, risk, and next action. It must not invent strong novelty without literature evidence.
-
-### Research Mode
-
-Use when the user wants a real novelty audit. It should include a timeline, trend matrix, gap evidence labels, and weak / medium / strong idea ranking.
-
-### Paper Mode
-
-Use when the user wants to write or test a paper. It should include thesis, experiments, baselines, ablations, robustness checks, falsification results, threats to validity, and a readiness verdict.
 
 ## Evidence Discipline
 
-Every important paper should be represented as a Paper Evidence Card. Every gap should have an evidence type. Every top idea should include the minimum experiment that could falsify it.
+Every important paper should be represented as a Paper Evidence Card. Every important claim should have a Claim-Evidence Map. Every top idea should include the minimum experiment that could falsify it.
 
-If the Skill uses placeholders because no real search was performed, it must explicitly mark them as `illustrative placeholder` or `unverified`.
+If the Skill uses placeholders because no real search was performed, it must explicitly mark them as `illustrative placeholder`, `candidate`, or `unverified`.
+
+Candidate or placeholder papers cannot be used as verified support for novelty claims.
