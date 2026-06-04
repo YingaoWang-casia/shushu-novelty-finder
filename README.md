@@ -13,6 +13,8 @@
 [![Reviewer Mode](https://img.shields.io/badge/Reviewer-Reasonableness%20Audit-7c3aed?style=for-the-badge)](skills/shushu-novelty-finder/references/idea-reasonableness-audit.md)
 [![Paper Ready](https://img.shields.io/badge/Paper-Readiness%20Verdict-ec4899?style=for-the-badge)](#-paper-readiness-verdicts)
 
+Languages: [English](README.md) | [中文](README_ZH.md)
+
 [✨ Why](#-why-this-exists) · [🔥 Capabilities](#-what-it-does) · [🔁 Core Loop](#-the-core-loop) · [⚡ Prompt](#-example-prompt) · [🛠️ Install](#️-install) · [🎯 Verdicts](#-paper-readiness-verdicts)
 
 </div>
