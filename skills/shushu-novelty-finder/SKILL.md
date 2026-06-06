@@ -1,11 +1,11 @@
 ---
 name: shushu-novelty-finder
-description: computer science research lineage mapping, novelty discovery, idea stress-testing, and Chinese-English research translation for codex. use when the user wants to map extremely similar papers in a research direction, extract each paper's innovation points, generate paper innovation ideas, analyze whether an idea is reasonable, find CS research gaps, translate research text between Chinese and English, rewrite bilingual academic descriptions, review recent or ten-year literature trends, rank weak/medium/strong novelty ideas, or judge whether an idea is paper-ready. the skill supports literature-lineage mode, idea-generation mode, paper-readiness mode, and Chinese-English translation mode. it must ground research claims in papers and ask clarifying questions when scope is underspecified instead of blindly searching broadly.
+description: computer science research lineage mapping, novelty discovery, and idea stress-testing for codex. use when the user wants to map extremely similar papers in a research direction, extract each paper's innovation points, generate paper innovation ideas, analyze whether an idea is reasonable, find CS research gaps, analyze a research direction or seed paper, review recent or ten-year literature trends, rank weak/medium/strong novelty ideas, or judge whether an idea is paper-ready. the skill supports two primary outputs: literature-lineage mode for detailed paper-context mapping, and idea-generation mode for concrete novelty candidates. it must ground claims in papers and ask clarifying questions when scope is underspecified instead of blindly searching broadly.
 ---
 
 # shushu-novelty-finder
 
-Use this Skill to help users first understand the paper lineage of a computer science research direction, then generate evidence-grounded novelty ideas and judge whether those ideas are reasonable. It can also translate research-related text between Chinese and English while preserving academic meaning, terminology, citations, paper titles, formulas, and structured formatting.
+Use this Skill to help users first understand the paper lineage of a computer science research direction, then generate evidence-grounded novelty ideas and judge whether those ideas are reasonable.
 
 The Skill must behave like a strict senior reviewer who is also trying to help the user find a viable paper direction. It should not stop at criticism, and it should not stop at brainstorming. It must first map the closest paper lineage when the user asks for context, then create candidate innovation points, then stress-test them against the literature, feasibility, baselines, reviewer objections, and falsifiable experiments.
 
@@ -17,9 +17,7 @@ For most full research requests, the Skill should produce three linked outputs:
 2. **Novelty candidates**: concrete idea options ranked as weak / medium / strong.
 3. **Reasonableness audit**: a careful judgment of whether each top idea is logically defensible, experimentally testable, and worth pursuing.
 
-For translation requests, the Skill should convert Chinese to English or English to Chinese faithfully, keep the research meaning intact, and optionally improve academic clarity without inventing claims.
-
-A useful answer should make the user better at deciding what to do next: pursue, narrow, verify, downgrade, pivot, stop, or polish the bilingual wording.
+A useful answer should make the user better at deciding what to do next: pursue, narrow, verify, downgrade, pivot, or stop.
 
 ## Operating Modes
 
@@ -120,58 +118,32 @@ Required output:
 - For each candidate: core claim, novelty mechanism, closest prior work, why it is not already solved, minimum experiment, baseline plan, risks, reasonableness verdict, and kill / continue criteria.
 - For the top 1-3 ideas: Paper Thesis Card, Experiment Card, reviewer objection pre-mortem, paper-readiness verdict.
 
-### 6. Chinese-English Translation Mode
-
-Use when the user asks for 中英文互转, 翻译, translate, Chinese to English, English to Chinese, bilingual version, academic polishing across languages, or asks to convert paper titles, abstracts, introductions, related work, method descriptions, reviewer responses, prompts, or README/Skill docs between Chinese and English.
-
-Default routing:
-
-- Chinese input -> English output.
-- English input -> Chinese output.
-- Mixed Chinese-English input -> preserve necessary technical terms and translate the main prose into the target language implied by the user; if no target is stated, provide both directions only when useful.
-- If the user asks for “中英文互转” without a specific text, explain the supported usage briefly and ask for the text.
-
-Required behavior:
-
-- Preserve paper titles, method names, dataset names, metric names, citations, URLs, code identifiers, equations, markdown tables, and numbered structures unless the user asks to localize them.
-- Keep technical terms consistent. When a term is ambiguous, include the original term in parentheses on first use.
-- Do not add new research claims, citations, results, or limitations during translation.
-- For academic text, prefer clear conference-paper style over literal word-for-word translation.
-- If asked for polishing, separate `Translation` from `Polished version` so the user can see what changed.
-- For reviewer responses, keep tone firm, specific, and non-defensive.
-- For abstracts and introductions, preserve claim strength; do not make the contribution sound stronger than the source text.
-
-When translation is part of a research workflow, translate first, then continue with lineage/idea/audit only if the user explicitly asked for those additional outputs.
-
-See `references/translation-mode.md` for detailed translation rules and output templates.
-
 ## Required Workflow
 
 1. Route the input.
 2. Clarify if needed.
-3. If the request is only Chinese-English translation, use Chinese-English Translation Mode and stop unless the user asks for research analysis too.
-4. Narrow broad directions before search.
-5. Build a Research Scope Card or Seed Paper Card.
-6. Decide whether the request needs Literature Lineage Mode, Idea Generation Mode, or both.
-7. Search and review related literature.
-8. Build Paper Evidence Cards for important papers.
-9. If Lineage Mode is requested, build closest-paper clusters and per-paper innovation cards before proposing ideas.
-10. Build a Claim-Evidence Map for top claims.
-11. Build a timeline across roughly the last decade, emphasizing the last five years.
-12. Build a trend matrix and saturation map.
-13. Audit gaps with evidence labels.
-14. If Idea Generation Mode is requested, generate concrete novelty candidates from the lineage, gaps, limitations, trend shifts, and user constraints.
-15. Rank novelty ideas as weak, medium, or strong.
-16. Run an Idea Reasonableness Audit for each top idea.
-17. Route each top idea to a paper type and fallback type.
-18. For top ideas, create a Paper Thesis Card.
-19. For top ideas, create an Experiment Card.
-20. For top ideas, use the baseline decision tree to define minimum and strong baselines.
-21. Run reviewer objection pre-mortem.
-22. Apply kill / continue criteria.
-23. Recommend the best 1-3 directions with the strongest reason for and against each.
-24. Give a paper-readiness verdict.
-25. Run eval checks if output quality is uncertain.
+3. Narrow broad directions before search.
+4. Build a Research Scope Card or Seed Paper Card.
+5. Decide whether the request needs Literature Lineage Mode, Idea Generation Mode, or both.
+6. Search and review related literature.
+7. Build Paper Evidence Cards for important papers.
+8. If Lineage Mode is requested, build closest-paper clusters and per-paper innovation cards before proposing ideas.
+9. Build a Claim-Evidence Map for top claims.
+10. Build a timeline across roughly the last decade, emphasizing the last five years.
+11. Build a trend matrix and saturation map.
+12. Audit gaps with evidence labels.
+13. If Idea Generation Mode is requested, generate concrete novelty candidates from the lineage, gaps, limitations, trend shifts, and user constraints.
+14. Rank novelty ideas as weak, medium, or strong.
+15. Run an Idea Reasonableness Audit for each top idea.
+16. Route each top idea to a paper type and fallback type.
+17. For top ideas, create a Paper Thesis Card.
+18. For top ideas, create an Experiment Card.
+19. For top ideas, use the baseline decision tree to define minimum and strong baselines.
+20. Run reviewer objection pre-mortem.
+21. Apply kill / continue criteria.
+22. Recommend the best 1-3 directions with the strongest reason for and against each.
+23. Give a paper-readiness verdict.
+24. Run eval checks if output quality is uncertain.
 
 ## Idea Generation Rules
 
@@ -180,16 +152,6 @@ See `references/translation-mode.md` for detailed translation rules and output t
 - Generate at least one safe idea, one medium-risk idea, and one ambitious idea when the scope allows it.
 - Make ideas falsifiable: state what result would support, weaken, or kill the idea.
 - If all ideas are weak, say so and explain what evidence or scope change could make them stronger.
-
-## Translation Rules
-
-- Default to meaning-preserving translation, not loose rewriting.
-- Preserve research claim strength, uncertainty, limitations, and evidence status.
-- Keep domain terms stable across the answer; do not alternate between multiple translations for the same concept.
-- Do not translate proper nouns if doing so would reduce recognizability.
-- Use bilingual glosses for important technical terms when helpful, for example `faithfulness（忠实性）` or `反事实评估（counterfactual evaluation）`.
-- If the source text is unclear, mark the ambiguity instead of silently deciding a stronger meaning.
-- If the user requests only translation, do not add literature review, idea generation, or extra critique.
 
 ## Evidence Rules
 
@@ -226,7 +188,6 @@ Use the reference files when needed:
 
 - `references/input-router.md` for routing and clarification policy.
 - `references/usage-modes.md` for mode behavior.
-- `references/translation-mode.md` for Chinese-English translation, bilingual academic polishing, and terminology-preserving conversion.
 - `references/scope-card.md` for Research Scope Card and Seed Paper Card formats.
 - `references/scope-narrowing-playbook.md` for turning broad directions into scoped tasks.
 - `references/search-protocol.md` for literature search strategy.
@@ -261,7 +222,6 @@ Choose the answer order from the user's request:
 - If the user asks to "先梳理", "先综述", "论文脉络", or "极度相似论文", start with Literature Lineage Mode. Do not put ideas first.
 - If the user asks only for "idea", "创新点", or "怎么做", start with the best 1-3 recommended ideas, but include a closest-prior-work snapshot.
 - If the user asks for both, output Part A: literature lineage, then Part B: idea generation and reasonableness audit.
-- If the user asks for "翻译", "中英文互转", "translate", "Chinese to English", "English to Chinese", or bilingual polishing, output the translation first and do not add unrelated research analysis.
 
 Do not hide uncertainty. A useful negative result is better than a fake strong idea.
 
