@@ -1,8 +1,13 @@
 # Usage Guide
 
-This guide explains how to use `shushu-novelty-finder` as a CS paper idea generator and reasonableness auditor.
+This guide explains how to use `shushu-novelty-finder` as a CS paper lineage mapper, idea generator, and reasonableness auditor.
 
-The Skill should produce concrete innovation-point candidates, then carefully judge whether each idea is reasonable, feasible, evidence-backed, and paper-worthy. It should prefer scoped, evidence-bound, decision-useful answers over long lists of plausible but unsupported ideas.
+The Skill has two primary outputs:
+
+1. **Literature Lineage Mode**: first map the closest papers in a direction and extract each paper's concrete innovation points.
+2. **Idea Generation Mode**: generate concrete innovation-point candidates, then judge whether each idea is reasonable, feasible, evidence-backed, and paper-worthy.
+
+It should prefer scoped, evidence-bound, decision-useful answers over long lists of plausible but unsupported ideas.
 
 ## 0. Activate The Skill In Codex
 
@@ -72,7 +77,81 @@ Paper-readiness Verdict:
 Next Action:
 ```
 
-## 2. Seed Paper Mode
+## 2. Literature Lineage Mode
+
+Use when the user wants a compact but detailed survey before ideas.
+
+Example prompt:
+
+```text
+Use shushu-novelty-finder.
+
+Mode: Literature Lineage first, then optional ideas.
+Direction:
+organic reaction prediction + RAG + LLM reasoning
+
+Please first梳理这个方向极度相似论文的整体脉络:
+- group papers by stage or method route;
+- list each important paper's concrete innovation points;
+- explain datasets, metrics, assumptions, and limitations;
+- mark what has become saturated and what remains open.
+
+After the lineage, briefly identify the most defensible gaps.
+```
+
+Expected output:
+
+```text
+Scope And Task Map:
+Closest-Paper Clusters:
+Per-Paper Innovation Cards:
+Literature Timeline:
+Trend Matrix:
+Gap Audit:
+Lineage Verdict:
+```
+
+## 3. Idea Generation Mode
+
+Use when the user wants paper ideas based on a direction or seed paper.
+
+Example prompt:
+
+```text
+Use shushu-novelty-finder.
+
+Mode: Idea Generation.
+Seed paper:
+<paper title / abstract / arXiv / DOI / PDF>
+
+Goal:
+Based on this paper and its closest prior work, output paper-worthy innovation points.
+
+Please include:
+- weak / medium / strong novelty candidates;
+- closest prior work for each idea;
+- why each idea is not already solved;
+- minimum experiment and baselines;
+- reviewer objections;
+- kill / continue criteria.
+```
+
+Expected output:
+
+```text
+Closest-Prior Snapshot:
+Executive Recommendation:
+Novelty Candidates:
+Idea Reasonableness Audit:
+Paper Thesis Card:
+Experiment Card:
+Baseline Decision:
+Reviewer Objection Pre-Mortem:
+Kill / Continue Criteria:
+Paper-readiness Verdict:
+```
+
+## 4. Seed Paper Mode
 
 Use when the user gives a paper title, abstract, arXiv link, DOI, URL, or PDF.
 
@@ -104,7 +183,7 @@ Then search or plan:
 
 The Skill should then generate extension ideas and audit whether each extension is actually different from prior work.
 
-## 3. Hybrid Mode
+## 5. Hybrid Mode
 
 Use when the user gives both a direction and a seed paper. The direction limits the search space. The paper locks the task boundary.
 
@@ -115,7 +194,7 @@ Seed paper: <paper title and abstract>.
 Goal: find a workshop-ready extension.
 ```
 
-## 4. Paper-Readiness Mode
+## 6. Paper-Readiness Mode
 
 Use when the user already has an idea and wants to know whether it can become a paper.
 
@@ -151,11 +230,13 @@ Allowed paper-readiness verdicts:
 - `main-track candidate`
 - `technical-report-only`
 
-## 5. Output Levels
+## 7. Output Levels
 
 ```text
 Quick Mode: top ideas, reasonableness verdict, key evidence status, next action, and kill / continue checkpoint
-Research Mode: timeline / trend matrix / gap audit / novelty candidates / claim-evidence map / reasonableness audit
+Literature Lineage Mode: closest-paper clusters / per-paper innovation cards / timeline / trend matrix / gap audit
+Idea Generation Mode: novelty candidates / reasonableness audit / experiment / baselines / kill criteria
+Research Mode: literature lineage plus novelty candidates when both are requested
 Paper Mode: thesis / experiment / baseline / reviewer objections / validity / readiness
 ```
 

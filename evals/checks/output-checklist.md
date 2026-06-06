@@ -4,6 +4,10 @@ A qualified `shushu-novelty-finder` output must satisfy the following checks.
 
 - has input mode
 - has scope card
+- if Literature Lineage Mode is requested, has closest-paper clusters
+- if Literature Lineage Mode is requested, has per-paper innovation cards
+- if Literature Lineage Mode is requested, each important paper has concrete innovation points
+- if Literature Lineage Mode is requested, states what each paper solved and left open
 - has concrete paper names or explicitly marks placeholder / unverified
 - has paper evidence cards
 - has evidence status for key papers
@@ -45,6 +49,9 @@ A qualified `shushu-novelty-finder` output must satisfy the following checks.
 
 - scope is broad and no clarification questions were asked
 - output reviews literature but never proposes concrete ideas
+- output claims to provide lineage but only lists paper titles
+- output gives similar papers but does not extract each paper's innovation points
+- output mixes actual paper contributions with inferred gaps without labeling the difference
 - output lists ideas but never stress-tests whether they are reasonable
 - output lists paper titles but no evidence roles
 - output lists papers but never says which claim they support

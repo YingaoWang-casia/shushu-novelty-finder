@@ -31,6 +31,53 @@ Constraints:
 Please run Research Mode first. If the scope is too broad, ask clarifying questions before searching.
 ```
 
+## Literature Lineage prompt
+
+Use this when you want the Skill to first map the closest papers and their innovation points.
+
+```text
+Use shushu-novelty-finder.
+
+Mode:
+Literature Lineage first.
+
+Direction:
+organic reaction prediction + RAG + LLM reasoning
+
+Please first梳理这个方向极度相似论文的整体脉络:
+- group papers by historical stage or method route;
+- list each important paper's concrete innovation points;
+- explain task, input, output, datasets, metrics, and assumptions;
+- mark what has become saturated and what remains open;
+- do not propose ideas until the lineage and gap audit are complete.
+```
+
+## Idea Generation prompt
+
+Use this when you already have a seed paper or direction and want concrete innovation points.
+
+```text
+Use shushu-novelty-finder.
+
+Mode:
+Idea Generation.
+
+Seed paper:
+<title, abstract, arXiv, DOI, URL, or PDF>
+
+Goal:
+Based on this paper and its closest prior work, output paper-worthy innovation points.
+
+Please include:
+- weak / medium / strong novelty candidates;
+- closest prior work for each idea;
+- why each idea is not already solved;
+- minimum experiment and baselines;
+- reviewer objections;
+- kill / continue criteria;
+- paper-readiness verdict.
+```
+
 ## Seed paper prompt
 
 ```text

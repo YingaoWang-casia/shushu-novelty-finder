@@ -1,10 +1,140 @@
 # Output Template
 
-Use this report format for full novelty-finding tasks. The output should read like a CS paper idea generator plus a strict reasonableness audit, not a generic brainstorm.
+Use this report format for full novelty-finding tasks. The output should read like a compact literature review plus a strict paper-idea audit, not a generic brainstorm.
 
-## 0. Executive Recommendation
+The Skill has two primary output modes:
 
-Give the best 1-3 recommended ideas first.
+- **Literature Lineage Mode**: first map the closest papers and their concrete innovation points.
+- **Idea Generation Mode**: generate and stress-test paper-worthy innovation points from a seed paper or user direction.
+
+If the user asks for both, output Mode 1 first, then Mode 2.
+
+## Mode 1. Literature Lineage Output
+
+Use this mode when the user asks for paper lineage, very similar papers, current task map, trend review, or "先梳理再给 idea".
+
+### 0. Scope And Task Map
+
+```text
+User direction or seed paper:
+Research field:
+Core task:
+Subtasks:
+Canonical input:
+Canonical output:
+Standard datasets:
+Standard metrics:
+Typical baselines:
+Deployment or system setting:
+What counts as meaningful progress:
+Directions intentionally excluded:
+Search status: verified / partial / placeholder-only / not searched
+```
+
+### 1. Closest-Paper Clusters
+
+Group papers by method route, task framing, benchmark route, or historical stage.
+
+```text
+Cluster:
+Why this cluster is close to the user's direction:
+Representative papers:
+Shared assumption:
+Shared contribution type:
+What became saturated:
+What remains open:
+```
+
+### 2. Per-Paper Innovation Cards
+
+For every important extremely similar paper, include a card. Do not only summarize the paper. Extract its innovation points.
+
+```text
+Paper:
+Year:
+Venue/source:
+URL / DOI / arXiv:
+Evidence status: verified / partial / candidate / unverified
+Relationship to user direction: ancestor / closest prior / sibling / follow-up / benchmark / contrary evidence
+Task:
+Input:
+Output:
+Datasets:
+Metrics:
+Main method:
+Innovation point 1:
+Innovation point 2:
+Innovation point 3:
+Contribution type: method / dataset / benchmark / metric / system / analysis / application
+What it solved:
+What it did not solve:
+Why it matters for the user's direction:
+What idea space it blocks:
+What idea space it leaves open:
+```
+
+### 3. Literature Timeline
+
+```text
+Stage:
+Years:
+Representative papers:
+Main task definition:
+Main method family:
+Dataset / metric pattern:
+What changed from previous stage:
+What became saturated:
+What remained weak:
+```
+
+### 4. Trend Matrix
+
+```text
+Time period | Representative papers | Task shift | Method shift | Dataset/metric shift | Saturated contribution | Open gap
+```
+
+### 5. Gap Audit
+
+For each gap:
+
+```text
+Gap:
+Gap type: explicit limitation / future work / cross-paper pattern / benchmark absence / implementation absence / inferred gap
+Evidence type:
+Supporting papers:
+Why this matters:
+Why it may be a bad idea:
+Confidence:
+```
+
+### 6. Lineage Verdict
+
+```text
+Most saturated idea:
+Most defensible gap:
+Most dangerous overlap risk:
+Best direction to continue:
+What must be verified next:
+```
+
+## Mode 2. Idea Generation Output
+
+Use this mode when the user asks for innovation points, paper ideas, extension directions, or whether a direction can become a paper.
+
+### 0. Closest-Prior Snapshot
+
+```text
+Seed paper or direction:
+Closest prior work:
+What those papers already did:
+What cannot be claimed as new:
+Open space for ideas:
+Evidence status:
+```
+
+### 1. Executive Recommendation
+
+Give the best 1-3 recommended ideas.
 
 ```text
 Recommended idea:
@@ -25,131 +155,9 @@ Likely reject reason:
 Continue / narrow / downgrade / kill:
 ```
 
-## 1. Input Mode
-
-```text
-Mode: Direction Mode / Seed Paper Mode / Hybrid Mode / Paper-Readiness Mode
-Output level: Quick / Research / Paper
-Assumptions:
-Search status: verified / partial / placeholder-only / not searched
-```
-
-## 2. Research Scope Card
-
-Summarize the locked scope and assumptions.
-
-```text
-Direction:
-Subfield:
-Task:
-Input:
-Output:
-Datasets:
-Metrics:
-Included directions:
-Excluded directions:
-Constraints:
-```
-
-## 3. Seed Paper Card
-
-Only include this section if the user supplied a seed paper.
-
-```text
-Title:
-Year:
-Venue/source:
-Paper type:
-Task:
-Input:
-Output:
-Dataset:
-Metric:
-Main method:
-Claimed contribution:
-Limitations:
-Expansion keywords:
-Excluded directions:
-```
-
-## 4. Paper Evidence Cards
-
-For every key paper, include a card. If a paper is only a placeholder or search candidate, say so.
-
-```text
-Title:
-Year:
-Venue or source:
-Paper type:
-URL, DOI, or arXiv id:
-Task:
-Dataset:
-Metric:
-Main contribution:
-Why it is relevant:
-Evidence status:
-Evidence role:
-Used to support which claim:
-Confidence:
-```
-
-## 5. Claim-Evidence Map
-
-For each top claim:
-
-```text
-Claim:
-Claim type: novelty / feasibility / limitation / baseline / evaluation / task importance
-Supporting papers:
-Contrary papers:
-Background papers:
-Evidence strength:
-What can be safely claimed:
-What must not be claimed:
-Confidence:
-Next verification step:
-```
-
-## 6. Literature Timeline
-
-Group representative papers by time stage.
-
-```text
-Time stage:
-Representative papers:
-Main task definition:
-Main method family:
-Dataset / metric pattern:
-What changed from previous stage:
-```
-
-## 7. Trend Matrix
-
-Use this table:
-
-```text
-Time period | Representative papers | Task shift | Method shift | Dataset/metric shift | Open gap
-```
-
-## 8. Gap Audit
-
-For each gap:
-
-```text
-Gap:
-Gap type:
-Evidence type:
-Supporting papers:
-Why this matters:
-Why it may be a bad idea:
-Confidence:
-```
-
-## 9. Novelty Candidates
+### 2. Novelty Candidates
 
 Generate concrete ideas and separate them into weak, medium, and strong.
-
-For each idea:
 
 ```text
 Idea:
@@ -169,7 +177,7 @@ Reasonableness verdict:
 Best target output:
 ```
 
-## 10. Idea Reasonableness Audit
+### 3. Idea Reasonableness Audit
 
 For each top idea, test whether the idea actually stands up.
 
@@ -194,7 +202,7 @@ Strongest reason against:
 Decision: pursue / narrow / verify / downgrade / pivot / stop
 ```
 
-## 11. Paper Type Routing
+### 4. Paper Type Routing
 
 For each top idea:
 
@@ -208,7 +216,7 @@ Main reviewer risk:
 Readiness verdict:
 ```
 
-## 12. Paper Thesis Card
+### 5. Paper Thesis Card
 
 For the top idea:
 
@@ -223,7 +231,7 @@ What evidence supports the claim:
 What reviewers may reject:
 ```
 
-## 13. Experiment Card
+### 6. Experiment Card
 
 For the top idea:
 
@@ -239,7 +247,7 @@ Robustness checks:
 Falsification result:
 ```
 
-## 14. Baseline Decision
+### 7. Baseline Decision
 
 ```text
 Minimum baselines:
@@ -249,7 +257,7 @@ What result would make the idea look weak:
 What result would make the idea publishable:
 ```
 
-## 15. Related Work Argument Map
+### 8. Related Work Argument Map
 
 ```text
 Closest prior work:
@@ -260,7 +268,7 @@ How the proposed idea differs:
 What should not be claimed:
 ```
 
-## 16. Reviewer Objection Pre-Mortem
+### 9. Reviewer Objection Pre-Mortem
 
 For each top idea, include at least three objections.
 
@@ -274,7 +282,7 @@ Action to strengthen:
 Verdict impact: no change / downgrade / kill
 ```
 
-## 17. Kill / Continue Criteria
+### 10. Kill / Continue Criteria
 
 ```text
 Continue condition:
@@ -285,7 +293,7 @@ Next checkpoint:
 Smallest next action that changes the decision:
 ```
 
-## 18. Threats to Validity
+### 11. Threats To Validity
 
 ```text
 Internal validity:
@@ -296,7 +304,7 @@ Reproducibility risk:
 Reviewer concern:
 ```
 
-## 19. Next-Step Plan
+### 12. Next-Step Plan
 
 Give a concrete plan:
 
@@ -306,6 +314,6 @@ Give a concrete plan:
 - first experiment;
 - decision checkpoint.
 
-## 20. Uncertainty and Search Limits
+### 13. Uncertainty And Search Limits
 
 State what the search may have missed. Do not hide weak evidence. If no verified search has been performed, mark all paper names as `placeholder`, `candidate`, or `unverified`.

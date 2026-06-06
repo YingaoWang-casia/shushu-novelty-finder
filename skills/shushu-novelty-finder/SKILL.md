@@ -1,24 +1,57 @@
 ---
 name: shushu-novelty-finder
-description: computer science research novelty discovery and idea stress-testing for codex. use when the user wants to generate paper innovation points, analyze whether an idea is reasonable, find CS research gaps, analyze a research direction or seed paper, review recent or ten-year literature trends, rank weak/medium/strong novelty ideas, or judge whether an idea is paper-ready. the skill must produce concrete candidate ideas, then scrutinize each idea with literature evidence, closest prior work, assumptions, baselines, risks, falsification tests, reviewer objections, and kill / continue criteria. it must ask clarifying questions when scope is underspecified instead of blindly searching broadly.
+description: computer science research lineage mapping, novelty discovery, and idea stress-testing for codex. use when the user wants to map extremely similar papers in a research direction, extract each paper's innovation points, generate paper innovation ideas, analyze whether an idea is reasonable, find CS research gaps, analyze a research direction or seed paper, review recent or ten-year literature trends, rank weak/medium/strong novelty ideas, or judge whether an idea is paper-ready. the skill supports two primary outputs: literature-lineage mode for detailed paper-context mapping, and idea-generation mode for concrete novelty candidates. it must ground claims in papers and ask clarifying questions when scope is underspecified instead of blindly searching broadly.
 ---
 
 # shushu-novelty-finder
 
-Use this Skill to help users generate evidence-grounded novelty ideas for computer science research and then judge whether those ideas are reasonable.
+Use this Skill to help users first understand the paper lineage of a computer science research direction, then generate evidence-grounded novelty ideas and judge whether those ideas are reasonable.
 
-The Skill must behave like a strict senior reviewer who is also trying to help the user find a viable paper direction. It should not stop at criticism, and it should not stop at brainstorming. It must first create candidate innovation points, then stress-test them against the literature, feasibility, baselines, reviewer objections, and falsifiable experiments.
+The Skill must behave like a strict senior reviewer who is also trying to help the user find a viable paper direction. It should not stop at criticism, and it should not stop at brainstorming. It must first map the closest paper lineage when the user asks for context, then create candidate innovation points, then stress-test them against the literature, feasibility, baselines, reviewer objections, and falsifiable experiments.
 
 ## Core Contract
 
-For most requests, the Skill should produce two linked outputs:
+For most full research requests, the Skill should produce three linked outputs:
 
-1. **Novelty candidates**: concrete idea options ranked as weak / medium / strong.
-2. **Reasonableness audit**: a careful judgment of whether each top idea is logically defensible, experimentally testable, and worth pursuing.
+1. **Closest-paper lineage**: a detailed map of extremely similar papers, grouped by stage or method family, with each paper's concrete innovation points, assumptions, datasets, metrics, limitations, and relationship to the user's direction.
+2. **Novelty candidates**: concrete idea options ranked as weak / medium / strong.
+3. **Reasonableness audit**: a careful judgment of whether each top idea is logically defensible, experimentally testable, and worth pursuing.
 
 A useful answer should make the user better at deciding what to do next: pursue, narrow, verify, downgrade, pivot, or stop.
 
 ## Operating Modes
+
+### 0. Literature Lineage Mode
+
+Use when the user asks to first understand the direction, paper context, closest prior work, very similar papers, research lineage, or "what has been done". Trigger phrases include:
+
+- "先梳理论文脉络"
+- "极度相似的论文"
+- "这个方向当前任务"
+- "把每篇论文创新点列出来"
+- "先综述，再给 idea"
+- "literature lineage"
+- "closest papers"
+- "survey this direction before ideas"
+
+Required output:
+
+- Scope and task map: task definition, input, output, standard datasets, metrics, deployment setting, and what counts as real progress.
+- Closest-paper clusters: group papers by stage, method route, benchmark route, or assumption.
+- Per-paper innovation card for each important paper:
+  - title, year, venue/source, URL/DOI/arXiv if known;
+  - task and setting;
+  - core innovation points, numbered and concrete;
+  - method/data/metric/system contribution type;
+  - datasets and metrics;
+  - what it solves;
+  - what it leaves open;
+  - relation to the user's target paper or direction: ancestor / closest prior / sibling / follow-up / contrary evidence / benchmark.
+- Trend matrix and saturation map.
+- Gap audit with evidence labels.
+- If the user explicitly asks for ideas in the same request, continue into Idea Generation Mode after the lineage.
+
+Do not output only a paper list. Convert papers into a lineage: what changed from paper to paper, which assumptions became dominant, which contributions are saturated, and which gaps remain defensible.
 
 ### 1. Direction Mode
 
@@ -74,30 +107,43 @@ Required output:
 - Threats to Validity;
 - Paper-readiness Verdict.
 
+### 5. Idea Generation Mode
+
+Use when the user asks for innovation points, paper ideas, extension directions, "how to do idea", or "what can I write based on this paper/direction".
+
+Required output:
+
+- A concise lineage summary or closest-prior-work snapshot unless a detailed lineage was already provided in the same answer.
+- Weak / medium / strong novelty candidates.
+- For each candidate: core claim, novelty mechanism, closest prior work, why it is not already solved, minimum experiment, baseline plan, risks, reasonableness verdict, and kill / continue criteria.
+- For the top 1-3 ideas: Paper Thesis Card, Experiment Card, reviewer objection pre-mortem, paper-readiness verdict.
+
 ## Required Workflow
 
 1. Route the input.
 2. Clarify if needed.
 3. Narrow broad directions before search.
 4. Build a Research Scope Card or Seed Paper Card.
-5. Search and review related literature.
-6. Build Paper Evidence Cards for important papers.
-7. Build a Claim-Evidence Map for top claims.
-8. Build a timeline across roughly the last decade, emphasizing the last five years.
-9. Build a trend matrix.
-10. Audit gaps with evidence labels.
-11. Generate concrete novelty candidates from the gaps, limitations, trend shifts, and user constraints.
-12. Rank novelty ideas as weak, medium, or strong.
-13. Run an Idea Reasonableness Audit for each top idea.
-14. Route each top idea to a paper type and fallback type.
-15. For top ideas, create a Paper Thesis Card.
-16. For top ideas, create an Experiment Card.
-17. For top ideas, use the baseline decision tree to define minimum and strong baselines.
-18. Run reviewer objection pre-mortem.
-19. Apply kill / continue criteria.
-20. Recommend the best 1-3 directions with the strongest reason for and against each.
-21. Give a paper-readiness verdict.
-22. Run eval checks if output quality is uncertain.
+5. Decide whether the request needs Literature Lineage Mode, Idea Generation Mode, or both.
+6. Search and review related literature.
+7. Build Paper Evidence Cards for important papers.
+8. If Lineage Mode is requested, build closest-paper clusters and per-paper innovation cards before proposing ideas.
+9. Build a Claim-Evidence Map for top claims.
+10. Build a timeline across roughly the last decade, emphasizing the last five years.
+11. Build a trend matrix and saturation map.
+12. Audit gaps with evidence labels.
+13. If Idea Generation Mode is requested, generate concrete novelty candidates from the lineage, gaps, limitations, trend shifts, and user constraints.
+14. Rank novelty ideas as weak, medium, or strong.
+15. Run an Idea Reasonableness Audit for each top idea.
+16. Route each top idea to a paper type and fallback type.
+17. For top ideas, create a Paper Thesis Card.
+18. For top ideas, create an Experiment Card.
+19. For top ideas, use the baseline decision tree to define minimum and strong baselines.
+20. Run reviewer objection pre-mortem.
+21. Apply kill / continue criteria.
+22. Recommend the best 1-3 directions with the strongest reason for and against each.
+23. Give a paper-readiness verdict.
+24. Run eval checks if output quality is uncertain.
 
 ## Idea Generation Rules
 
@@ -110,6 +156,8 @@ Required output:
 ## Evidence Rules
 
 - Never claim `nobody has done this` unless the search coverage is strong and explicitly described.
+- When the user asks for closest-paper lineage, every important paper must include explicit innovation points, not only a summary.
+- In Lineage Mode, separate each paper's actual contribution from your inferred gap. Do not turn inferred gaps into verified author claims.
 - Every trend must cite or name concrete representative papers.
 - Every important paper must have a Paper Evidence Card.
 - Every Paper Evidence Card must state evidence status, evidence role, and which claim the paper supports.
@@ -169,7 +217,11 @@ Use the reference files when needed:
 
 ## Final Answer Style
 
-Keep the final report decision-oriented. Put the best 1-3 recommended ideas near the top, then provide the literature evidence and analysis behind them.
+Choose the answer order from the user's request:
+
+- If the user asks to "先梳理", "先综述", "论文脉络", or "极度相似论文", start with Literature Lineage Mode. Do not put ideas first.
+- If the user asks only for "idea", "创新点", or "怎么做", start with the best 1-3 recommended ideas, but include a closest-prior-work snapshot.
+- If the user asks for both, output Part A: literature lineage, then Part B: idea generation and reasonableness audit.
 
 Do not hide uncertainty. A useful negative result is better than a fake strong idea.
 
