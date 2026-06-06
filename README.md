@@ -8,6 +8,8 @@
 
 先把一个方向里“极度相似”的论文脉络讲透，再从文献 gap 里长出真正能做的 idea，也支持科研文本的中英文互转。
 
+🌐 语言 / Language: **中文** | [English](README_EN.md)
+
 [![Codex Skill](https://img.shields.io/badge/Codex-Skill-111827?style=for-the-badge&logo=openai&logoColor=white)](skills/shushu-novelty-finder/SKILL.md)
 [![论文脉络](https://img.shields.io/badge/Literature-Lineage-2563eb?style=for-the-badge)](examples/literature-lineage-mode.md)
 [![创新点生成](https://img.shields.io/badge/Idea-Generation-7c3aed?style=for-the-badge)](examples/idea-generation-mode.md)
@@ -33,9 +35,9 @@
 - 哪些点已经被做烂了，哪些 gap 还站得住？
 - 我的 idea 和 closest prior work 到底差在哪？
 - 最小实验怎么设计，什么结果会支持、削弱或杀掉这个 idea？
-- 中文表述怎么准确翻成英文论文写法？英文摘要、related work、review response 又怎么翻回中文理解？
+- 中文 idea、摘要、rebuttal 怎么翻成自然的英文论文表达？英文 review / related work 又怎么翻回中文理解？
 
-`shushu-novelty-finder` 就是为这个场景准备的。它不只是 brainstorm，而是把研究 idea 拆成一条能被审查的链：
+`shushu-novelty-finder` 不是简单 brainstorm，而是把研究 idea 拆成一条能被审查的链：
 
 ```text
 研究方向 -> 极度相似论文 -> 每篇论文创新点 -> 趋势和饱和点 -> gap -> 候选 idea -> 实验和 baseline -> 审稿人反驳 -> 是否继续
@@ -107,14 +109,7 @@ Chinese-English Translation.
 <粘贴文本>
 ```
 
-或者：
-
-```text
-$idea 帮我把这段英文 abstract 翻译成中文，并保留 technical terms：
-<粘贴英文摘要>
-```
-
-如果你本地把它安装成了短名 `idea`，也可以像这样启动：
+如果你本地把它安装成了短名 `idea`，也可以这样启动：
 
 ```text
 $idea 先梳理 organic reaction prediction + RAG + LLM reasoning 的论文脉络，再给可以做的 idea
@@ -153,41 +148,6 @@ Direction:
 4. 说明每篇论文的数据集、指标、核心假设和局限；
 5. 总结哪些贡献已经饱和，哪些 gap 仍然可以做；
 6. 暂时不要急着给 idea，先把文献脉络讲清楚。
-```
-
-### 预期输出
-
-```text
-Scope And Task Map
-- Core task
-- Subtasks
-- Input / output
-- Standard datasets
-- Standard metrics
-- Typical baselines
-
-Closest-Paper Clusters
-- Cluster name
-- Why this cluster is close
-- Representative papers
-- Shared assumptions
-- Saturated contribution
-- Open gap
-
-Per-Paper Innovation Cards
-- Paper
-- Year / venue
-- Relationship to your direction
-- Innovation point 1 / 2 / 3
-- Dataset and metric
-- What it solved
-- What it left open
-- What idea space it blocks
-- What idea space it leaves open
-
-Trend Matrix
-Gap Audit
-Lineage Verdict
 ```
 
 完整示例：[`examples/literature-lineage-mode.md`](examples/literature-lineage-mode.md)
@@ -229,22 +189,6 @@ Goal:
 6. reviewer objections；
 7. kill / continue criteria；
 8. paper-readiness verdict。
-```
-
-### 预期输出
-
-```text
-Closest-Prior Snapshot
-Executive Recommendation
-Novelty Candidates
-Idea Reasonableness Audit
-Paper Type Routing
-Paper Thesis Card
-Experiment Card
-Baseline Decision
-Reviewer Objection Pre-Mortem
-Kill / Continue Criteria
-Paper-readiness Verdict
 ```
 
 完整示例：[`examples/idea-generation-mode.md`](examples/idea-generation-mode.md)
@@ -290,21 +234,6 @@ $idea 请把下面英文 related work 翻译成中文，保留 benchmark、datas
 <粘贴英文文本>
 ```
 
-### 预期输出
-
-```text
-Translation
-- 忠实翻译，不增加新 claim
-
-Polished Version（可选）
-- 更自然的论文写法或中文理解版
-
-Terminology Notes（可选）
-- 关键术语如何处理
-- 哪些词保留英文
-- 哪些地方存在语义歧义
-```
-
 ---
 
 ## 🛠️ 安装教程
@@ -337,8 +266,6 @@ Use shushu-novelty-finder.
 
 如果你想像 `$pua` 那样直接说 `$idea`，可以把 Skill 目录复制成 `idea`：
 
-Windows PowerShell:
-
 ```powershell
 git clone https://github.com/YingaoWang-casia/shushu-novelty-finder.git
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills\idea" | Out-Null
@@ -362,17 +289,6 @@ $idea 帮我先梳理论文脉络，再给创新点
 ```text
 $idea 把下面中文 idea 翻译成英文学术表达：<粘贴文本>
 ```
-
-### 方法 3：更新到最新版
-
-如果之前已经安装过，可以重新复制覆盖：
-
-```powershell
-git pull
-Copy-Item -Recurse -Force "skills\shushu-novelty-finder\*" "$env:USERPROFILE\.codex\skills\idea\"
-```
-
-如果你使用的是标准名字，把最后的 `idea` 换成 `shushu-novelty-finder`。
 
 ---
 
@@ -454,13 +370,6 @@ Chinese-English Translation.
 <粘贴中文研究想法>
 ```
 
-也可以英译中：
-
-```text
-$idea 请把下面英文 reviewer comment 翻译成中文，并解释其中最关键的拒稿点：
-<粘贴英文 review>
-```
-
 ---
 
 ## 🧪 输出质量检查
@@ -482,26 +391,6 @@ $idea 请把下面英文 reviewer comment 翻译成中文，并解释其中最�
 - ✅ 中英文互转时不增加新 claim，保留关键术语、引用、公式和数据集 / metric 名。
 
 完整检查清单：[`evals/checks/output-checklist.md`](evals/checks/output-checklist.md)
-
----
-
-## 🗂️ 仓库结构
-
-```text
-shushu-novelty-finder/
-|- skills/shushu-novelty-finder/
-|  |- SKILL.md
-|  |- agents/openai.yaml
-|  `- references/
-|- docs/
-|  |- quickstart.md
-|  `- usage.md
-|- examples/
-|  |- literature-lineage-mode.md
-|  `- idea-generation-mode.md
-|- evals/
-`- scripts/
-```
 
 ---
 
