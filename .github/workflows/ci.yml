@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install locked development environment
+        run: |
+          python -m pip install --require-hashes -r requirements-dev.lock
+          python -m pip install --no-deps --no-build-isolation -e .
+      - name: Verify dependency lock is current
+        run: |
+          pip-compile pyproject.toml --extra dev --all-build-deps --allow-unsafe \
+            --strip-extras --generate-hashes --output-file requirements-dev.lock
+          git diff --exit-code -- requirements-dev.lock
+      - run: ruff check .
+      - run: pytest
+      - run: shushu check
+      - run: shushu benchmark validate evals/benchmark-v1.jsonl
+      - run: shushu validate evals/retrieval-topics-v1.jsonl --schema retrieval-benchmark-topic
+      - run: shushu validate evals/judgment.example.jsonl --schema evaluation-judgment
+      - run: shushu validate evals/pairwise-judgment.example.jsonl --schema pairwise-judgment
+      - run: shushu release-check --readme README.md
+      - run: shushu release-check --readme README_EN.md
+      - run: for run in examples/runs/*-known-scoop; do shushu next --run "$run"; done
+      - run: python -m build --no-isolation
+      - run: python scripts/check_distribution.py dist
