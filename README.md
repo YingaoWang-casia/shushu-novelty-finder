@@ -138,14 +138,27 @@ run_dir=$(.venv/bin/shushu run "RAG citation robustness" --mode full)
   --results-root . \
   --output evals/executed-run-matrix.jsonl
 
-# 240 个输出完成后，为两名评审者生成隐藏系统身份的独立盲包
+# 240 个输出完成后，生成 60-seed 全覆盖、12-seed 共同评审的减负盲包
 .venv/bin/shushu benchmark blind-pack evals/completed-run-matrix.jsonl \
   --benchmark-seeds evals/benchmark-v1.jsonl \
   --results-root . \
   --rater rater-a --rater rater-b \
-  --output-dir evals/blind-v1
+  --rating-design balanced-overlap \
+  --shared-seeds 12 \
+  --output-dir evals/blind-balanced-v1
 
-# 完成双人盲评后聚合指标；缺少任一 seed/system/rater 会返回非零状态
+# 两人分别 lock 后，由协调者验证清单、key、响应哈希并安全汇总；不要手工拼 JSONL
+.venv/bin/shushu benchmark collect-responses \
+  evals/blind-balanced-v1/raters/rater-a \
+  --rater-dir evals/blind-balanced-v1/raters/rater-b \
+  --blind-manifest-sha256 \
+    552dfbd1ef0517bd632ea0540beca3505674229ddaf856f5b2f82073e63a6c40 \
+  --blind-manifest evals/blind-balanced-v1/coordinator/manifest.json \
+  --blind-key evals/blind-balanced-v1/coordinator/blind-key.jsonl \
+  --output evals/blind-scalar-responses.jsonl \
+  --pairwise-output evals/blind-pairwise-responses.jsonl
+
+# 完成双人盲评后聚合指标；缺少集体 60-seed 覆盖、共同子集或包内完整评分会失败
 .venv/bin/shushu benchmark score evals/judgments.jsonl \
   --benchmark-seeds evals/benchmark-v1.jsonl \
   --run-matrix evals/completed-run-matrix.jsonl \
@@ -154,8 +167,8 @@ run_dir=$(.venv/bin/shushu run "RAG citation robustness" --mode full)
   --pairwise evals/pairwise-judgments.jsonl \
   --blind-scalar evals/blind-scalar-responses.jsonl \
   --blind-pairwise evals/blind-pairwise-responses.jsonl \
-  --blind-key evals/blind-v1/coordinator/blind-key.jsonl \
-  --blind-manifest evals/blind-v1/coordinator/manifest.json \
+  --blind-key evals/blind-balanced-v1/coordinator/blind-key.jsonl \
+  --blind-manifest evals/blind-balanced-v1/coordinator/manifest.json \
   --output evals/public-results.json
 ```
 
@@ -163,14 +176,17 @@ run_dir=$(.venv/bin/shushu run "RAG citation robustness" --mode full)
 
 <!-- EFFECTIVENESS_CLAIMS_START -->
 当前没有公开的比较效果声明。60-seed × 4-system 的 240 次运行及双人匿名评审包已经
-完成并做哈希绑定，但两名科研评审者的盲评和公开聚合结果尚未完成；在此之前，LLM
-judge 结果不能用来证明新版优于 baseline。
+完成并做哈希绑定；减负协议由两人各评 36 个种子、共同评 12 个种子，并集覆盖全部
+60 个种子。但两名科研评审者的盲评和公开聚合结果尚未完成；在此之前，LLM judge
+结果不能用来证明新版优于 baseline。
 <!-- EFFECTIVENESS_CLAIMS_END -->
 
 这一区域受 release gate 约束。评测协议见 [`evals/README.md`](evals/README.md)，失败模式见
 [`docs/failure-cases.md`](docs/failure-cases.md)；迁移说明、版本变化和发布清单分别见
 [`docs/migration-v0.2.md`](docs/migration-v0.2.md)、[`CHANGELOG.md`](CHANGELOG.md) 与
 [`docs/release-checklist.md`](docs/release-checklist.md)。
+两名科研评审者的筛选、付费 pilot、工作量披露和招募文案见
+[`docs/rater-recruitment.md`](docs/rater-recruitment.md)。
 
 架构与当前实施状态见 [`docs/architecture.md`](docs/architecture.md) 和
 [`docs/implementation-status.md`](docs/implementation-status.md)。

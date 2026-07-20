@@ -7,6 +7,7 @@ import pytest
 from shushu_novelty.cli import main
 from shushu_novelty.errors import InputError
 from shushu_novelty.evaluation.blinding import (
+    collect_locked_rater_responses,
     create_blind_packages,
     lock_rater_responses,
     unblind_responses,
@@ -125,11 +126,11 @@ def test_blind_pack_has_full_opaque_coverage_and_separate_key(tmp_path):
     assert "shushu-v0.2" in (
         output_dir / "coordinator" / "blind-key.jsonl"
     ).read_text(encoding="utf-8")
-    assert len(
-        (output_dir / "raters" / "rater-a" / "benchmark-seeds.jsonl")
-        .read_text(encoding="utf-8")
-        .splitlines()
-    ) == 60
+    rater_seed_text = (
+        output_dir / "raters" / "rater-a" / "benchmark-seeds.jsonl"
+    ).read_text(encoding="utf-8")
+    assert len(rater_seed_text.splitlines()) == 60
+    assert "shushu" not in rater_seed_text.casefold()
     rater_root = output_dir / "raters" / "rater-a"
     guide = (rater_root / "README.md").read_text(encoding="utf-8")
     assert "shushu" not in guide.casefold()
@@ -144,6 +145,102 @@ def test_blind_pack_has_full_opaque_coverage_and_separate_key(tmp_path):
     assert manifest["blind_key_sha256"] == hashlib.sha256(
         (output_dir / "coordinator" / "blind-key.jsonl").read_bytes()
     ).hexdigest()
+
+
+def test_balanced_overlap_pack_covers_suite_with_twelve_shared_seeds(tmp_path):
+    seeds = benchmark_seeds()
+    runs = complete_matrix(tmp_path, seeds)
+    output_dir = tmp_path / "balanced"
+
+    result = create_blind_packages(
+        runs,
+        seeds,
+        tmp_path,
+        output_dir,
+        ["rater-a", "rater-b"],
+        secret=b"test secret" * 4,
+        rating_design="balanced-overlap",
+        shared_seed_count=12,
+    )
+
+    assert result.rating_design == "balanced-overlap"
+    assert result.scalar_assignments == 288
+    assert result.pairwise_assignments == 432
+    assert result.key_records == 288
+    assert result.shared_seed_count == 12
+    assert result.rater_seed_counts == {"rater-a": 36, "rater-b": 36}
+    seed_sets = {}
+    for rater_id in ["rater-a", "rater-b"]:
+        rater_root = output_dir / "raters" / rater_id
+        assigned = validate_jsonl(
+            rater_root / "scalar-assignments.jsonl", BlindOutputAssignment
+        )
+        pairs = validate_jsonl(
+            rater_root / "pairwise-assignments.jsonl", BlindPairwiseAssignment
+        )
+        packed_seeds = validate_jsonl(
+            rater_root / "benchmark-seeds.jsonl", BenchmarkSeed
+        )
+        seed_sets[rater_id] = {item.seed_id for item in assigned}
+        assert len(assigned) == 144
+        assert len(pairs) == 216
+        assert len(packed_seeds) == 36
+        assert {seed.seed_id for seed in packed_seeds} == seed_sets[rater_id]
+    assert len(seed_sets["rater-a"] | seed_sets["rater-b"]) == 60
+    assert len(seed_sets["rater-a"] & seed_sets["rater-b"]) == 12
+
+    manifest = json.loads(
+        (output_dir / "coordinator" / "manifest.json").read_text(encoding="utf-8")
+    )
+    seed_by_id = {seed.seed_id: seed for seed in seeds}
+    shared_case_types = {}
+    for seed_id in manifest["shared_seed_ids"]:
+        case_type = seed_by_id[seed_id].case_type
+        shared_case_types[case_type] = shared_case_types.get(case_type, 0) + 1
+    assert shared_case_types == {
+        "broad-direction": 4,
+        "seed-paper": 4,
+        "known-scoop": 2,
+        "mechanism-transfer": 2,
+    }
+    assert manifest["shared_case_type_counts"] == shared_case_types
+    assert set(manifest["shared_domain_counts"]) == {
+        "agents",
+        "cv-multimodal",
+        "data-mining",
+        "llm-rag",
+        "scientific-ml",
+        "security",
+        "speech",
+        "systems",
+    }
+    assert all(
+        sum(counts.values()) == 36
+        for counts in manifest["rater_case_type_counts"].values()
+    )
+    assert all(
+        sum(counts.values()) == 36
+        for counts in manifest["rater_domain_counts"].values()
+    )
+
+    rater_root = output_dir / "raters" / "rater-a"
+    scalar, pairwise = complete_rater_responses(rater_root)
+    scalar_path = rater_root / "blind-scalar-responses.jsonl"
+    pairwise_path = rater_root / "blind-pairwise-responses.jsonl"
+    write_jsonl(scalar, scalar_path)
+    write_jsonl(pairwise, pairwise_path)
+    commitment = hashlib.sha256(
+        (output_dir / "coordinator" / "manifest.json").read_bytes()
+    ).hexdigest()
+    lock = lock_rater_responses(
+        rater_root,
+        scalar_path,
+        pairwise_path,
+        commitment,
+        rater_root / "response-lock.json",
+    )
+    assert lock.scalar_responses == 144
+    assert lock.pairwise_responses == 216
 
 
 def test_rater_response_lock_validates_coverage_bindings_and_hashes(tmp_path):
@@ -416,6 +513,14 @@ def test_blind_manifest_detects_output_and_key_tampering(tmp_path):
     manifest = output_dir / "coordinator" / "manifest.json"
 
     verify_blind_package_manifest(key, manifest)
+    original_manifest = manifest.read_text(encoding="utf-8")
+    tampered_manifest = json.loads(original_manifest)
+    tampered_manifest["shared_seed_count"] -= 1
+    manifest.write_text(json.dumps(tampered_manifest), encoding="utf-8")
+    with pytest.raises(InputError, match="rating coverage is inconsistent"):
+        verify_blind_package_manifest(key, manifest)
+    manifest.write_text(original_manifest, encoding="utf-8")
+    verify_blind_package_manifest(key, manifest)
     output = next((output_dir / "raters" / "rater-a" / "outputs").rglob("*.md"))
     original = output.read_bytes()
     output.write_bytes(original + b"tampered\n")
@@ -492,7 +597,7 @@ def test_blind_pack_rejects_explicit_self_reflection_profile(tmp_path):
         )
 
 
-def test_full_blind_unblind_and_score_cli_pipeline(tmp_path):
+def test_balanced_blind_unblind_and_score_cli_pipeline(tmp_path):
     seeds = benchmark_seeds()
     seed_path = tmp_path / "benchmark-v1.jsonl"
     write_jsonl(seeds, seed_path)
@@ -532,14 +637,18 @@ def test_full_blind_unblind_and_score_cli_pipeline(tmp_path):
         blind_dir,
         ["rater-a", "rater-b"],
         secret=b"test secret" * 4,
+        rating_design="balanced-overlap",
+        shared_seed_count=12,
     )
     fixture = EvaluationJudgment.model_validate(
         json.loads(Path("evals/judgment.example.jsonl").read_text(encoding="utf-8"))
     )
-    scalar_responses = []
-    pairwise_responses = []
+    blind_manifest = blind_dir / "coordinator" / "manifest.json"
+    commitment = hashlib.sha256(blind_manifest.read_bytes()).hexdigest()
     for rater_id in ["rater-a", "rater-b"]:
         rater_root = blind_dir / "raters" / rater_id
+        scalar_responses = []
+        pairwise_responses = []
         assignments = validate_jsonl(
             rater_root / "scalar-assignments.jsonl", BlindOutputAssignment
         )
@@ -575,12 +684,53 @@ def test_full_blind_unblind_and_score_cli_pipeline(tmp_path):
                     rationale="The fixture outputs are equivalent.",
                 )
             )
+        rater_scalar_path = rater_root / "blind-scalar-responses.jsonl"
+        rater_pairwise_path = rater_root / "blind-pairwise-responses.jsonl"
+        write_jsonl(scalar_responses, rater_scalar_path)
+        write_jsonl(pairwise_responses, rater_pairwise_path)
+        lock_rater_responses(
+            rater_root,
+            rater_scalar_path,
+            rater_pairwise_path,
+            commitment,
+            rater_root / "response-lock.json",
+        )
     scalar_path = tmp_path / "blind-scalar-responses.jsonl"
     pairwise_path = tmp_path / "blind-pairwise-responses.jsonl"
-    write_jsonl(scalar_responses, scalar_path)
-    write_jsonl(pairwise_responses, pairwise_path)
+    assert main(
+        [
+            "benchmark",
+            "collect-responses",
+            str(blind_dir / "raters" / "rater-a"),
+            "--rater-dir",
+            str(blind_dir / "raters" / "rater-b"),
+            "--blind-manifest-sha256",
+            commitment,
+            "--blind-manifest",
+            str(blind_manifest),
+            "--blind-key",
+            str(blind_dir / "coordinator" / "blind-key.jsonl"),
+            "--output",
+            str(scalar_path),
+            "--pairwise-output",
+            str(pairwise_path),
+        ]
+    ) == 0
+    locked_scalar = (
+        blind_dir / "raters" / "rater-a" / "blind-scalar-responses.jsonl"
+    )
+    locked_bytes = locked_scalar.read_bytes()
+    locked_scalar.write_bytes(locked_bytes + b"tampered\n")
+    with pytest.raises(InputError, match="response lock hashes"):
+        collect_locked_rater_responses(
+            [
+                blind_dir / "raters" / "rater-a",
+                blind_dir / "raters" / "rater-b",
+            ],
+            commitment,
+        )
+    locked_scalar.write_bytes(locked_bytes)
     key_path = blind_dir / "coordinator" / "blind-key.jsonl"
-    blind_manifest = blind_dir / "coordinator" / "manifest.json"
     judgments_path = tmp_path / "judgments.jsonl"
     pairwise_judgments_path = tmp_path / "pairwise-judgments.jsonl"
 
@@ -631,8 +781,19 @@ def test_full_blind_unblind_and_score_cli_pipeline(tmp_path):
     ) == 0
     payload = json.loads(public_results.read_text(encoding="utf-8"))
     assert payload["publishable"] is True
-    assert payload["human_judgments"] == 480
-    assert payload["pairwise"]["human_judgments"] == 720
+    assert payload["rating_design"] == "balanced-overlap"
+    assert payload["human_judgments"] == 288
+    assert payload["pairwise"]["human_judgments"] == 432
+    assert payload["coverage"]["collective_seed_count"] == 60
+    assert payload["coverage"]["shared_seed_count"] == 12
+    assert payload["coverage"]["rater_seed_counts"] == {
+        "rater-a": 36,
+        "rater-b": 36,
+    }
+    assert all(
+        metrics["effective_seed_judgments"] == 60
+        for metrics in payload["systems"].values()
+    )
     assert set(payload["artifacts"]) == {
         "benchmark_seeds",
         "blind_key",

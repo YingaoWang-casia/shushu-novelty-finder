@@ -6,7 +6,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
-from shushu_novelty.evaluation.metrics import REQUIRED_PRIMARY_SYSTEMS
+from shushu_novelty.evaluation.metrics import MIN_SHARED_SEEDS, REQUIRED_PRIMARY_SYSTEMS
 from shushu_novelty.io import sha256_file
 
 START = "<!-- EFFECTIVENESS_CLAIMS_START -->"
@@ -98,15 +98,73 @@ def validate_public_evaluation(evaluation: dict[str, object]) -> list[str]:
     human_raters = evaluation.get("human_raters", [])
     if not isinstance(human_raters, list) or len(human_raters) < 2:
         errors.append("public evaluation must list at least two human raters")
+    coverage = evaluation.get("coverage")
+    overlap_coverage = isinstance(coverage, dict)
+    expected_human_seed_ratings = None
+    if overlap_coverage:
+        if evaluation.get("rating_design") not in {"complete", "balanced-overlap"}:
+            errors.append("public evaluation must declare a verified human rating design")
+        if coverage.get("collective_seed_count") != 60:
+            errors.append("public evaluation must collectively cover all 60 benchmark seeds")
+        if not isinstance(coverage.get("shared_seed_count"), int) or coverage.get(
+            "shared_seed_count", 0
+        ) < MIN_SHARED_SEEDS:
+            errors.append(
+                "public evaluation must include at least "
+                f"{MIN_SHARED_SEEDS} shared human-rated seeds"
+            )
+        minimum_raters = coverage.get("minimum_raters_per_seed")
+        if not isinstance(minimum_raters, int) or minimum_raters < 1:
+            errors.append("public evaluation must report per-seed human coverage")
+        maximum_raters = coverage.get("maximum_raters_per_seed")
+        if not isinstance(maximum_raters, int) or maximum_raters < 2:
+            errors.append("public evaluation must include multiply rated shared seeds")
+        shared_seed_ids = coverage.get("shared_seed_ids")
+        if (
+            not isinstance(shared_seed_ids, list)
+            or len(shared_seed_ids) != coverage.get("shared_seed_count")
+            or any(not isinstance(seed_id, str) for seed_id in shared_seed_ids)
+            or len(set(shared_seed_ids)) != len(shared_seed_ids)
+        ):
+            errors.append("public evaluation shared seed IDs must match shared coverage")
+        rater_seed_counts = coverage.get("rater_seed_counts")
+        if (
+            not isinstance(rater_seed_counts, dict)
+            or len(rater_seed_counts) < 2
+            or any(not isinstance(key, str) for key in rater_seed_counts)
+            or any(
+                not isinstance(value, int) or value < 1
+                for value in rater_seed_counts.values()
+            )
+        ):
+            errors.append("public evaluation must report valid per-rater seed counts")
+        else:
+            expected_human_seed_ratings = sum(rater_seed_counts.values())
     human_judgments = evaluation.get("human_judgments", 0)
-    if not isinstance(human_judgments, int) or human_judgments < 480:
-        errors.append("public evaluation must include at least 480 scalar human judgments")
+    minimum_scalar = (60 + MIN_SHARED_SEEDS) * 4 if overlap_coverage else 480
+    if not isinstance(human_judgments, int) or human_judgments < minimum_scalar:
+        errors.append(
+            f"public evaluation must include at least {minimum_scalar} scalar human judgments"
+        )
+    if (
+        expected_human_seed_ratings is not None
+        and human_judgments != expected_human_seed_ratings * 4
+    ):
+        errors.append("scalar human judgments do not match per-rater seed coverage")
     if evaluation.get("cohens_kappa") is None:
         errors.append("public evaluation must report scalar Cohen's kappa")
     pairwise = evaluation.get("pairwise", {})
     pairwise_count = pairwise.get("human_judgments", 0) if isinstance(pairwise, dict) else 0
-    if not isinstance(pairwise_count, int) or pairwise_count < 720:
-        errors.append("public evaluation must include at least 720 pairwise human judgments")
+    minimum_pairwise = (60 + MIN_SHARED_SEEDS) * 6 if overlap_coverage else 720
+    if not isinstance(pairwise_count, int) or pairwise_count < minimum_pairwise:
+        errors.append(
+            f"public evaluation must include at least {minimum_pairwise} pairwise human judgments"
+        )
+    if (
+        expected_human_seed_ratings is not None
+        and pairwise_count != expected_human_seed_ratings * 6
+    ):
+        errors.append("pairwise human judgments do not match per-rater seed coverage")
     if not isinstance(pairwise, dict) or pairwise.get("cohens_kappa") is None:
         errors.append("public evaluation must report pairwise Cohen's kappa")
     if evaluation.get("expected_seed_count") != 60:
@@ -156,8 +214,19 @@ def validate_public_evaluation(evaluation: dict[str, object]) -> list[str]:
             errors.append(f"public evaluation system {system} is not an object")
             continue
         judgment_count = payload.get("judgments", 0)
-        if not isinstance(judgment_count, int) or judgment_count < 120:
-            errors.append(f"public evaluation system {system} has fewer than 120 judgments")
+        minimum_system_judgments = 60 + MIN_SHARED_SEEDS if overlap_coverage else 120
+        if not isinstance(judgment_count, int) or judgment_count < minimum_system_judgments:
+            errors.append(
+                f"public evaluation system {system} has fewer than "
+                f"{minimum_system_judgments} judgments"
+            )
+        if overlap_coverage:
+            effective = payload.get("effective_seed_judgments")
+            if not isinstance(effective, (int, float)) or effective < 60:
+                errors.append(
+                    f"public evaluation system {system} has fewer than 60 effective seed "
+                    "judgments"
+                )
         for family, required_keys in REQUIRED_METRIC_FAMILIES.items():
             metrics = payload.get(family, {})
             missing = required_keys - set(metrics if isinstance(metrics, dict) else {})

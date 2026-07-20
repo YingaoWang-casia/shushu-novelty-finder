@@ -85,14 +85,17 @@ do not edit the lock file manually.
 
 <!-- EFFECTIVENESS_CLAIMS_START -->
 There are no public comparative effectiveness claims. All 240 runs in the fixed 60-seed ×
-4-system matrix and the two anonymous rater packs are hash-complete, but blind ratings by two
-research-experienced reviewers and public aggregate results are pending. Until then, an LLM judge
-cannot establish superiority over a baseline.
+4-system matrix and the balanced anonymous rater packs are hash-complete. Each of two raters is
+assigned 36 seeds, with 12 shared seeds and complete collective coverage of all 60. Blind ratings
+by two research-experienced reviewers and public aggregate results are still pending. Until then,
+an LLM judge cannot establish superiority over a baseline.
 <!-- EFFECTIVENESS_CLAIMS_END -->
 
 The release gate enforces this block. See [`evals/README.md`](evals/README.md) for the protocol and
 [`docs/release-checklist.md`](docs/release-checklist.md) for the publication requirements. Version
 changes are recorded in [`CHANGELOG.md`](CHANGELOG.md).
+The paid-pilot and recruitment brief is in
+[`docs/rater-recruitment.md`](docs/rater-recruitment.md).
 
 After installation, you can use it in Codex like this:
 

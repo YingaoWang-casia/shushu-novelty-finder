@@ -28,14 +28,18 @@ Updated: 2026-07-20
 - a fixed 60-seed benchmark with exact case distribution, eight-domain coverage, and a default
   240-run bare/self-reflection/v0.1/v0.2 matrix;
 - a completed 240-run `gpt-5.6-sol` matrix with four 60-run systems, per-output hashes, a completed
-  execution manifest, retained failure history, and two hash-bound opaque human-rater packs;
+  execution manifest, retained failure history, and two hash-bound opaque human-rater packs using
+  a preregistered 12-seed balanced overlap;
 - human-primary aggregation for every specified retrieval, evidence, lineage, idea, and calibration
-  metric, full scalar and pairwise coverage gates, and Cohen's kappa;
+  metric, collective 60-seed coverage, complete within-pack scalar/pairwise gates, seed-normalized
+  weighting, and scalar/pairwise Cohen's kappa on shared items;
 - external command adapters that execute the fixed run matrix without a shell, persist failures,
   hash outputs, checkpoint after every run, validate prompt/adapter provenance, and safely resume
   completed runs, with a circuit breaker for quota, authentication, and 429 failures;
 - coordinator tooling that produces per-rater opaque scalar and pairwise packs, randomizes pair
-  order, keeps system identity in a separate key, and unblinds only locked response files;
+  order, supports complete or balanced-overlap designs, neutralizes coordinator branding in rater
+  seed provenance, keeps system identity in a separate key, safely collects independently locked
+  directories, and unblinds only verified combined responses;
 - deterministic reviewer-audit gates with independent context, evidence-backed objections, one
   structural revision, and fatal-objection abandonment;
 - final-report manifests that expose failures, uncertainty, limitations, strong claims, hashes,
@@ -58,8 +62,9 @@ Updated: 2026-07-20
   explicit per document;
 - lineage relation classification remains LLM-assisted;
 - benchmark system execution and blind-pack generation are complete, while the real two-person
-  ratings remain pending; the judgment contracts, coverage checks, aggregation, and agreement
-  statistic are implemented;
+  ratings remain pending. The retained reduced packs assign each person 36 seeds (144 scalar and
+  216 pairwise rows), share 12 stratified seeds, and collectively cover all 60; recruitment and a
+  paid pilot still require external humans;
 - the original credential-free 20-topic live connector run measured arXiv/OpenReview at 100%,
   OpenAlex at 0%, Semantic Scholar at 20%, and zero post-dedup duplicates. After enabling the
   providers' bounded anonymous paths, the retained joint rerun passed all four sources at 20/20,
@@ -80,15 +85,18 @@ Updated: 2026-07-20
 | 7 | Independent novelty collision | Implemented at schema/gate level |
 | 8 | Scooped ideas downgrade or abandon | Implemented and regression-tested |
 | 9 | At least 60 fixed eval seeds | Implemented |
-| 10 | Bare-model and old-version baselines | 240/240 real runs complete; matrix, execution manifest, and two-rater blind packs hash-verified |
-| 11 | Core code has automated tests | Implemented for current runtime (113 tests) |
-| 12 | CI runs on every PR | Draft PR #1 run 29735638352 passed Python 3.9 and 3.12 from one pull-request workflow |
+| 10 | Bare-model and old-version baselines | 240/240 real runs complete; matrix, execution manifest, and reduced two-rater blind packs hash-verified |
+| 11 | Core code has automated tests | Implemented for current runtime (117 tests) |
+| 12 | CI runs on every PR | Draft PR #1 passes Python 3.9 and 3.12 from one pull-request workflow |
 | 13 | Reports expose failures and uncertainty | Implemented as a P9 manifest/report gate |
 | 14 | README claims are supported by public evals | Enforced: no comparative claim until a hashed public eval passes |
 
 The remaining comparative-release evidence is external: collect paired blind judgments from at
 least two research-experienced humans, publish the aggregate report, and only then update the
 guarded README claim block with the report SHA-256.
+
+The exact reviewer profile, paid-pilot procedure, current workload, and copy-ready recruitment
+brief are in [`rater-recruitment.md`](rater-recruitment.md).
 
 The command-by-command evidence and remaining external requirements are recorded in
 [`acceptance-audit.md`](acceptance-audit.md).

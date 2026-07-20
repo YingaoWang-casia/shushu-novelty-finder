@@ -11,13 +11,24 @@ not imply completed comparative effectiveness evidence.
   quota, login, or HTTP 429 failures instead of marking every remaining run failed.
 - Blind rater packs now include hash-bound identity-free scoring guidance and response schemas;
   contextual leakage detection distinguishes system-profile disclosure from research terminology.
+- Added a preregistered balanced-overlap human-rating design: two raters collectively cover all 60
+  seeds, share 12 case/domain-stratified seeds, and complete 288 scalar plus 432 pairwise judgments
+  instead of 480 plus 720. Shared seeds are normalized to one total weight in system metrics.
+- Rater-side benchmark provenance is coordinator-neutral, while the original benchmark and the
+  complete assignment/stratum plan remain hash-bound in the coordinator manifest.
 - Added an identity-neutral rater-side response-lock command that verifies complete coverage,
   immutable anonymous assignments, copied-output hashes, and consistent rater metadata before
   committing both human-response hashes.
+- Added coordinator-side locked-response collection that rejects hand-edited, unlocked,
+  foreign-package, incomplete, or commitment-mismatched rater directories before unblinding.
 - Public scoring now verifies the declared adapter file and completed run-matrix path in addition
   to their hashes, and rejects drift between locked blind responses and unblinded judgments.
-- Human-primary blind evaluation, credentialed live retrieval, and remote pull-request CI evidence
-  remain release gates for a stable comparative release.
+- OpenAlex now supports its bounded anonymous demo path for smoke/evaluation runs; the retained
+  credential-free four-source suite passed all sources at 20/20 with replay-verifiable artifacts.
+- GitHub Actions now passes Python 3.9 and 3.12 from one PR workflow, regenerating the canonical
+  dependency lock only on Python 3.9.
+- Completed human-primary ratings remain the only external evidence gate for stable comparative
+  claims.
 
 ## [0.2.0a1] - 2026-07-16
 

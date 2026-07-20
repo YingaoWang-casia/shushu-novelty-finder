@@ -17,6 +17,7 @@ REQUIRED_PRIMARY_SYSTEMS = {
     "shushu-v0.1",
     "shushu-v0.2",
 }
+MIN_SHARED_SEEDS = 12
 
 IDEA_DIMENSIONS = [
     "problem_significance",
@@ -47,22 +48,41 @@ def _sum_ratio(
     numerator: str,
     denominator: str,
     group: str,
+    weights: list[float] | None = None,
 ) -> float | None:
+    item_weights = weights or [1.0] * len(judgments)
     objects = [getattr(item, group) for item in judgments]
-    return _ratio(
-        sum(getattr(item, numerator) for item in objects),
-        sum(getattr(item, denominator) for item in objects),
+    weighted_numerator = sum(
+        weight * getattr(item, numerator) for item, weight in zip(objects, item_weights)
     )
+    weighted_denominator = sum(
+        weight * getattr(item, denominator) for item, weight in zip(objects, item_weights)
+    )
+    return weighted_numerator / weighted_denominator if weighted_denominator else None
 
 
-def _pearson(xs: list[float], ys: list[float]) -> float | None:
+def _weighted_mean(values: list[float], weights: list[float]) -> float:
+    return sum(value * weight for value, weight in zip(values, weights)) / sum(weights)
+
+
+def _pearson(
+    xs: list[float], ys: list[float], weights: list[float] | None = None
+) -> float | None:
     if len(xs) < 2 or len(set(xs)) < 2 or len(set(ys)) < 2:
         return None
-    x_mean = fmean(xs)
-    y_mean = fmean(ys)
-    numerator = sum((x - x_mean) * (y - y_mean) for x, y in zip(xs, ys))
-    x_scale = math.sqrt(sum((x - x_mean) ** 2 for x in xs))
-    y_scale = math.sqrt(sum((y - y_mean) ** 2 for y in ys))
+    item_weights = weights or [1.0] * len(xs)
+    x_mean = _weighted_mean(xs, item_weights)
+    y_mean = _weighted_mean(ys, item_weights)
+    numerator = sum(
+        weight * (x - x_mean) * (y - y_mean)
+        for x, y, weight in zip(xs, ys, item_weights)
+    )
+    x_scale = math.sqrt(
+        sum(weight * (x - x_mean) ** 2 for x, weight in zip(xs, item_weights))
+    )
+    y_scale = math.sqrt(
+        sum(weight * (y - y_mean) ** 2 for y, weight in zip(ys, item_weights))
+    )
     return numerator / (x_scale * y_scale) if x_scale and y_scale else None
 
 
@@ -124,9 +144,26 @@ def human_pairwise_kappa(judgments: list[PairwiseJudgment]) -> float | None:
 
 
 def aggregate_system(judgments: list[EvaluationJudgment]) -> dict[str, object]:
+    ratings_per_seed: dict[str, int] = defaultdict(int)
+    for item in judgments:
+        ratings_per_seed[item.seed_id] += 1
+    weights = [1.0 / ratings_per_seed[item.seed_id] for item in judgments]
     strong = [item for item in judgments if item.idea.novelty_verdict == "strong"]
+    strong_weights = [
+        weight
+        for item, weight in zip(judgments, weights)
+        if item.idea.novelty_verdict == "strong"
+    ]
     scoop_cases = [item for item in judgments if item.calibration.is_scoop_case]
+    scoop_weights = [
+        weight for item, weight in zip(judgments, weights) if item.calibration.is_scoop_case
+    ]
     kill_positive = [item for item in judgments if item.calibration.kill_recommended]
+    kill_weights = [
+        weight
+        for item, weight in zip(judgments, weights)
+        if item.calibration.kill_recommended
+    ]
     relation_f1 = []
     relation_metrics = {}
     for relation in RELATION_TYPES:
@@ -134,9 +171,15 @@ def aggregate_system(judgments: list[EvaluationJudgment]) -> dict[str, object]:
             next(item for item in judgment.lineage.relations if item.relation == relation)
             for judgment in judgments
         ]
-        true_positive = sum(item.true_positive for item in assessments)
-        false_positive = sum(item.false_positive for item in assessments)
-        false_negative = sum(item.false_negative for item in assessments)
+        true_positive = sum(
+            weight * item.true_positive for item, weight in zip(assessments, weights)
+        )
+        false_positive = sum(
+            weight * item.false_positive for item, weight in zip(assessments, weights)
+        )
+        false_negative = sum(
+            weight * item.false_negative for item, weight in zip(assessments, weights)
+        )
         denominator = 2 * true_positive + false_positive + false_negative
         value = 2 * true_positive / denominator if denominator else None
         relation_metrics[relation] = value
@@ -144,35 +187,49 @@ def aggregate_system(judgments: list[EvaluationJudgment]) -> dict[str, object]:
             relation_f1.append(value)
     return {
         "judgments": len(judgments),
+        "effective_seed_judgments": sum(weights),
         "retrieval": {
             "known_prior_recall_at_k": _sum_ratio(
-                judgments, "known_prior_retrieved_at_k", "known_prior_total", "retrieval"
+                judgments,
+                "known_prior_retrieved_at_k",
+                "known_prior_total",
+                "retrieval",
+                weights,
             ),
             "duplicate_rate": _sum_ratio(
-                judgments, "duplicate_records", "retrieved_records", "retrieval"
+                judgments, "duplicate_records", "retrieved_records", "retrieval", weights
             ),
             "metadata_completeness": _sum_ratio(
-                judgments, "metadata_fields_present", "metadata_fields_total", "retrieval"
+                judgments,
+                "metadata_fields_present",
+                "metadata_fields_total",
+                "retrieval",
+                weights,
             ),
             "accepted_preprint_accuracy": _sum_ratio(
                 judgments,
                 "publication_labels_correct",
                 "publication_labels_total",
                 "retrieval",
+                weights,
             ),
         },
         "evidence": {
             "citation_existence_precision": _sum_ratio(
-                judgments, "citations_existing", "citations_total", "evidence"
+                judgments, "citations_existing", "citations_total", "evidence", weights
             ),
             "claim_entailment_accuracy": _sum_ratio(
-                judgments, "claims_entailed", "claims_total", "evidence"
+                judgments, "claims_entailed", "claims_total", "evidence", weights
             ),
             "unsupported_claim_rate": _sum_ratio(
-                judgments, "unsupported_claims", "claims_total", "evidence"
+                judgments, "unsupported_claims", "claims_total", "evidence", weights
             ),
             "full_text_verification_coverage": _sum_ratio(
-                judgments, "full_text_verified_claims", "strong_claims", "evidence"
+                judgments,
+                "full_text_verified_claims",
+                "strong_claims",
+                "evidence",
+                weights,
             ),
         },
         "lineage": {
@@ -185,37 +242,61 @@ def aggregate_system(judgments: list[EvaluationJudgment]) -> dict[str, object]:
                 "closest_prior_retrieved_at_5",
                 "closest_prior_total",
                 "lineage",
+                weights,
             ),
             "saturated_contribution_precision": _sum_ratio(
                 judgments,
                 "saturated_contributions_correct",
                 "saturated_contributions_predicted",
                 "lineage",
+                weights,
             ),
             "unsupported_lineage_edge_rate": _sum_ratio(
                 judgments,
                 "unsupported_lineage_edges",
                 "lineage_edges_total",
                 "lineage",
+                weights,
             ),
         },
         "idea": {
-            dimension: fmean(getattr(item.idea, dimension) for item in judgments)
+            dimension: _weighted_mean(
+                [getattr(item.idea, dimension) for item in judgments], weights
+            )
             for dimension in IDEA_DIMENSIONS
         },
         "calibration": {
-            "strong_false_positive_rate": _ratio(
-                sum(not item.calibration.prediction_correct for item in strong), len(strong)
+            "strong_false_positive_rate": (
+                sum(
+                    weight * (not item.calibration.prediction_correct)
+                    for item, weight in zip(strong, strong_weights)
+                )
+                / sum(strong_weights)
+                if strong_weights
+                else None
             ),
-            "scoop_detection_recall": _ratio(
-                sum(item.calibration.scoop_detected for item in scoop_cases), len(scoop_cases)
+            "scoop_detection_recall": (
+                sum(
+                    weight * item.calibration.scoop_detected
+                    for item, weight in zip(scoop_cases, scoop_weights)
+                )
+                / sum(scoop_weights)
+                if scoop_weights
+                else None
             ),
             "confidence_accuracy_correlation": _pearson(
                 [item.calibration.confidence for item in judgments],
                 [float(item.calibration.prediction_correct) for item in judgments],
+                weights,
             ),
-            "kill_decision_precision": _ratio(
-                sum(item.calibration.kill_correct for item in kill_positive), len(kill_positive)
+            "kill_decision_precision": (
+                sum(
+                    weight * item.calibration.kill_correct
+                    for item, weight in zip(kill_positive, kill_weights)
+                )
+                / sum(kill_weights)
+                if kill_weights
+                else None
             ),
         },
     }
@@ -276,6 +357,47 @@ def aggregate_evaluation(
     expected_seeds = set(expected_seed_ids or [])
     if expected_seed_ids is not None and not expected_seeds:
         errors.append("expected benchmark seed IDs cannot be empty")
+    required_pairs = set(combinations(sorted(REQUIRED_PRIMARY_SYSTEMS), 2))
+    scalar_seed_raters: dict[str, set[str]] = defaultdict(set)
+    pairwise_seed_raters: dict[str, set[str]] = defaultdict(set)
+    rater_seed_counts: dict[str, int] = {}
+    for rater_id in human_raters:
+        scalar_by_seed: dict[str, set[str]] = defaultdict(set)
+        pairwise_by_seed: dict[str, set[tuple[str, str]]] = defaultdict(set)
+        for item in humans:
+            if item.rater_id == rater_id:
+                scalar_by_seed[item.seed_id].add(item.system)
+        for item in pairwise_humans:
+            if item.rater_id == rater_id:
+                pairwise_by_seed[item.seed_id].add(_canonical_pairwise(item)[0])
+        for seed_id, systems in sorted(scalar_by_seed.items()):
+            missing = REQUIRED_PRIMARY_SYSTEMS - systems
+            if missing:
+                errors.append(
+                    f"human rater {rater_id} seed {seed_id} is missing {len(missing)} "
+                    "required system judgments"
+                )
+            scalar_seed_raters[seed_id].add(rater_id)
+        for seed_id, pairs in sorted(pairwise_by_seed.items()):
+            missing = required_pairs - pairs
+            if missing:
+                errors.append(
+                    f"human rater {rater_id} seed {seed_id} is missing {len(missing)} "
+                    "required pairwise judgments"
+                )
+            pairwise_seed_raters[seed_id].add(rater_id)
+        if set(scalar_by_seed) != set(pairwise_by_seed):
+            errors.append(
+                f"human rater {rater_id} must rate the same seeds in scalar and pairwise files"
+            )
+        rater_seed_counts[rater_id] = len(scalar_by_seed)
+
+    collective_seeds = set(scalar_seed_raters)
+    shared_seed_ids = {
+        seed_id
+        for seed_id, raters in scalar_seed_raters.items()
+        if len(raters) >= 2 and len(pairwise_seed_raters.get(seed_id, set())) >= 2
+    }
     if expected_seeds:
         unknown_seeds = {
             item.seed_id for item in [*items, *pairwise_items]
@@ -285,39 +407,18 @@ def aggregate_evaluation(
                 "judgments reference unknown benchmark seeds: "
                 + ", ".join(sorted(unknown_seeds))
             )
-        expected_pairs = {
-            (seed_id, system)
-            for seed_id in expected_seeds
-            for system in REQUIRED_PRIMARY_SYSTEMS
-        }
-        for rater_id in human_raters:
-            observed_pairs = {
-                (item.seed_id, item.system)
-                for item in humans
-                if item.rater_id == rater_id
-            }
-            missing = expected_pairs - observed_pairs
-            if missing:
-                errors.append(
-                    f"human rater {rater_id} is missing {len(missing)} "
-                    "required seed/system judgments"
-                )
-        required_pairs = set(combinations(sorted(REQUIRED_PRIMARY_SYSTEMS), 2))
-        expected_pairwise = {
-            (seed_id, pair) for seed_id in expected_seeds for pair in required_pairs
-        }
-        for rater_id in human_raters:
-            observed_pairwise = {
-                (item.seed_id, _canonical_pairwise(item)[0])
-                for item in pairwise_humans
-                if item.rater_id == rater_id
-            }
-            missing = expected_pairwise - observed_pairwise
-            if missing:
-                errors.append(
-                    f"human rater {rater_id} is missing {len(missing)} "
-                    "required pairwise judgments"
-                )
+        missing_collective = expected_seeds - collective_seeds
+        if missing_collective:
+            errors.append(
+                "human ratings collectively miss benchmark seeds: "
+                + ", ".join(sorted(missing_collective))
+            )
+        required_shared = min(MIN_SHARED_SEEDS, len(expected_seeds))
+        if len(shared_seed_ids) < required_shared:
+            errors.append(
+                f"human raters must share at least {required_shared} complete seeds for "
+                "agreement"
+            )
     elif human_raters:
         warnings.append(
             "benchmark seed suite was not supplied; full 60-seed coverage was not verified"
@@ -336,13 +437,42 @@ def aggregate_evaluation(
     by_system: dict[str, list[EvaluationJudgment]] = defaultdict(list)
     for item in primary:
         by_system[item.system].append(item)
+    if expected_seeds and shared_seed_ids == expected_seeds and all(
+        count == len(expected_seeds) for count in rater_seed_counts.values()
+    ):
+        rating_design = "complete"
+    elif (
+        expected_seeds
+        and collective_seeds == expected_seeds
+        and len(shared_seed_ids) >= min(MIN_SHARED_SEEDS, len(expected_seeds))
+    ):
+        rating_design = "balanced-overlap"
+    else:
+        rating_design = "incomplete-or-unverified"
     report = {
         "schema_version": "1.0",
         "primary_basis": "human" if len(human_raters) >= 2 else "insufficient-human-ratings",
+        "rating_design": rating_design,
         "human_raters": human_raters,
         "human_judgments": len(humans),
         "auxiliary_llm_judgments": len(llms),
         "expected_seed_count": len(expected_seeds) if expected_seeds else None,
+        "coverage": {
+            "collective_seed_count": len(collective_seeds),
+            "shared_seed_count": len(shared_seed_ids),
+            "shared_seed_ids": sorted(shared_seed_ids),
+            "minimum_raters_per_seed": (
+                min(len(scalar_seed_raters.get(seed_id, set())) for seed_id in expected_seeds)
+                if expected_seeds
+                else None
+            ),
+            "maximum_raters_per_seed": (
+                max(len(scalar_seed_raters.get(seed_id, set())) for seed_id in expected_seeds)
+                if expected_seeds
+                else None
+            ),
+            "rater_seed_counts": rater_seed_counts,
+        },
         "cohens_kappa": kappa,
         "pairwise": {
             "human_judgments": len(pairwise_humans),

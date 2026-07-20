@@ -31,6 +31,9 @@ from shushu_novelty.evaluation.benchmark import (
     validate_suite,
 )
 from shushu_novelty.evaluation.blinding import (
+    DEFAULT_SHARED_SEEDS,
+    RATING_DESIGNS,
+    collect_locked_rater_responses,
     create_blind_packages,
     lock_rater_responses,
     unblind_responses,
@@ -206,6 +209,7 @@ def _build_parser() -> argparse.ArgumentParser:
             "collect",
             "merge",
             "blind-pack",
+            "collect-responses",
             "lock-responses",
             "unblind",
             "score",
@@ -243,6 +247,24 @@ def _build_parser() -> argparse.ArgumentParser:
         "--matrix", action="append", type=Path, help="additional checkpoint for merge"
     )
     benchmark.add_argument("--rater", action="append", help="blind-pack rater ID; repeat")
+    benchmark.add_argument(
+        "--rater-dir",
+        action="append",
+        type=Path,
+        help="additional locked rater directory for collect-responses; repeat as needed",
+    )
+    benchmark.add_argument(
+        "--rating-design",
+        choices=RATING_DESIGNS,
+        default="complete",
+        help="blind-pack coverage design; balanced-overlap requires exactly two raters",
+    )
+    benchmark.add_argument(
+        "--shared-seeds",
+        type=int,
+        default=DEFAULT_SHARED_SEEDS,
+        help=f"shared seeds in balanced-overlap design (default: {DEFAULT_SHARED_SEEDS})",
+    )
     benchmark.add_argument("--output-dir", type=Path, help="blind-pack destination")
     benchmark.add_argument("--blind-key", type=Path, help="coordinator key for unblind")
     benchmark.add_argument(
@@ -642,7 +664,13 @@ def _command_benchmark(args: argparse.Namespace) -> int:
         runs = validate_jsonl(args.input, BenchmarkRun)
         seeds = validate_jsonl(args.benchmark_seeds, BenchmarkSeed)
         result = create_blind_packages(
-            runs, seeds, args.results_root, args.output_dir, args.rater
+            runs,
+            seeds,
+            args.results_root,
+            args.output_dir,
+            args.rater,
+            rating_design=args.rating_design,
+            shared_seed_count=args.shared_seeds,
         )
         print(
             json.dumps(
@@ -650,6 +678,49 @@ def _command_benchmark(args: argparse.Namespace) -> int:
                     "scalar_assignments": result.scalar_assignments,
                     "pairwise_assignments": result.pairwise_assignments,
                     "key_records": result.key_records,
+                    "rating_design": result.rating_design,
+                    "shared_seed_count": result.shared_seed_count,
+                    "rater_seed_counts": result.rater_seed_counts,
+                },
+                indent=2,
+            )
+        )
+        return EXIT_OK
+
+    if args.action == "collect-responses":
+        if (
+            not args.rater_dir
+            or not args.blind_manifest_sha256
+            or not args.blind_manifest
+            or not args.blind_key
+            or not args.output
+            or not args.pairwise_output
+        ):
+            raise InputError(
+                "benchmark collect-responses requires an input rater directory, repeated "
+                "--rater-dir, --blind-manifest-sha256, --blind-manifest, --blind-key, "
+                "--output, and --pairwise-output"
+            )
+        verify_blind_package_manifest(args.blind_key, args.blind_manifest)
+        if sha256_file(args.blind_manifest) != args.blind_manifest_sha256:
+            raise InputError("blind manifest file does not match its pre-rating commitment")
+        expected_rater_root = args.blind_manifest.resolve().parent.parent / "raters"
+        rater_dirs = [args.input, *args.rater_dir]
+        if any(path.resolve().parent != expected_rater_root for path in rater_dirs):
+            raise InputError("collect-responses rater directories must belong to the blind package")
+        scalar, pairwise = collect_locked_rater_responses(
+            rater_dirs, args.blind_manifest_sha256
+        )
+        write_jsonl(scalar, args.output)
+        write_jsonl(pairwise, args.pairwise_output)
+        print(
+            json.dumps(
+                {
+                    "raters": sorted({item.rater_id for item in scalar}),
+                    "scalar_responses": len(scalar),
+                    "pairwise_responses": len(pairwise),
+                    "scalar_output": str(args.output),
+                    "pairwise_output": str(args.pairwise_output),
                 },
                 indent=2,
             )

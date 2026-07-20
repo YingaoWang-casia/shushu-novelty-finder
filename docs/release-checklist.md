@@ -9,7 +9,7 @@
 - [x] wheel and source distribution build cleanly with the locked build backend via
       `python -m build --no-isolation`;
 - [ ] clean Python 3.9 and 3.12 CI jobs pass on the final tagged release commit; both jobs already
-      pass on draft PR #1 head in run 29735638352.
+      pass on draft PR #1.
 
 ## Evidence and workflow gates
 
@@ -28,8 +28,9 @@
 - [x] adapter and prompt provenance hashes are preserved for all 240 runs;
 - [x] the completed execution manifest binds model, CLI/runtime version, adapter, benchmark, and
       final run-matrix hashes;
-- [x] blind packs contain 480 opaque scalar and 720 randomized pairwise assignments with the
-      coordinator key withheld until response lock;
+- [x] balanced-overlap blind packs contain 288 opaque scalar and 432 randomized pairwise
+      assignments, collectively cover all 60 seeds, share 12 stratified seeds, and withhold the
+      coordinator key until response lock;
 - [ ] blind responses, coordinator key, and package manifest are hash-bound, and deterministic
       unblinding exactly reproduces the published scalar and pairwise judgments;
 - [ ] at least two research-experienced human raters completed blind ratings;

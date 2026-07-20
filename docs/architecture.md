@@ -116,10 +116,13 @@ Mode routing may skip phases, but it cannot bypass a gate within the selected ro
 `benchmark execute` invokes external systems through no-shell argv adapters, checks prompt and
 adapter provenance hashes, atomically stores each output, and checkpoints the matrix after every
 run. Repeating the same command resumes only if immutable run fields still match. `benchmark
-blind-pack` then copies the 240 hash-complete outputs into per-rater directories with independent
-opaque labels and randomized left/right order. System identities remain in a coordinator-only key
-whose hash, together with every rater-side artifact, is bound in the package manifest until
-`benchmark unblind` joins locked responses.
+blind-pack` then copies the assigned subset of the 240 hash-complete outputs into per-rater
+directories with independent opaque labels and randomized left/right order. The recommended
+balanced-overlap design collectively covers 60 seeds, shares 12 stratified seeds for agreement,
+and normalizes shared ratings to one total seed weight; complete duplicate rating remains an
+option. System identities remain in a coordinator-only key whose hash, together with every
+rater-side artifact and the assignment plan, is bound in the package manifest until `benchmark
+unblind` joins locked responses.
 Scoring replays that join and binds blind responses, key, manifest, unblinded judgments, seeds, and
 the completed run matrix plus its execution-environment manifest. Human completion and
 research-experience claims cannot be automated by this runtime.

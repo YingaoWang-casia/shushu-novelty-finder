@@ -89,23 +89,30 @@ The real execution completed on 2026-07-20. `completed-run-matrix.jsonl` contain
 runs (60 per system) and has SHA-256
 `bbfee19d4466f168b482593e38e0145b0cf2acb7bcd0cb54a6ad0b71e88cbbc2`. The completed runtime
 manifest and retained failure history are under `execution/codex-gpt-5.6-sol/`. Two human-rater
-packs are under `blind-v1/`; their coordinator-manifest commitment is
-`9e34a730d2f2509e1e3a33bad4dd95dfaf355e68f37dd5d2667f3d9892f98312`. These are execution and
-blinding artifacts, not comparative effectiveness evidence; human responses remain pending.
+packs are under `blind-balanced-v1/`; their coordinator-manifest commitment is
+`552dfbd1ef0517bd632ea0540beca3505674229ddaf856f5b2f82073e63a6c40`. The preregistered
+balanced-overlap design assigns 36 seeds to each rater, shares 12 stratified seeds, and
+collectively covers all 60. It contains 288 scalar and 432 pairwise assignments, 40% fewer than
+complete duplicate rating. These are execution and blinding artifacts, not comparative
+effectiveness evidence; human responses remain pending.
 Raters use the identity-neutral `blind-eval` entry point supplied in each pack to initialize
 assignment-bound drafts, check progress, verify exact coverage and output bindings, and commit
 their response hashes before unblinding.
+The coordinator must combine the two returned directories with `shushu benchmark
+collect-responses`; that command verifies the package manifest/key and both response locks. Never
+concatenate the two JSONL files manually. The exact command is in
+[`docs/evaluation-protocol.md`](../docs/evaluation-protocol.md).
 
-Scoring also requires blind judgments for all six pairwise combinations of the four primary
-systems, for every seed and every human rater:
+Scoring requires all four scalar outputs and all six pairwise combinations for every seed assigned
+to a human rater. The union must cover all 60 seeds and at least 12 complete seeds must be shared:
 
 ```bash
 shushu benchmark score evals/judgments.jsonl \
   --pairwise evals/pairwise-judgments.jsonl \
   --blind-scalar evals/blind-scalar-responses.jsonl \
   --blind-pairwise evals/blind-pairwise-responses.jsonl \
-  --blind-key evals/blind-v1/coordinator/blind-key.jsonl \
-  --blind-manifest evals/blind-v1/coordinator/manifest.json \
+  --blind-key evals/blind-balanced-v1/coordinator/blind-key.jsonl \
+  --blind-manifest evals/blind-balanced-v1/coordinator/manifest.json \
   --benchmark-seeds evals/benchmark-v1.jsonl \
   --run-matrix evals/completed-run-matrix.jsonl \
   --execution-manifest evals/execution/codex-gpt-5.6-sol/manifest.json \

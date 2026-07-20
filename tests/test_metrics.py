@@ -195,3 +195,71 @@ def test_full_sixty_seed_human_matrix_is_publishable():
     assert result.report["human_judgments"] == 480
     assert result.report["pairwise"]["human_judgments"] == 720
     assert result.report["expected_seed_count"] == 60
+    assert result.report["rating_design"] == "complete"
+
+
+def test_balanced_partial_overlap_is_publishable_and_seed_weighted():
+    seed_ids = [f"B-{index:03d}" for index in range(1, 61)]
+    shared = set(seed_ids[:12])
+    rater_seeds = {
+        "rater-a": shared | set(seed_ids[12:36]),
+        "rater-b": shared | set(seed_ids[36:]),
+    }
+    judgments = [
+        make_judgment(seed, system, rater)
+        for rater, assigned_seeds in rater_seeds.items()
+        for seed in sorted(assigned_seeds)
+        for system in SYSTEMS
+    ]
+    for judgment in judgments:
+        judgment.idea.novelty = 5 if judgment.seed_id in shared else 1
+    pairwise = [
+        make_pairwise(seed, left, right, rater)
+        for rater, assigned_seeds in rater_seeds.items()
+        for seed in sorted(assigned_seeds)
+        for left, right in combinations(SYSTEMS, 2)
+    ]
+
+    result = aggregate_evaluation(judgments, seed_ids, pairwise)
+
+    assert result.publishable
+    assert result.report["human_judgments"] == 288
+    assert result.report["pairwise"]["human_judgments"] == 432
+    assert result.report["rating_design"] == "balanced-overlap"
+    assert result.report["coverage"] == {
+        "collective_seed_count": 60,
+        "shared_seed_count": 12,
+        "shared_seed_ids": sorted(shared),
+        "minimum_raters_per_seed": 1,
+        "maximum_raters_per_seed": 2,
+        "rater_seed_counts": {"rater-a": 36, "rater-b": 36},
+    }
+    assert result.report["systems"]["bare"]["judgments"] == 72
+    assert result.report["systems"]["bare"]["effective_seed_judgments"] == 60
+    assert result.report["systems"]["bare"]["idea"]["novelty"] == 1.8
+
+
+def test_partial_overlap_requires_twelve_shared_seeds_for_full_suite():
+    seed_ids = [f"B-{index:03d}" for index in range(1, 61)]
+    shared = set(seed_ids[:11])
+    rater_seeds = {
+        "rater-a": shared | set(seed_ids[11:36]),
+        "rater-b": shared | set(seed_ids[36:]),
+    }
+    judgments = [
+        make_judgment(seed, system, rater)
+        for rater, assigned_seeds in rater_seeds.items()
+        for seed in sorted(assigned_seeds)
+        for system in SYSTEMS
+    ]
+    pairwise = [
+        make_pairwise(seed, left, right, rater)
+        for rater, assigned_seeds in rater_seeds.items()
+        for seed in sorted(assigned_seeds)
+        for left, right in combinations(SYSTEMS, 2)
+    ]
+
+    result = aggregate_evaluation(judgments, seed_ids, pairwise)
+
+    assert not result.publishable
+    assert any("at least 12 complete seeds" in error for error in result.errors)

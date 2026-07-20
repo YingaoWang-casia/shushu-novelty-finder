@@ -1,6 +1,11 @@
 import json
 
-from shushu_novelty.evaluation.release import END, START, check_release_claims
+from shushu_novelty.evaluation.release import (
+    END,
+    START,
+    check_release_claims,
+    validate_public_evaluation,
+)
 from shushu_novelty.io import sha256_file
 
 
@@ -27,7 +32,8 @@ def test_comparative_claim_without_public_evaluation_fails(tmp_path):
 
 def test_publishable_claim_is_bound_to_evaluation_hash(tmp_path):
     system_metrics = {
-        "judgments": 120,
+        "judgments": 72,
+        "effective_seed_judgments": 60,
         "retrieval": {
             "known_prior_recall_at_k": 0.8,
             "duplicate_rate": 0.01,
@@ -93,11 +99,20 @@ def test_publishable_claim_is_bound_to_evaluation_hash(tmp_path):
             {
                 "publishable": True,
                 "primary_basis": "human",
+                "rating_design": "balanced-overlap",
                 "human_raters": ["r1", "r2"],
-                "human_judgments": 480,
+                "human_judgments": 288,
                 "cohens_kappa": 0.7,
-                "pairwise": {"human_judgments": 720, "cohens_kappa": 0.7},
+                "pairwise": {"human_judgments": 432, "cohens_kappa": 0.7},
                 "expected_seed_count": 60,
+                "coverage": {
+                    "collective_seed_count": 60,
+                    "shared_seed_count": 12,
+                    "shared_seed_ids": [f"B-{index:03d}" for index in range(1, 13)],
+                    "minimum_raters_per_seed": 1,
+                    "maximum_raters_per_seed": 2,
+                    "rater_seed_counts": {"r1": 36, "r2": 36},
+                },
                 "completed_run_count": 240,
                 "artifacts": artifacts,
                 "systems": {
@@ -142,3 +157,25 @@ def test_public_evaluation_without_run_artifact_binding_fails(tmp_path):
     assert not result.ok
     assert any("240 completed" in error for error in result.errors)
     assert any("hashed artifacts" in error for error in result.errors)
+
+
+def test_partial_design_cannot_lower_count_gate_without_auditable_coverage():
+    errors = validate_public_evaluation(
+        {
+            "publishable": True,
+            "primary_basis": "human",
+            "human_raters": ["r1", "r2"],
+            "human_judgments": 288,
+            "cohens_kappa": 0.5,
+            "pairwise": {"human_judgments": 432, "cohens_kappa": 0.5},
+            "expected_seed_count": 60,
+            "coverage": {
+                "collective_seed_count": 60,
+                "shared_seed_count": 12,
+                "minimum_raters_per_seed": 1,
+            },
+        }
+    )
+
+    assert "public evaluation shared seed IDs must match shared coverage" in errors
+    assert "public evaluation must report valid per-rater seed counts" in errors

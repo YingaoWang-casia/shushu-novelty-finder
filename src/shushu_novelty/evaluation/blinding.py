@@ -10,6 +10,7 @@ import math
 import re
 import secrets
 import shutil
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
@@ -35,6 +36,8 @@ from shushu_novelty.schemas.blind_evaluation import (
 )
 
 PRIMARY_SYSTEMS = ("bare", "self-reflection", "shushu-v0.1", "shushu-v0.2")
+RATING_DESIGNS = ("complete", "balanced-overlap")
+DEFAULT_SHARED_SEEDS = 12
 SAFE_RATER = re.compile(r"^[A-Za-z0-9._-]+$")
 IDENTITY_PATTERNS = (
     ("shushu", re.compile(r"\bshushu(?:-v0\.[12])?\b", re.IGNORECASE)),
@@ -56,17 +59,20 @@ IDENTITY_PATTERNS = (
 
 RATER_GUIDE = """# Blind evaluation guide
 
-You are rating four anonymous research-audit outputs for each of 60 fixed seeds. Do not attempt to
-infer the producing system, contact another rater, or inspect the coordinator directory. Work from
-the supplied seed, output, and independently verified literature evidence. Record uncertainty in
-`notes`; do not silently convert an unknown into a zero or a correct judgment.
+You are rating four anonymous research-audit outputs for each seed assigned in this pack. The
+coordinator may use either complete duplicate rating or a preregistered balanced-overlap design;
+your responsibility is exactly the rows supplied here. Do not attempt to infer the producing
+system, contact another rater, or inspect the coordinator directory. Work from the supplied seed,
+output, and independently verified literature evidence. Record uncertainty in `notes`; do not
+silently convert an unknown into a zero or a correct judgment.
 
 ## Files and required coverage
 
-- `benchmark-seeds.jsonl`: the 60 source requests and curated case metadata.
-- `scalar-assignments.jsonl`: 240 output assignments; submit exactly one scalar response per row.
-- `pairwise-assignments.jsonl`: 360 randomized comparisons; submit exactly one pairwise response
+- `benchmark-seeds.jsonl`: the source requests and curated metadata assigned to you.
+- `scalar-assignments.jsonl`: four output assignments per seed; submit exactly one scalar response
   per row.
+- `pairwise-assignments.jsonl`: six randomized comparisons per seed; submit exactly one pairwise
+  response per row.
 - `outputs/`: immutable answer files. Verify their SHA-256 against the assignment before rating.
 - `schemas/`: JSON Schemas for the two response files and the generated response lock.
 
@@ -134,10 +140,10 @@ blind-eval lock . \
   --output response-lock.json
 ```
 
-This verifies exact 240/360 coverage, immutable assignment fields, copied-output hashes, and one
-consistent experience value, then records both response SHA-256 values. Treat the response files
-and `response-lock.json` as locked. Do not edit them after the coordinator reveals any identity
-mapping.
+This verifies exact coverage of every assignment in your pack, immutable assignment fields,
+copied-output hashes, and one consistent experience value, then records both response SHA-256
+values. Treat the response files and `response-lock.json` as locked. Do not edit them after the
+coordinator reveals any identity mapping.
 """
 
 
@@ -146,6 +152,9 @@ class BlindPackageResult:
     scalar_assignments: int
     pairwise_assignments: int
     key_records: int
+    rating_design: str
+    shared_seed_count: int
+    rater_seed_counts: dict[str, int]
 
 
 @dataclass(frozen=True)
@@ -168,6 +177,40 @@ RELATION_TYPES = (
 )
 
 
+def _validate_assignment_shape(
+    scalar: list[BlindOutputAssignment], pairwise: list[BlindPairwiseAssignment]
+) -> set[str]:
+    if not scalar or not pairwise:
+        raise InputError("rater pack assignments cannot be empty")
+    scalar_by_seed: dict[str, list[BlindOutputAssignment]] = defaultdict(list)
+    pairwise_by_seed: dict[str, list[BlindPairwiseAssignment]] = defaultdict(list)
+    for item in scalar:
+        scalar_by_seed[item.seed_id].append(item)
+    for item in pairwise:
+        pairwise_by_seed[item.seed_id].append(item)
+    if set(scalar_by_seed) != set(pairwise_by_seed):
+        raise InputError("scalar and pairwise assignments must cover the same seeds")
+    for seed_id, assignments in sorted(scalar_by_seed.items()):
+        output_ids = {item.output_id for item in assignments}
+        if len(assignments) != len(PRIMARY_SYSTEMS) or len(output_ids) != len(PRIMARY_SYSTEMS):
+            raise InputError(
+                f"rater pack seed {seed_id} must contain exactly four unique outputs"
+            )
+        expected_pairs = set(itertools.combinations(sorted(output_ids), 2))
+        observed_pairs = {
+            tuple(sorted((item.output_left, item.output_right)))
+            for item in pairwise_by_seed[seed_id]
+        }
+        if (
+            len(pairwise_by_seed[seed_id]) != len(expected_pairs)
+            or observed_pairs != expected_pairs
+        ):
+            raise InputError(
+                f"rater pack seed {seed_id} must contain all six unique output pairs"
+            )
+    return set(scalar_by_seed)
+
+
 def _load_rater_pack(
     rater_dir: Path,
 ) -> tuple[Path, list[BlindOutputAssignment], list[BlindPairwiseAssignment]]:
@@ -176,8 +219,7 @@ def _load_rater_pack(
         raise InputError(f"rater directory does not exist: {rater_dir}")
     scalar = validate_jsonl(root / "scalar-assignments.jsonl", BlindOutputAssignment)
     pairwise = validate_jsonl(root / "pairwise-assignments.jsonl", BlindPairwiseAssignment)
-    if len(scalar) != 240 or len(pairwise) != 360:
-        raise InputError("rater pack must contain exactly 240 scalar and 360 pairwise assignments")
+    _validate_assignment_shape(scalar, pairwise)
     if len({item.assignment_id for item in scalar}) != len(scalar):
         raise InputError("scalar assignments contain duplicate assignment IDs")
     if len({item.assignment_id for item in pairwise}) != len(pairwise):
@@ -320,10 +362,11 @@ def initialize_rater_response_drafts(
     root, scalar_assignments, pairwise_assignments = _load_rater_pack(rater_dir)
     seeds = validate_jsonl(root / "benchmark-seeds.jsonl", BenchmarkSeed)
     seed_by_id = {seed.seed_id: seed for seed in seeds}
-    if len(seeds) != 60 or len(seed_by_id) != 60:
-        raise InputError("rater pack must contain exactly 60 unique benchmark seeds")
-    if any(item.seed_id not in seed_by_id for item in scalar_assignments):
-        raise InputError("scalar assignment references a missing benchmark seed")
+    assigned_seed_ids = {item.seed_id for item in scalar_assignments}
+    if len(seed_by_id) != len(seeds) or set(seed_by_id) != assigned_seed_ids:
+        raise InputError(
+            "rater pack benchmark seeds must exactly match its assigned unique seeds"
+        )
 
     scalar_path = root / "blind-scalar-responses.jsonl"
     pairwise_path = root / "blind-pairwise-responses.jsonl"
@@ -489,11 +532,13 @@ def rater_response_draft_status(rater_dir: Path) -> dict[str, Any]:
         pairwise_by_id,
         ("rater_id", "seed_id", "output_left", "output_right"),
     )
+    expected_scalar = len(scalar_assignments)
+    expected_pairwise = len(pairwise_assignments)
     ready = (
-        scalar["rows"] == 240
-        and pairwise["rows"] == 360
-        and scalar["complete"] == 240
-        and pairwise["complete"] == 360
+        scalar["rows"] == expected_scalar
+        and pairwise["rows"] == expected_pairwise
+        and scalar["complete"] == expected_scalar
+        and pairwise["complete"] == expected_pairwise
         and scalar["incomplete"] == 0
         and pairwise["incomplete"] == 0
         and scalar["invalid"] == 0
@@ -503,7 +548,14 @@ def rater_response_draft_status(rater_dir: Path) -> dict[str, Any]:
         and not scalar["unexpected_assignment_ids"]
         and not pairwise["unexpected_assignment_ids"]
     )
-    return {"rater_id": root.name, "ready_to_lock": ready, "scalar": scalar, "pairwise": pairwise}
+    return {
+        "rater_id": root.name,
+        "ready_to_lock": ready,
+        "expected_scalar_responses": expected_scalar,
+        "expected_pairwise_responses": expected_pairwise,
+        "scalar": scalar,
+        "pairwise": pairwise,
+    }
 
 
 def _opaque_id(secret: bytes, *parts: str) -> str:
@@ -527,6 +579,11 @@ def _rater_materials() -> dict[str, str]:
         )
         + "\n",
     }
+
+
+def _rater_seed_record(seed: BenchmarkSeed) -> BenchmarkSeed:
+    """Remove coordinator branding while preserving every scoring-relevant seed field."""
+    return seed.model_copy(update={"provenance": "Coordinator-curated benchmark seed"})
 
 
 def _unique_by_id(items: list[object], field: str, label: str) -> dict[str, object]:
@@ -568,10 +625,17 @@ def lock_rater_responses(
     )
     scalar_responses = validate_jsonl(scalar_path, BlindScalarResponse)
     pairwise_responses = validate_jsonl(pairwise_path, BlindPairwiseResponse)
-    if len(scalar_assignments) != 240 or len(scalar_responses) != 240:
-        raise InputError("response lock requires exactly 240 scalar assignments and responses")
-    if len(pairwise_assignments) != 360 or len(pairwise_responses) != 360:
-        raise InputError("response lock requires exactly 360 pairwise assignments and responses")
+    _validate_assignment_shape(scalar_assignments, pairwise_assignments)
+    if len(scalar_responses) != len(scalar_assignments):
+        raise InputError(
+            "response lock requires exactly "
+            f"{len(scalar_assignments)} scalar assignments and responses"
+        )
+    if len(pairwise_responses) != len(pairwise_assignments):
+        raise InputError(
+            "response lock requires exactly "
+            f"{len(pairwise_assignments)} pairwise assignments and responses"
+        )
 
     scalar_by_id = _unique_by_id(scalar_assignments, "assignment_id", "scalar assignments")
     scalar_response_by_id = _unique_by_id(
@@ -670,6 +734,94 @@ def lock_rater_responses(
     return lock
 
 
+def collect_locked_rater_responses(
+    rater_dirs: list[Path], blind_manifest_sha256: str
+) -> tuple[list[BlindScalarResponse], list[BlindPairwiseResponse]]:
+    """Verify independent response locks and combine them without changing any row."""
+    if len(rater_dirs) < 2:
+        raise InputError("collecting blind responses requires at least two rater directories")
+    if not re.fullmatch(r"[a-f0-9]{64}", blind_manifest_sha256):
+        raise InputError("blind manifest commitment must be a lowercase SHA-256")
+    all_scalar: list[BlindScalarResponse] = []
+    all_pairwise: list[BlindPairwiseResponse] = []
+    collected_raters: set[str] = set()
+    for rater_dir in rater_dirs:
+        root, scalar_assignments, pairwise_assignments = _load_rater_pack(rater_dir)
+        lock_path = root / "response-lock.json"
+        try:
+            lock = BlindResponseLock.model_validate_json(
+                lock_path.read_text(encoding="utf-8")
+            )
+        except OSError as exc:
+            raise InputError(f"cannot read rater response lock {lock_path}: {exc}") from exc
+        except ValidationError as exc:
+            raise InputError(f"invalid rater response lock {lock_path}: {exc}") from exc
+        if lock.rater_id != root.name or lock.rater_id in collected_raters:
+            raise InputError("response locks must have unique IDs matching their rater directories")
+        if lock.blind_manifest_sha256 != blind_manifest_sha256:
+            raise InputError("rater response lock uses a different blind manifest commitment")
+        if (
+            lock.scalar_assignments_sha256
+            != sha256_file(root / "scalar-assignments.jsonl")
+            or lock.pairwise_assignments_sha256
+            != sha256_file(root / "pairwise-assignments.jsonl")
+        ):
+            raise InputError("rater response lock assignment hashes do not match its pack")
+        scalar_path = root / lock.scalar_response_filename
+        pairwise_path = root / lock.pairwise_response_filename
+        if (
+            not scalar_path.is_file()
+            or not pairwise_path.is_file()
+            or sha256_file(scalar_path) != lock.scalar_responses_sha256
+            or sha256_file(pairwise_path) != lock.pairwise_responses_sha256
+        ):
+            raise InputError("rater response files do not match their response lock hashes")
+        scalar = validate_jsonl(scalar_path, BlindScalarResponse)
+        pairwise = validate_jsonl(pairwise_path, BlindPairwiseResponse)
+        scalar_by_id = _unique_by_id(scalar_assignments, "assignment_id", "scalar assignments")
+        pairwise_by_id = _unique_by_id(
+            pairwise_assignments, "assignment_id", "pairwise assignments"
+        )
+        scalar_response_by_id = _unique_by_id(
+            scalar, "assignment_id", "scalar responses"
+        )
+        pairwise_response_by_id = _unique_by_id(
+            pairwise, "assignment_id", "pairwise responses"
+        )
+        if (
+            len(scalar) != lock.scalar_responses
+            or len(pairwise) != lock.pairwise_responses
+            or set(scalar_by_id) != set(scalar_response_by_id)
+            or set(pairwise_by_id) != set(pairwise_response_by_id)
+        ):
+            raise InputError("rater response lock does not exactly cover its assignments")
+        for assignment_id, response in scalar_response_by_id.items():
+            assignment = scalar_by_id[assignment_id]
+            if any(
+                getattr(response, field) != getattr(assignment, field)
+                for field in ("rater_id", "seed_id", "output_id")
+            ):
+                raise InputError("locked scalar response changes immutable assignment fields")
+        for assignment_id, response in pairwise_response_by_id.items():
+            assignment = pairwise_by_id[assignment_id]
+            if any(
+                getattr(response, field) != getattr(assignment, field)
+                for field in ("rater_id", "seed_id", "output_left", "output_right")
+            ):
+                raise InputError("locked pairwise response changes immutable assignment fields")
+        experience = {
+            item.research_experience_years for item in [*scalar, *pairwise]
+        }
+        if experience != {lock.research_experience_years}:
+            raise InputError("locked responses differ from the lock's research experience")
+        collected_raters.add(lock.rater_id)
+        all_scalar.extend(scalar)
+        all_pairwise.extend(pairwise)
+    _unique_by_id(all_scalar, "assignment_id", "combined scalar responses")
+    _unique_by_id(all_pairwise, "assignment_id", "combined pairwise responses")
+    return all_scalar, all_pairwise
+
+
 def verify_blind_package_manifest(
     blind_key: Path, manifest_path: Path
 ) -> dict[str, object]:
@@ -689,6 +841,56 @@ def verify_blind_package_manifest(
     )
     if manifest.get("key_records") != key_records:
         raise InputError("blind key record count does not match the blind-package manifest")
+    rating_design = manifest.get("rating_design")
+    if rating_design is not None:
+        if rating_design not in RATING_DESIGNS:
+            raise InputError("blind-package manifest has an unknown rating design")
+        raters = manifest.get("raters")
+        rater_seed_ids = manifest.get("rater_seed_ids")
+        if (
+            not isinstance(raters, list)
+            or not raters
+            or any(not isinstance(rater, str) for rater in raters)
+            or len(set(raters)) != len(raters)
+            or not isinstance(rater_seed_ids, dict)
+            or set(rater_seed_ids) != set(raters)
+            or any(
+                not isinstance(value, list)
+                or not value
+                or any(not isinstance(seed_id, str) for seed_id in value)
+                for value in rater_seed_ids.values()
+            )
+        ):
+            raise InputError("blind-package manifest has invalid rater seed assignments")
+        seed_sets = {rater: set(rater_seed_ids[rater]) for rater in raters}
+        if any(len(seed_sets[rater]) != len(rater_seed_ids[rater]) for rater in raters):
+            raise InputError("blind-package manifest has duplicate rater seed assignments")
+        collective = set.union(*seed_sets.values())
+        shared = set.intersection(*seed_sets.values())
+        if (
+            manifest.get("collective_seed_count") != len(collective)
+            or manifest.get("shared_seed_count") != len(shared)
+            or manifest.get("shared_seed_ids") != sorted(shared)
+            or manifest.get("rater_seed_counts")
+            != {rater: len(seed_sets[rater]) for rater in sorted(raters)}
+        ):
+            raise InputError("blind-package manifest rating coverage is inconsistent")
+        expected_scalar = sum(len(seed_sets[rater]) for rater in raters) * len(
+            PRIMARY_SYSTEMS
+        )
+        expected_pairwise = sum(len(seed_sets[rater]) for rater in raters) * len(
+            list(itertools.combinations(PRIMARY_SYSTEMS, 2))
+        )
+        if (
+            manifest.get("scalar_assignments") != expected_scalar
+            or manifest.get("pairwise_assignments") != expected_pairwise
+            or manifest.get("key_records") != expected_scalar
+        ):
+            raise InputError("blind-package manifest assignment totals are inconsistent")
+        if rating_design == "balanced-overlap" and (
+            len(raters) != 2 or len(collective) != 60 or len(shared) < DEFAULT_SHARED_SEEDS
+        ):
+            raise InputError("balanced-overlap manifest violates its minimum coverage design")
     artifacts = manifest.get("rater_artifact_sha256")
     if not isinstance(artifacts, dict) or not artifacts:
         raise InputError("blind-package manifest has no rater artifact hashes")
@@ -704,6 +906,49 @@ def verify_blind_package_manifest(
             raise InputError(f"blind-package rater artifact is missing or unsafe: {relative}")
         if sha256_file(candidate) != digest:
             raise InputError(f"blind-package rater artifact hash does not match: {relative}")
+    if rating_design is not None:
+        package_seed_by_id: dict[str, BenchmarkSeed] = {}
+        for rater in raters:
+            rater_seeds = validate_jsonl(
+                package_root / "raters" / rater / "benchmark-seeds.jsonl", BenchmarkSeed
+            )
+            if {seed.seed_id for seed in rater_seeds} != seed_sets[rater]:
+                raise InputError("blind-package rater seeds differ from the manifest plan")
+            for seed in rater_seeds:
+                prior = package_seed_by_id.get(seed.seed_id)
+                if prior is not None and prior.model_dump() != seed.model_dump():
+                    raise InputError("blind-package shared seed metadata differs across raters")
+                package_seed_by_id[seed.seed_id] = seed
+
+        def manifest_strata(seed_ids: set[str], field: str) -> dict[str, int]:
+            return dict(
+                sorted(
+                    Counter(
+                        getattr(package_seed_by_id[seed_id], field) for seed_id in seed_ids
+                    ).items()
+                )
+            )
+
+        if (
+            manifest.get("shared_case_type_counts") != manifest_strata(shared, "case_type")
+            or manifest.get("shared_domain_counts") != manifest_strata(shared, "domain")
+            or manifest.get("rater_case_type_counts")
+            != {
+                rater: manifest_strata(seed_sets[rater], "case_type")
+                for rater in sorted(raters)
+            }
+            or manifest.get("rater_domain_counts")
+            != {
+                rater: manifest_strata(seed_sets[rater], "domain")
+                for rater in sorted(raters)
+            }
+            or (
+                rating_design == "balanced-overlap"
+                and set(manifest_strata(shared, "domain"))
+                != {seed.domain for seed in package_seed_by_id.values()}
+            )
+        ):
+            raise InputError("blind-package manifest stratum counts are inconsistent")
     return manifest
 
 
@@ -750,6 +995,138 @@ def _require_complete_matrix(
     return by_key
 
 
+def _rank_seed(secret: bytes, label: str, *parts: str) -> bytes:
+    return hmac.new(
+        secret,
+        "\0".join((label, *parts)).encode(),
+        hashlib.sha256,
+    ).digest()
+
+
+def _balanced_overlap_seed_plan(
+    seeds: list[BenchmarkSeed],
+    rater_ids: list[str],
+    package_secret: bytes,
+    shared_seed_count: int,
+) -> tuple[dict[str, set[str]], set[str]]:
+    if len(rater_ids) != 2:
+        raise InputError("balanced-overlap rating requires exactly two rater IDs")
+    if (
+        shared_seed_count < 2
+        or shared_seed_count >= len(seeds)
+        or (len(seeds) - shared_seed_count) % 2
+    ):
+        raise InputError(
+            "balanced-overlap shared seed count must be at least 2, below the suite size, "
+            "and leave an even number of unique seeds"
+        )
+
+    by_case_type: dict[str, list[BenchmarkSeed]] = defaultdict(list)
+    for seed in seeds:
+        by_case_type[seed.case_type].append(seed)
+    total = len(seeds)
+    quotas = {
+        case_type: shared_seed_count * len(group) // total
+        for case_type, group in by_case_type.items()
+    }
+    remaining_quota = shared_seed_count - sum(quotas.values())
+    quota_order = sorted(
+        by_case_type,
+        key=lambda case_type: (
+            -(shared_seed_count * len(by_case_type[case_type]) % total),
+            case_type,
+        ),
+    )
+    for case_type in quota_order[:remaining_quota]:
+        quotas[case_type] += 1
+
+    candidates = {
+        case_type: list(group) for case_type, group in by_case_type.items()
+    }
+    shared: set[str] = set()
+    shared_domains: Counter[str] = Counter()
+    while sum(quotas.values()):
+        for case_type in sorted(quotas):
+            if not quotas[case_type]:
+                continue
+            selected = min(
+                candidates[case_type],
+                key=lambda seed: (
+                    shared_domains[seed.domain],
+                    _rank_seed(package_secret, "shared", seed.seed_id),
+                ),
+            )
+            candidates[case_type].remove(selected)
+            quotas[case_type] -= 1
+            shared.add(selected.seed_id)
+            shared_domains[selected.domain] += 1
+
+    raters = sorted(rater_ids)
+    unique_target = (len(seeds) - shared_seed_count) // 2
+    unique: dict[str, set[str]] = {rater_id: set() for rater_id in raters}
+    case_load: dict[str, Counter[str]] = {
+        rater_id: Counter() for rater_id in raters
+    }
+    domain_load: dict[str, Counter[str]] = {
+        rater_id: Counter() for rater_id in raters
+    }
+    by_stratum: dict[tuple[str, str], list[BenchmarkSeed]] = defaultdict(list)
+    for seed in seeds:
+        if seed.seed_id not in shared:
+            by_stratum[(seed.case_type, seed.domain)].append(seed)
+    leftovers = []
+    for stratum, group in sorted(by_stratum.items()):
+        ordered = sorted(
+            group,
+            key=lambda seed: _rank_seed(package_secret, "unique-stratum", seed.seed_id),
+        )
+        for pair_index in range(0, len(ordered) - 1, 2):
+            first_rater, second_rater = raters
+            if _rank_seed(
+                package_secret, "unique-pair-order", *stratum, str(pair_index)
+            )[0] % 2:
+                first_rater, second_rater = second_rater, first_rater
+            for seed, rater_id in zip(
+                ordered[pair_index : pair_index + 2],
+                (first_rater, second_rater),
+            ):
+                unique[rater_id].add(seed.seed_id)
+                case_load[rater_id][seed.case_type] += 1
+                domain_load[rater_id][seed.domain] += 1
+        if len(ordered) % 2:
+            leftovers.append(ordered[-1])
+    for seed in sorted(
+        leftovers,
+        key=lambda item: _rank_seed(package_secret, "unique-leftover", item.seed_id),
+    ):
+        eligible = [rater_id for rater_id in raters if len(unique[rater_id]) < unique_target]
+        selected_rater = min(
+            eligible,
+            key=lambda rater_id: (
+                len(unique[rater_id]),
+                case_load[rater_id][seed.case_type],
+                domain_load[rater_id][seed.domain],
+                _rank_seed(package_secret, "unique-rater", seed.seed_id, rater_id),
+            ),
+        )
+        unique[selected_rater].add(seed.seed_id)
+        case_load[selected_rater][seed.case_type] += 1
+        domain_load[selected_rater][seed.domain] += 1
+
+    plan = {rater_id: shared | unique[rater_id] for rater_id in raters}
+    if (
+        set.union(*plan.values()) != {seed.seed_id for seed in seeds}
+        or set.intersection(*plan.values()) != shared
+        or any(len(seed_ids) != shared_seed_count + unique_target for seed_ids in plan.values())
+        or (
+            shared_seed_count >= len({seed.domain for seed in seeds})
+            and set(shared_domains) != {seed.domain for seed in seeds}
+        )
+    ):
+        raise InputError("balanced-overlap seed allocation failed its coverage invariant")
+    return plan, shared
+
+
 def create_blind_packages(
     runs: list[BenchmarkRun],
     seeds: list[BenchmarkSeed],
@@ -757,6 +1134,8 @@ def create_blind_packages(
     output_dir: Path,
     rater_ids: list[str],
     secret: bytes | None = None,
+    rating_design: str = "complete",
+    shared_seed_count: int = DEFAULT_SHARED_SEEDS,
 ) -> BlindPackageResult:
     root = results_root.resolve()
     by_key = _require_complete_matrix(runs, seeds, root)
@@ -764,9 +1143,19 @@ def create_blind_packages(
         raise InputError("blind packaging requires at least two unique rater IDs")
     if any(not SAFE_RATER.fullmatch(rater_id) for rater_id in rater_ids):
         raise InputError("rater IDs may contain only letters, numbers, dot, underscore, and dash")
+    if rating_design not in RATING_DESIGNS:
+        raise InputError("rating design must be complete or balanced-overlap")
     if output_dir.exists():
         raise InputError(f"blind package output already exists: {output_dir}")
     package_secret = secret or secrets.token_bytes(32)
+    if rating_design == "balanced-overlap":
+        rater_seed_ids, shared_seed_ids = _balanced_overlap_seed_plan(
+            seeds, rater_ids, package_secret, shared_seed_count
+        )
+    else:
+        all_seed_ids = {seed.seed_id for seed in seeds}
+        rater_seed_ids = {rater_id: set(all_seed_ids) for rater_id in rater_ids}
+        shared_seed_ids = set(all_seed_ids)
     assignments = []
     pairs = []
     keys = []
@@ -775,8 +1164,7 @@ def create_blind_packages(
         rater_root = output_dir / "raters" / rater_id
         rater_assignments = []
         rater_pairs = []
-        for seed_number in range(1, 61):
-            seed_id = f"B-{seed_number:03d}"
+        for seed_id in sorted(rater_seed_ids[rater_id]):
             blinded: dict[str, BlindOutputAssignment] = {}
             for system in PRIMARY_SYSTEMS:
                 run = by_key[(seed_id, system)]
@@ -832,7 +1220,14 @@ def create_blind_packages(
                 rater_pairs.append(pair)
         write_jsonl(rater_assignments, rater_root / "scalar-assignments.jsonl")
         write_jsonl(rater_pairs, rater_root / "pairwise-assignments.jsonl")
-        write_jsonl(seeds, rater_root / "benchmark-seeds.jsonl")
+        write_jsonl(
+            [
+                _rater_seed_record(seed)
+                for seed in seeds
+                if seed.seed_id in rater_seed_ids[rater_id]
+            ],
+            rater_root / "benchmark-seeds.jsonl",
+        )
         for relative, content in rater_materials.items():
             destination = rater_root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
@@ -846,9 +1241,36 @@ def create_blind_packages(
         for artifact in sorted(path for path in rater_root.rglob("*") if path.is_file()):
             relative = artifact.relative_to(output_dir).as_posix()
             rater_artifact_sha256[relative] = sha256_file(artifact)
+    seed_by_id = {seed.seed_id: seed for seed in seeds}
+
+    def stratum_counts(seed_ids: set[str], field: str) -> dict[str, int]:
+        return dict(
+            sorted(Counter(getattr(seed_by_id[seed_id], field) for seed_id in seed_ids).items())
+        )
+
     manifest = {
         "schema_version": "1.0",
         "raters": sorted(rater_ids),
+        "rating_design": rating_design,
+        "collective_seed_count": len(set.union(*rater_seed_ids.values())),
+        "shared_seed_count": len(shared_seed_ids),
+        "shared_seed_ids": sorted(shared_seed_ids),
+        "rater_seed_counts": {
+            rater_id: len(rater_seed_ids[rater_id]) for rater_id in sorted(rater_ids)
+        },
+        "rater_seed_ids": {
+            rater_id: sorted(rater_seed_ids[rater_id]) for rater_id in sorted(rater_ids)
+        },
+        "shared_case_type_counts": stratum_counts(shared_seed_ids, "case_type"),
+        "shared_domain_counts": stratum_counts(shared_seed_ids, "domain"),
+        "rater_case_type_counts": {
+            rater_id: stratum_counts(rater_seed_ids[rater_id], "case_type")
+            for rater_id in sorted(rater_ids)
+        },
+        "rater_domain_counts": {
+            rater_id: stratum_counts(rater_seed_ids[rater_id], "domain")
+            for rater_id in sorted(rater_ids)
+        },
         "scalar_assignments": len(assignments),
         "pairwise_assignments": len(pairs),
         "key_records": len(keys),
@@ -871,7 +1293,14 @@ def create_blind_packages(
     (coordinator / "manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
-    return BlindPackageResult(len(assignments), len(pairs), len(keys))
+    return BlindPackageResult(
+        len(assignments),
+        len(pairs),
+        len(keys),
+        rating_design,
+        len(shared_seed_ids),
+        {rater_id: len(rater_seed_ids[rater_id]) for rater_id in sorted(rater_ids)},
+    )
 
 
 def unblind_responses(
