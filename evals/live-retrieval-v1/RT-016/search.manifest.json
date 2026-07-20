@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "query": "machine unlearning attacks defenses",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "dc6e3b5417b04189c924b7e06ee4e62bad62f9e9d3741a61546a8ea8610c929b",
+  "records_count": 10,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "2e4e29000351d66bfa7ba2141df6ae6bac8d3c424c0a19b6d22359dd6e4836bb",
+  "failure_count": 2,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 5
+  },
+  "created_at": "2026-07-16T05:39:41.236535+00:00"
+}

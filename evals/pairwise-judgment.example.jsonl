@@ -1,0 +1,1 @@
+{"schema_version":"1.0","pairwise_id":"PW-B-001-bare-v02-rater-a","seed_id":"B-001","system_left":"bare","system_right":"shushu-v0.2","preference":"right","rater_id":"rater-a","rater_type":"human","blind":true,"research_experience_years":3,"rationale":"The right output has a more complete traceable evidence chain. Schema example only; not benchmark evidence."}

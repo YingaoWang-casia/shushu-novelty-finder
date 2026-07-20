@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "query": "trustworthy recommender systems feedback loops",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "485d6aae98cdb5f4653962321fecb5e4a58762fe0f6954478187c1a137bc50d8",
+  "records_count": 9,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "b9f15eba4d8eee37facb16a8b58db9d65c3d2b9fba3489ccbd8df27ead3bbc78",
+  "failure_count": 2,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 4
+  },
+  "created_at": "2026-07-16T05:39:26.069275+00:00"
+}

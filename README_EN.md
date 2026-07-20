@@ -66,6 +66,34 @@ then use Idea Generation Mode to generate ideas from defensible gaps.
 
 ## ⚡ Quick start
 
+### Engineering CLI (v0.2 alpha)
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install --require-hashes -r requirements-dev.lock
+.venv/bin/python -m pip install --no-deps --no-build-isolation -e .
+run_dir=$(.venv/bin/shushu run "RAG citation robustness" --mode full)
+.venv/bin/shushu next --run "$run_dir"
+```
+
+`requirements-dev.lock` pins and verifies development and build dependencies. After changing
+dependency declarations, regenerate it with
+`.venv/bin/pip-compile pyproject.toml --extra dev --all-build-deps --allow-unsafe --strip-extras --generate-hashes --output-file requirements-dev.lock`;
+do not edit the lock file manually.
+
+### Effectiveness-claim status
+
+<!-- EFFECTIVENESS_CLAIMS_START -->
+There are no public comparative effectiveness claims. All 240 runs in the fixed 60-seed ×
+4-system matrix and the two anonymous rater packs are hash-complete, but blind ratings by two
+research-experienced reviewers and public aggregate results are pending. Until then, an LLM judge
+cannot establish superiority over a baseline.
+<!-- EFFECTIVENESS_CLAIMS_END -->
+
+The release gate enforces this block. See [`evals/README.md`](evals/README.md) for the protocol and
+[`docs/release-checklist.md`](docs/release-checklist.md) for the publication requirements. Version
+changes are recorded in [`CHANGELOG.md`](CHANGELOG.md).
+
 After installation, you can use it in Codex like this:
 
 ```text
@@ -96,6 +124,12 @@ If you installed it locally with the short alias `idea`, you can also invoke it 
 ```text
 $idea first map the paper lineage of organic reaction prediction + RAG + LLM reasoning, then suggest viable paper ideas
 ```
+
+Three real-paper end-to-end prior-art controls for RAG, LoRA, and CLIP are documented in
+[`examples/real-end-to-end-cases.md`](examples/real-end-to-end-cases.md). They exercise the
+`downgrade/abandon` path and are not comparative-effectiveness evidence.
+Their complete P0–P9 run trees, including real PDFs, page hashes, and manifests, are stored in
+[`examples/runs/`](examples/runs/README.md).
 
 ---
 

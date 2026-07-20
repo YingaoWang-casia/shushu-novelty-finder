@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "nodes": [
+    {
+      "paper_id": "P-example:A",
+      "method_family": "retrieval",
+      "assumptions": ["static corpus"],
+      "contributions": ["basic retrieval"]
+    },
+    {
+      "paper_id": "P-example:B",
+      "method_family": "retrieval",
+      "assumptions": ["corpus can change"],
+      "contributions": ["dynamic updates"]
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "E-A-B",
+      "source_paper_id": "P-example:A",
+      "target_paper_id": "P-example:B",
+      "relation": "ancestor",
+      "rationale": "B extends A and relaxes its static-corpus assumption.",
+      "evidence_claim_ids": ["C-relation"],
+      "confidence": 0.8
+    }
+  ],
+  "saturation": [
+    {
+      "saturation_id": "S-basic-retrieval",
+      "contribution": "basic retrieval",
+      "status": "saturated",
+      "paper_ids": ["P-example:A", "P-example:B"],
+      "evidence_claim_ids": ["C-relation"],
+      "blocked_idea_space": ["repeat basic retrieval without changing assumptions"],
+      "open_idea_space": ["retrieval under dynamic-corpus consistency constraints"]
+    }
+  ]
+}

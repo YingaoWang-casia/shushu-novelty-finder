@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "adapters": [
+    {
+      "system": "bare",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "shushu_novelty.evaluation.codex_adapter",
+        "--profile",
+        "bare",
+        "--model",
+        "gpt-5.6-sol"
+      ],
+      "model": "gpt-5.6-sol",
+      "timeout_seconds": 900,
+      "provenance_files": {
+        "src/shushu_novelty/evaluation/codex_adapter.py": "1b7b0a61429f3ea34f7508f3c656f1c88166f1f97ddf4363567e97ccd1e87247"
+      }
+    },
+    {
+      "system": "self-reflection",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "shushu_novelty.evaluation.codex_adapter",
+        "--profile",
+        "self-reflection",
+        "--model",
+        "gpt-5.6-sol"
+      ],
+      "model": "gpt-5.6-sol",
+      "timeout_seconds": 900,
+      "provenance_files": {
+        "src/shushu_novelty/evaluation/codex_adapter.py": "1b7b0a61429f3ea34f7508f3c656f1c88166f1f97ddf4363567e97ccd1e87247"
+      }
+    },
+    {
+      "system": "shushu-v0.1",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "shushu_novelty.evaluation.codex_adapter",
+        "--profile",
+        "shushu-v0.1",
+        "--model",
+        "gpt-5.6-sol",
+        "--skill",
+        "skills/shushu-novelty-finder/SKILL.md"
+      ],
+      "model": "gpt-5.6-sol",
+      "timeout_seconds": 900,
+      "provenance_files": {
+        "src/shushu_novelty/evaluation/codex_adapter.py": "1b7b0a61429f3ea34f7508f3c656f1c88166f1f97ddf4363567e97ccd1e87247",
+        "skills/shushu-novelty-finder/SKILL.md": "a10903c0a957f9b2b215d049f21ecf42aaa2bcdc207389c7b5cbd3164d40482c"
+      }
+    },
+    {
+      "system": "shushu-v0.2",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "shushu_novelty.evaluation.codex_adapter",
+        "--profile",
+        "shushu-v0.2",
+        "--model",
+        "gpt-5.6-sol",
+        "--skill",
+        "skills/shushu-novelty-finder/SKILL.md",
+        "--v02-addon",
+        "evals/prompts/shushu-v0.2-engineering.md"
+      ],
+      "model": "gpt-5.6-sol",
+      "timeout_seconds": 900,
+      "provenance_files": {
+        "src/shushu_novelty/evaluation/codex_adapter.py": "1b7b0a61429f3ea34f7508f3c656f1c88166f1f97ddf4363567e97ccd1e87247",
+        "skills/shushu-novelty-finder/SKILL.md": "a10903c0a957f9b2b215d049f21ecf42aaa2bcdc207389c7b5cbd3164d40482c",
+        "evals/prompts/shushu-v0.2-engineering.md": "55c3e8a0f76657abeee3ff5ab4ad63fdf721d8f838c1337498e5c6b5455a124c"
+      }
+    }
+  ]
+}

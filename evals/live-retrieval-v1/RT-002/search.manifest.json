@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "query": "citation faithfulness metrics long form generation",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "87eca568753f05b46a38332ec0569d57c26a608b73689735cc5e9096928054ce",
+  "records_count": 10,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "a98c20a3a73483579731d76b020961819e2ce0d3f8fae82e68df88a3306e5cf7",
+  "failure_count": 2,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 5
+  },
+  "created_at": "2026-07-16T05:37:57.059743+00:00"
+}

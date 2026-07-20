@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "run_id": "example-lora-known-scoop",
+  "mode": "full",
+  "report_path": "report/report.md",
+  "report_sha256": "66cf0a78b57a2c4124193a7f582e521ba010db16353a7ae0f0c088ca1ec82601",
+  "input_artifact_hashes": {
+    "intake/scope.json": "63aea3bd055e556a3a2a34523750f3dda8438e7994a4bc00113bcb0251c6c1a7",
+    "retrieval/papers.jsonl": "40e646d0eb70f17018c98be071fb4f8ba3785219ca369668fdb5bf0412ed194a",
+    "papers/fulltext.jsonl": "7ce09cde0595fa34be8d6253642dd5ab6c76d0db264fe1f2ceee26a6dcedf42e",
+    "papers/claims.jsonl": "9da8da706082063460faa0bf377087f207deae2a1a2079dd19a62d23fc472a29",
+    "lineage/graph.json": "c2b044529bb471c62ba5393318950f85677f24ec8abddfbf64cb65b7e42103f7",
+    "gaps/gaps.jsonl": "afc3c330f2eae91f8246d34603c41ea7f80494cd52cf9c8dfb44c28cccf40f6e",
+    "ideas/ideas.jsonl": "6193c530c7ea597322322531b36a2f75b5eeaefd781c358f892fc7019e51d4c3",
+    "collision/collisions.json": "2f90dae7e1a7cfcf9bf34d6e5393c03a4e1c06dd0b1050d7dea76cb736f5b368",
+    "audit/reviewer.json": "480d26561067377fe7660d0003c61c8e94279000deaf04857151f2b3ee3eba05"
+  },
+  "claim_ids": [
+    "C-lora-known-scoop-1",
+    "C-lora-known-scoop-2",
+    "C-lora-known-scoop-3",
+    "C-lora-known-scoop-lineage"
+  ],
+  "failure_logs": [
+    "retrieval/failures.jsonl",
+    "papers/fulltext.failures.jsonl"
+  ],
+  "failure_log_hashes": {
+    "retrieval/failures.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "papers/fulltext.failures.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "uncertainty_sections": [
+    "Uncertainty Budget"
+  ],
+  "known_limitations": [
+    "This control does not audit later adaptive-rank variants."
+  ],
+  "effectiveness_claims": [],
+  "public_evaluation_path": null,
+  "public_evaluation_sha256": null
+}

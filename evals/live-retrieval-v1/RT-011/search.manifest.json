@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "query": "distributed inference long context language models",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "df763356c2fdbee436e2aae1aaddd272b147f6d1508e1242f175f793f21fcacb",
+  "records_count": 10,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "efb8fe87d9838aa968e78807f4fd1eb9609b8d3765e2efe746826f58d7f381ab",
+  "failure_count": 2,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 5
+  },
+  "created_at": "2026-07-16T05:39:08.224530+00:00"
+}

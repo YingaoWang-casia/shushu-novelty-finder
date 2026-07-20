@@ -1,0 +1,190 @@
+{
+  "schema_version": "1.0",
+  "audits": [
+    {
+      "schema_version": "1.0",
+      "audit_id": "A-rag-known-scoop",
+      "idea_id": "I-rag-known-scoop",
+      "generator_context_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "auditor_context_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "queries": {
+        "problem": [
+          "RAG mechanism prior-art control"
+        ],
+        "mechanism_signature": [
+          "Condition a sequence generator on passages retrieved from a dense Wikipedia index and jointly train retrieval and generation."
+        ],
+        "escape_mechanism": [
+          "new falsifiable assumption or evaluation claim"
+        ]
+      },
+      "comparisons": [
+        {
+          "paper_id": "P-arxiv:2005.11401",
+          "axes": [
+            {
+              "axis": "task",
+              "overlap": "full",
+              "rationale": "Direct mechanism replay.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-1"
+              ]
+            },
+            {
+              "axis": "mechanism",
+              "overlap": "full",
+              "rationale": "Direct mechanism replay.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-1"
+              ]
+            },
+            {
+              "axis": "supervision-data",
+              "overlap": "full",
+              "rationale": "Direct mechanism replay.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-1"
+              ]
+            },
+            {
+              "axis": "assumption",
+              "overlap": "full",
+              "rationale": "Direct mechanism replay.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-1"
+              ]
+            },
+            {
+              "axis": "evaluation",
+              "overlap": "full",
+              "rationale": "Direct mechanism replay.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-1"
+              ]
+            },
+            {
+              "axis": "application",
+              "overlap": "full",
+              "rationale": "Direct mechanism replay.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-1"
+              ]
+            }
+          ],
+          "collision_risk": "high"
+        },
+        {
+          "paper_id": "P-arxiv:2002.08909",
+          "axes": [
+            {
+              "axis": "task",
+              "overlap": "none",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-2"
+              ]
+            },
+            {
+              "axis": "mechanism",
+              "overlap": "partial",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-2"
+              ]
+            },
+            {
+              "axis": "supervision-data",
+              "overlap": "none",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-2"
+              ]
+            },
+            {
+              "axis": "assumption",
+              "overlap": "none",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-2"
+              ]
+            },
+            {
+              "axis": "evaluation",
+              "overlap": "none",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-2"
+              ]
+            },
+            {
+              "axis": "application",
+              "overlap": "none",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-2"
+              ]
+            }
+          ],
+          "collision_risk": "low"
+        },
+        {
+          "paper_id": "P-arxiv:2004.04906",
+          "axes": [
+            {
+              "axis": "task",
+              "overlap": "none",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-3"
+              ]
+            },
+            {
+              "axis": "mechanism",
+              "overlap": "partial",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-3"
+              ]
+            },
+            {
+              "axis": "supervision-data",
+              "overlap": "none",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-3"
+              ]
+            },
+            {
+              "axis": "assumption",
+              "overlap": "none",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-3"
+              ]
+            },
+            {
+              "axis": "evaluation",
+              "overlap": "none",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-3"
+              ]
+            },
+            {
+              "axis": "application",
+              "overlap": "none",
+              "rationale": "Neighboring lineage evidence.",
+              "evidence_claim_ids": [
+                "C-rag-known-scoop-3"
+              ]
+            }
+          ],
+          "collision_risk": "low"
+        }
+      ],
+      "decision": "abandon",
+      "rationale": "The closest paper fully covers the submitted mechanism.",
+      "structural_rewrite_count": 0
+    }
+  ]
+}

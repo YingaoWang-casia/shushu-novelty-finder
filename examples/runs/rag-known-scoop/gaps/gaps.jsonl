@@ -1,0 +1,1 @@
+{"schema_version":"1.0","gap_id":"G-rag-known-scoop","statement":"A new project needs a falsifiable assumption or evaluation claim.","gap_type":"cross-paper-pattern","evidence_claim_ids":["C-rag-known-scoop-lineage"],"blocked_by_paper_ids":["P-arxiv:2005.11401"],"open_assumptions":["A structural rewrite changes the novelty-bearing mechanism."],"confidence":0.7}

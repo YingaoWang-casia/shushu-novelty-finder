@@ -2,6 +2,119 @@
 
 This folder defines lightweight checks for `shushu-novelty-finder` outputs.
 
+## Benchmark v1
+
+`benchmark-v1.jsonl` is the fixed 60-seed engineering benchmark:
+
+- 20 broad research directions;
+- 20 title-only seed-paper cases with OpenReview identifiers;
+- 10 known-scoop controls expected to downgrade or abandon;
+- 10 mechanism-transfer cases expected to distinguish application transfer from mechanism novelty.
+
+It covers `llm-rag`, `cv-multimodal`, `speech`, `agents`, `systems`, `data-mining`,
+`security`, and `scientific-ml`. Validate its composition and create the default 240-run matrix:
+
+```bash
+shushu benchmark validate evals/benchmark-v1.jsonl
+shushu benchmark plan evals/benchmark-v1.jsonl --output evals/run-matrix.jsonl
+shushu benchmark execute evals/run-matrix.jsonl \
+  --benchmark-seeds evals/benchmark-v1.jsonl \
+  --adapters evals/adapters.local.json \
+  --results-root . \
+  --output evals/executed-run-matrix.jsonl
+shushu benchmark collect evals/run-matrix.jsonl \
+  --results-root . \
+  --output evals/completed-run-matrix.jsonl
+```
+
+The default systems are bare model, self-reflection, Shushu v0.1, and Shushu v0.2. This
+matrix is an execution plan, not an evaluation result. `execute` uses no-shell argv adapters,
+passes the seed prompt on stdin, captures stdout, persists failures, checkpoints after every run,
+and automatically resumes a matching `--output` matrix when the same command is repeated. A
+systemic adapter failure such as an exhausted usage limit, missing login, or HTTP 429 is recorded
+once and stops that queue immediately; remaining records retain their status for a later resume.
+Single-run adapter failures remain isolated and do not stop unrelated runs.
+`collect` requires all 240 output files,
+rejects empty or escaping paths, and hashes each result. Public quality claims remain prohibited
+until collection, two-person blind ratings, agreement statistics, and evidence/novelty metrics are
+complete.
+
+When execution is intentionally sharded, combine overlapping plan/checkpoint files with repeated
+`--matrix` arguments. `merge` prefers a matching complete record over a pending plan record,
+rejects conflicting results, and revalidates all 240 files before writing the final manifest.
+
+The fixed 20-topic live connector suite is `retrieval-topics-v1.jsonl`. It gates every selected
+source at ≥95% success and independently checks that duplicates remaining after canonical dedup are
+≤5%:
+
+```bash
+shushu retrieval-benchmark evals/retrieval-topics-v1.jsonl \
+  --output-dir evals/live-retrieval-v1 \
+  --report evals/live-retrieval-v1/report.json
+```
+
+For a publishable reliability run, set `OPENALEX_API_KEY` and use a dedicated
+`SEMANTICSCHOLAR_API_KEY`; anonymous Semantic Scholar traffic is shared and may be throttled.
+The credential-free 2026-07-16 run is retained under `live-retrieval-v1/` as non-publishable
+failure evidence rather than being rewritten.
+
+The repository also includes a pinned Codex CLI adapter for reproducible real-system execution:
+
+```bash
+shushu benchmark execute evals/run-matrix.jsonl \
+  --benchmark-seeds evals/benchmark-v1.jsonl \
+  --adapters evals/adapters.codex-gpt-5.6-sol.json \
+  --results-root . \
+  --output evals/executed-run-matrix.jsonl
+```
+
+All four systems use the same `gpt-5.6-sol` model and web-search availability. Bare receives only
+the seed, self-reflection receives one private critique/revision instruction, v0.1 receives the
+pinned Skill, and v0.2 receives the same Skill plus the engineering protocol. The adapter locks
+its wrapper and prompt files by SHA-256 and records an adapter fingerprint in every completed run.
+
+The real execution completed on 2026-07-20. `completed-run-matrix.jsonl` contains 240 verified
+runs (60 per system) and has SHA-256
+`bbfee19d4466f168b482593e38e0145b0cf2acb7bcd0cb54a6ad0b71e88cbbc2`. The completed runtime
+manifest and retained failure history are under `execution/codex-gpt-5.6-sol/`. Two human-rater
+packs are under `blind-v1/`; their coordinator-manifest commitment is
+`a0d83026f39d54672d137e7ca7a03bc15fa3314d7b653e57bca8e539f11ba647`. These are execution and
+blinding artifacts, not comparative effectiveness evidence; human responses remain pending.
+Raters use the identity-neutral `blind-eval-lock` entry point supplied in each pack to verify exact
+coverage and assignment/output bindings and to commit their response hashes before unblinding.
+
+Scoring also requires blind judgments for all six pairwise combinations of the four primary
+systems, for every seed and every human rater:
+
+```bash
+shushu benchmark score evals/judgments.jsonl \
+  --pairwise evals/pairwise-judgments.jsonl \
+  --blind-scalar evals/blind-scalar-responses.jsonl \
+  --blind-pairwise evals/blind-pairwise-responses.jsonl \
+  --blind-key evals/blind-v1/coordinator/blind-key.jsonl \
+  --blind-manifest evals/blind-v1/coordinator/manifest.json \
+  --benchmark-seeds evals/benchmark-v1.jsonl \
+  --run-matrix evals/completed-run-matrix.jsonl \
+  --execution-manifest evals/execution/codex-gpt-5.6-sol/manifest.json \
+  --results-root . \
+  --output evals/public-results.json
+```
+
+The human-primary score report covers:
+
+- retrieval: known-prior Recall@K, duplicate rate, metadata completeness, and publication-label
+  accuracy;
+- evidence: citation existence, claim entailment, unsupported claims, and full-text coverage;
+- lineage: relation macro-F1, closest-prior Recall@5, saturated-contribution precision, and
+  unsupported-edge rate;
+- idea quality: all seven rubric dimensions;
+- calibration: strong false positives, scoop recall, confidence/accuracy correlation, and kill
+  precision.
+
+The blinding, randomization, locking, and coordinator join procedure is specified in
+[`docs/evaluation-protocol.md`](../docs/evaluation-protocol.md). The `*.example.jsonl` files are
+schema examples only and must never be counted as human evidence.
+
 The goal is not to automatically judge scientific truth. The goal is to check whether a run generates concrete innovation-point candidates and then follows the Skill's evidence, reasonableness-audit, novelty-ranking, reviewer-objection, and paper-readiness discipline.
 
 ## Files
@@ -10,6 +123,7 @@ The goal is not to automatically judge scientific truth. The goal is to check wh
 - `cases/seed-paper.md` - Seed Paper Mode eval case.
 - `checks/output-checklist.md` - required output checklist.
 - `checklist.md` - legacy checklist kept for compatibility.
+- `benchmark-v1.jsonl` - fixed 60-seed benchmark.
 
 ## Required Checks
 
