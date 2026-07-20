@@ -44,11 +44,14 @@ Updated: 2026-07-20
   hashed 60-seed evaluation;
 - three offline-verifiable real-paper P0–P9 example runs for RAG, LoRA, and CLIP known-scoop
   controls, including PDFs and page-level evidence;
-- pytest, Ruff, and GitHub Actions for Python 3.9 and 3.12.
+- pytest, Ruff, and a single-per-PR GitHub Actions matrix for Python 3.9 and 3.12, with canonical
+  lock regeneration restricted to Python 3.9 and Node 24 action runtimes.
 
 ## Current limitations
 
-- OpenAlex requires the caller's `OPENALEX_API_KEY` under the current official API contract;
+- OpenAlex's free caller key remains recommended for repeatable or production use; the connector
+  can use the service's small anonymous demo allowance for bounded smoke/evaluation runs and
+  persists quota exhaustion as a normal source failure;
 - raw HTTP response caching is not implemented; replay operates on canonical records plus durable
   failure logs;
 - PDF text extraction does not perform semantic entailment or OCR, and visual verification remains
@@ -58,10 +61,11 @@ Updated: 2026-07-20
   ratings remain pending; the judgment contracts, coverage checks, aggregation, and agreement
   statistic are implemented;
 - the original credential-free 20-topic live connector run measured arXiv/OpenReview at 100%,
-  OpenAlex at 0%, Semantic Scholar at 20%, and zero post-dedup duplicates. After routing anonymous
-  Semantic Scholar calls through bulk search, its separate retained rerun passed 20/20 with 97
-  serializable records and zero duplicates. A publishable four-source rerun still requires only a
-  caller-owned OpenAlex credential.
+  OpenAlex at 0%, Semantic Scholar at 20%, and zero post-dedup duplicates. After enabling the
+  providers' bounded anonymous paths, the retained joint rerun passed all four sources at 20/20,
+  produced 380 serializable canonical records from 395 raw records, and had zero source failures
+  or remaining duplicates. Repeating OpenAlex after its demo allowance is consumed requires a
+  free caller-owned key.
 
 ## Final acceptance progress
 
@@ -69,23 +73,22 @@ Updated: 2026-07-20
 |---:|---|---|
 | 1 | One command starts a complete run | Implemented (`shushu run --mode full`) |
 | 2 | Interrupted runs resume | Implemented |
-| 3 | Four real retrieval sources | Implemented; OpenAlex needs user key |
-| 4 | Cross-source deduplication | Implemented and contract-tested; 214-record live run had zero remaining duplicates |
+| 3 | Four real retrieval sources | Implemented; credential-free joint live run passed every source at 20/20 |
+| 4 | Cross-source deduplication | Implemented and contract-tested; the final 380-record joint live run had zero remaining duplicates |
 | 5 | Every strong claim has traceable evidence | Implemented at schema/ledger level |
 | 6 | Abstract-only evidence cannot impersonate full text | Implemented |
 | 7 | Independent novelty collision | Implemented at schema/gate level |
 | 8 | Scooped ideas downgrade or abandon | Implemented and regression-tested |
 | 9 | At least 60 fixed eval seeds | Implemented |
 | 10 | Bare-model and old-version baselines | 240/240 real runs complete; matrix, execution manifest, and two-rater blind packs hash-verified |
-| 11 | Core code has automated tests | Implemented for current runtime (111 tests) |
-| 12 | CI runs on every PR | Draft PR #1 triggered push/PR workflows; green release run pending the canonical-Python lock-check correction |
+| 11 | Core code has automated tests | Implemented for current runtime (113 tests) |
+| 12 | CI runs on every PR | Draft PR #1 run 29735638352 passed Python 3.9 and 3.12 from one pull-request workflow |
 | 13 | Reports expose failures and uncertainty | Implemented as a P9 manifest/report gate |
 | 14 | README claims are supported by public evals | Enforced: no comparative claim until a hashed public eval passes |
 
 The remaining comparative-release evidence is external: collect paired blind judgments from at
-least two research-experienced humans, publish the aggregate report, rerun credentialed connector
-reliability, verify remote pull-request CI, and only then update the guarded README claim block
-with the report SHA-256.
+least two research-experienced humans, publish the aggregate report, and only then update the
+guarded README claim block with the report SHA-256.
 
 The command-by-command evidence and remaining external requirements are recorded in
 [`acceptance-audit.md`](acceptance-audit.md).

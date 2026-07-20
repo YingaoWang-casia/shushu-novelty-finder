@@ -86,9 +86,10 @@ run_dir=$(.venv/bin/shushu run "RAG citation robustness" --mode full)
 .venv/bin/shushu next --run "$run_dir"
 ```
 
-统一检索入口支持 arXiv、OpenAlex、Semantic Scholar 和 OpenReview。OpenAlex 当前官方
-API 要求 `OPENALEX_API_KEY`；Semantic Scholar 可选 `SEMANTICSCHOLAR_API_KEY`，匿名调用
-自动使用较低开销的 bulk 检索。有 key 时保留 relevance 检索。多源检索会并发执行、
+统一检索入口支持 arXiv、OpenAlex、Semantic Scholar 和 OpenReview。OpenAlex 的免费
+`OPENALEX_API_KEY` 仍是可重复或生产检索的推荐方式；未配置时，连接器会尝试官方当前
+提供的小额匿名 demo 额度，并把额度耗尽等失败完整落盘。Semantic Scholar 可选
+`SEMANTICSCHOLAR_API_KEY`，匿名调用自动使用较低开销的 bulk 检索。有 key 时保留 relevance 检索。多源检索会并发执行、
 跨源去重，并把部分失败持久化为 JSONL：
 
 ```bash

@@ -53,14 +53,22 @@ shushu retrieval-benchmark evals/retrieval-topics-v1.jsonl \
   --report evals/live-retrieval-v1/report.json
 ```
 
-For a publishable four-source reliability run, set `OPENALEX_API_KEY`. A dedicated
-`SEMANTICSCHOLAR_API_KEY` is optional: authenticated calls use relevance search, while anonymous
-calls use Semantic Scholar's lower-cost bulk search with a bounded zero-result relaxation. The
-credential-free 2026-07-16 run is retained under `live-retrieval-v1/` as historical failure
-evidence rather than being rewritten. The 2026-07-20 anonymous Semantic Scholar rerun is retained
-under `live-retrieval-s2-anonymous-v1/`; it passed 20/20 topics with 97 serializable records and
-zero post-dedup duplicates. Its report SHA-256 is
+For repeatable or production OpenAlex retrieval, use its free `OPENALEX_API_KEY`. Without one, the
+connector attempts OpenAlex's small anonymous demo allowance and persists quota exhaustion like
+any other source failure. A dedicated `SEMANTICSCHOLAR_API_KEY` is optional: authenticated calls
+use relevance search, while anonymous calls use Semantic Scholar's lower-cost bulk search with a
+bounded zero-result relaxation. The credential-free 2026-07-16 run is retained under
+`live-retrieval-v1/` as historical failure evidence rather than being rewritten. The 2026-07-20
+anonymous Semantic Scholar rerun is retained under `live-retrieval-s2-anonymous-v1/`; it passed
+20/20 topics with 97 serializable records and zero post-dedup duplicates. Its report SHA-256 is
 `6bbd951a28234b258d36f37c2001f6bc44fc4719b844358cdab3659f78f89e30`.
+
+The final credential-free four-source rerun is retained under
+`live-retrieval-four-source-anonymous-v1/`. arXiv, OpenAlex, Semantic Scholar, and OpenReview each
+passed 20/20 topics. The run produced 395 raw source records, 380 canonical records after
+cross-source deduplication, zero remaining duplicates, zero source failures, and 20 offline-
+verified replay manifests. Its report SHA-256 is
+`acabc854490418f6a645caa83446d5dd479efa2d15a2a3a92df428f24cd33c74`.
 
 The repository also includes a pinned Codex CLI adapter for reproducible real-system execution:
 

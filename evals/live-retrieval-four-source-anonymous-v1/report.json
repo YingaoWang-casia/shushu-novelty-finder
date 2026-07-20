@@ -1,0 +1,279 @@
+{
+  "schema_version": "1.0",
+  "topics": 20,
+  "source_success_rates": {
+    "arxiv": 1.0,
+    "openalex": 1.0,
+    "semantic-scholar": 1.0,
+    "openreview": 1.0
+  },
+  "raw_source_records": 395,
+  "deduplicated_records": 380,
+  "remaining_duplicate_records": 0,
+  "post_dedup_duplicate_rate": 0.0,
+  "serializable_records": 380,
+  "publishable": true,
+  "errors": [],
+  "topic_results": [
+    {
+      "topic_id": "RT-001",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 18,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 18
+    },
+    {
+      "topic_id": "RT-002",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 18,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 18
+    },
+    {
+      "topic_id": "RT-003",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 20,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 20
+    },
+    {
+      "topic_id": "RT-004",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 19,
+      "deduplicated_records": 18,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 18
+    },
+    {
+      "topic_id": "RT-005",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 19,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 19
+    },
+    {
+      "topic_id": "RT-006",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 19,
+      "deduplicated_records": 17,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 17
+    },
+    {
+      "topic_id": "RT-007",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 19,
+      "deduplicated_records": 19,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 19
+    },
+    {
+      "topic_id": "RT-008",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 20,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 20
+    },
+    {
+      "topic_id": "RT-009",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 20,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 20
+    },
+    {
+      "topic_id": "RT-010",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 20,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 20
+    },
+    {
+      "topic_id": "RT-011",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 20,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 20
+    },
+    {
+      "topic_id": "RT-012",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 19,
+      "deduplicated_records": 19,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 19
+    },
+    {
+      "topic_id": "RT-013",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 20,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 20
+    },
+    {
+      "topic_id": "RT-014",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 19,
+      "deduplicated_records": 19,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 19
+    },
+    {
+      "topic_id": "RT-015",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 20,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 20
+    },
+    {
+      "topic_id": "RT-016",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 19,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 19
+    },
+    {
+      "topic_id": "RT-017",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 20,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 20
+    },
+    {
+      "topic_id": "RT-018",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 19,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 19
+    },
+    {
+      "topic_id": "RT-019",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 17,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 17
+    },
+    {
+      "topic_id": "RT-020",
+      "source_success": {
+        "arxiv": true,
+        "openalex": true,
+        "semantic-scholar": true,
+        "openreview": true
+      },
+      "raw_source_records": 20,
+      "deduplicated_records": 18,
+      "remaining_duplicate_records": 0,
+      "serializable_records": 18
+    }
+  ]
+}

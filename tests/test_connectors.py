@@ -1,4 +1,4 @@
-from shushu_novelty.retrieval import semantic_scholar
+from shushu_novelty.retrieval import openalex, semantic_scholar
 from shushu_novelty.retrieval.openalex import reconstruct_abstract, record_from_work
 from shushu_novelty.retrieval.openreview import parse_search_response
 from shushu_novelty.retrieval.semantic_scholar import record_from_paper
@@ -25,6 +25,37 @@ def test_openalex_reconstructs_abstract_and_identifiers():
     assert record.identifiers["doi"] == "10.1000/xyz"
     assert record.venue_or_source == "ExampleConf"
     assert record.verification_level == "abstract"
+
+
+def test_openalex_uses_bounded_anonymous_demo_when_key_is_absent(monkeypatch):
+    requests = []
+
+    def fake_get_json(url, **kwargs):
+        requests.append((url, kwargs))
+        return {"results": [{"id": "https://openalex.org/W123", "title": "Evidence Graphs"}]}
+
+    monkeypatch.delenv("OPENALEX_API_KEY", raising=False)
+    monkeypatch.setattr(openalex, "get_json", fake_get_json)
+
+    records = openalex.search_openalex("evidence graphs", max_results=5)
+
+    assert len(records) == 1
+    assert "api_key=" not in requests[0][0]
+    assert "per_page=5" in requests[0][0]
+
+
+def test_openalex_prefers_caller_key(monkeypatch):
+    requests = []
+
+    def fake_get_json(url, **kwargs):
+        requests.append((url, kwargs))
+        return {"results": [{"id": "https://openalex.org/W123", "title": "Evidence Graphs"}]}
+
+    monkeypatch.setattr(openalex, "get_json", fake_get_json)
+
+    openalex.search_openalex("evidence graphs", max_results=5, api_key="secret")
+
+    assert "api_key=secret" in requests[0][0]
 
 
 def test_semantic_scholar_preserves_cross_source_ids():

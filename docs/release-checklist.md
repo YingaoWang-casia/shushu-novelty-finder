@@ -8,11 +8,14 @@
 - [x] legacy wrappers still pass regression tests;
 - [x] wheel and source distribution build cleanly with the locked build backend via
       `python -m build --no-isolation`;
-- [ ] clean Python 3.9 and 3.12 CI jobs pass on the release commit.
+- [ ] clean Python 3.9 and 3.12 CI jobs pass on the final tagged release commit; both jobs already
+      pass on draft PR #1 head in run 29735638352.
 
 ## Evidence and workflow gates
 
 - [x] four connectors pass their contract tests;
+- [x] the fixed 20-topic live suite passes all four sources at 100% with zero post-dedup
+      duplicates and replay-verifiable manifests;
 - [x] full-text and Claim-Evidence Ledger fixtures pass;
 - [x] resume, collision, reviewer, and final-report gates pass;
 - [x] the 60-seed benchmark composition is unchanged or versioned explicitly;

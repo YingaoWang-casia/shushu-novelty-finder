@@ -100,15 +100,18 @@ def search_openalex(
     timeout: float = 30.0,
 ) -> list[PaperRecord]:
     key = api_key or os.environ.get("OPENALEX_API_KEY")
-    if not key:
-        raise RetrievalError("OpenAlex requires OPENALEX_API_KEY")
     params = {
         "search": query,
         "per_page": str(min(max_results, 100)),
         "sort": "relevance_score:desc",
         "select": SELECT,
-        "api_key": key,
     }
+    # OpenAlex currently grants a small one-time anonymous demo allowance. Keep that bounded
+    # path usable for smoke tests and one-off evaluation, while preferring a caller-owned key for
+    # repeatable or production retrieval. Quota exhaustion still surfaces through get_json and is
+    # persisted by the multi-source failure ledger.
+    if key:
+        params["api_key"] = key
     payload = get_json(
         OPENALEX_API + "?" + urllib.parse.urlencode(params),
         headers={"User-Agent": "shushu-novelty-finder/0.2"},
