@@ -12,6 +12,7 @@ from shushu_novelty.retrieval.http import get_json
 from shushu_novelty.schemas import PaperRecord, Provenance
 
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
+SEMANTIC_SCHOLAR_BULK_API = SEMANTIC_SCHOLAR_API + "/bulk"
 FIELDS = ",".join(
     [
         "paperId",
@@ -26,6 +27,14 @@ FIELDS = ",".join(
         "authors",
     ]
 )
+
+
+def _relaxed_bulk_query(query: str) -> str:
+    """Relax an over-constrained natural-language query once, without an unbounded OR."""
+    terms = query.split()
+    if len(terms) < 4:
+        return query
+    return " ".join(terms[: (len(terms) + 1) // 2])
 
 
 def record_from_paper(paper: dict[str, Any], retrieved_at: str | None = None) -> PaperRecord:
@@ -63,7 +72,7 @@ def record_from_paper(paper: dict[str, Any], retrieved_at: str | None = None) ->
         authors=authors,
         abstract=abstract,
         main_contribution=(abstract[:500] if abstract else "unknown"),
-        why_relevant="matched Semantic Scholar relevance search; verify before claim use",
+        why_relevant="matched Semantic Scholar paper search; verify before claim use",
         evidence_status="candidate",
         verification_level="abstract" if abstract else "metadata",
         evidence_roles=["cs-recall"],
@@ -85,21 +94,42 @@ def search_semantic_scholar(
     api_key: str | None = None,
     timeout: float = 30.0,
 ) -> list[PaperRecord]:
+    key = api_key or os.environ.get("SEMANTICSCHOLAR_API_KEY")
     params = {
         "query": query.replace("-", " "),
-        "limit": str(min(max_results, 100)),
         "fields": FIELDS,
     }
+    endpoint = SEMANTIC_SCHOLAR_API
+    if key:
+        params["limit"] = str(min(max_results, 100))
+    else:
+        # Semantic Scholar recommends the less resource-intensive bulk endpoint for
+        # most keyword searches. Anonymous relevance-search traffic shares a heavily
+        # throttled pool; bulk remains a real API search and avoids turning an
+        # optional credential into a functional requirement. Its default paper-ID
+        # ordering is not useful for discovery, so prefer highly cited matches.
+        endpoint = SEMANTIC_SCHOLAR_BULK_API
+        params["sort"] = "citationCount:desc"
     headers = {"User-Agent": "shushu-novelty-finder/0.2"}
-    key = api_key or os.environ.get("SEMANTICSCHOLAR_API_KEY")
     if key:
         headers["x-api-key"] = key
-    payload = get_json(
-        SEMANTIC_SCHOLAR_API + "?" + urllib.parse.urlencode(params),
-        headers=headers,
-        timeout=timeout,
-    )
+    request_kwargs: dict[str, Any] = {"headers": headers, "timeout": timeout}
+    if not key:
+        # The anonymous pool is shared. A slightly wider bounded retry window covers
+        # transient bulk throttles while still surfacing durable failures.
+        request_kwargs["retries"] = 4
+    payload = get_json(endpoint + "?" + urllib.parse.urlencode(params), **request_kwargs)
     results = payload.get("data")
     if not isinstance(results, list):
         raise RetrievalError("Semantic Scholar response is missing data")
+    if not results and not key:
+        relaxed_query = _relaxed_bulk_query(params["query"])
+        if relaxed_query != params["query"]:
+            params["query"] = relaxed_query
+            payload = get_json(
+                endpoint + "?" + urllib.parse.urlencode(params), **request_kwargs
+            )
+            results = payload.get("data")
+            if not isinstance(results, list):
+                raise RetrievalError("Semantic Scholar response is missing data")
     return [record_from_paper(paper) for paper in results[:max_results]]

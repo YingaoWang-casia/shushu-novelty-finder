@@ -57,9 +57,11 @@ Updated: 2026-07-20
 - benchmark system execution and blind-pack generation are complete, while the real two-person
   ratings remain pending; the judgment contracts, coverage checks, aggregation, and agreement
   statistic are implemented;
-- the credential-free 20-topic live connector run measured arXiv/OpenReview at 100%, OpenAlex at
-  0%, Semantic Scholar at 20%, and zero post-dedup duplicates; a publishable rerun still requires
-  caller-owned OpenAlex and Semantic Scholar credentials.
+- the original credential-free 20-topic live connector run measured arXiv/OpenReview at 100%,
+  OpenAlex at 0%, Semantic Scholar at 20%, and zero post-dedup duplicates. After routing anonymous
+  Semantic Scholar calls through bulk search, its separate retained rerun passed 20/20 with 97
+  serializable records and zero duplicates. A publishable four-source rerun still requires only a
+  caller-owned OpenAlex credential.
 
 ## Final acceptance progress
 
@@ -75,7 +77,7 @@ Updated: 2026-07-20
 | 8 | Scooped ideas downgrade or abandon | Implemented and regression-tested |
 | 9 | At least 60 fixed eval seeds | Implemented |
 | 10 | Bare-model and old-version baselines | 240/240 real runs complete; matrix, execution manifest, and two-rater blind packs hash-verified |
-| 11 | Core code has automated tests | Implemented for current runtime (108 tests) |
+| 11 | Core code has automated tests | Implemented for current runtime (111 tests) |
 | 12 | CI runs on every PR | Draft PR #1 triggered push/PR workflows; green release run pending the canonical-Python lock-check correction |
 | 13 | Reports expose failures and uncertainty | Implemented as a P9 manifest/report gate |
 | 14 | README claims are supported by public evals | Enforced: no comparative claim until a hashed public eval passes |

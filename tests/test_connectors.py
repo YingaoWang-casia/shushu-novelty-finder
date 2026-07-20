@@ -1,3 +1,4 @@
+from shushu_novelty.retrieval import semantic_scholar
 from shushu_novelty.retrieval.openalex import reconstruct_abstract, record_from_work
 from shushu_novelty.retrieval.openreview import parse_search_response
 from shushu_novelty.retrieval.semantic_scholar import record_from_paper
@@ -41,6 +42,66 @@ def test_semantic_scholar_preserves_cross_source_ids():
     )
     assert record.identifiers["doi"] == "10.1000/xyz"
     assert record.identifiers["arxiv"] == "2501.00001"
+
+
+def test_semantic_scholar_uses_bulk_search_without_key(monkeypatch):
+    requests = []
+
+    def fake_get_json(url, **kwargs):
+        requests.append((url, kwargs))
+        return {"data": [{"paperId": "S2-1", "title": "Evidence Graphs"}]}
+
+    monkeypatch.delenv("SEMANTICSCHOLAR_API_KEY", raising=False)
+    monkeypatch.setattr(semantic_scholar, "get_json", fake_get_json)
+
+    records = semantic_scholar.search_semantic_scholar("evidence-graphs", max_results=5)
+
+    assert len(records) == 1
+    assert requests[0][0].startswith(semantic_scholar.SEMANTIC_SCHOLAR_BULK_API + "?")
+    assert "sort=citationCount%3Adesc" in requests[0][0]
+    assert "limit=" not in requests[0][0]
+    assert "x-api-key" not in requests[0][1]["headers"]
+    assert requests[0][1]["retries"] == 4
+
+
+def test_semantic_scholar_relaxes_empty_bulk_query_once(monkeypatch):
+    requests = []
+
+    def fake_get_json(url, **kwargs):
+        requests.append(url)
+        if len(requests) == 1:
+            return {"data": []}
+        return {"data": [{"paperId": "S2-1", "title": "Citation Faithfulness"}]}
+
+    monkeypatch.delenv("SEMANTICSCHOLAR_API_KEY", raising=False)
+    monkeypatch.setattr(semantic_scholar, "get_json", fake_get_json)
+
+    records = semantic_scholar.search_semantic_scholar(
+        "citation faithfulness metrics long form generation", max_results=5
+    )
+
+    assert len(records) == 1
+    assert len(requests) == 2
+    assert "query=citation+faithfulness+metrics&" in requests[1]
+
+
+def test_semantic_scholar_uses_relevance_search_with_key(monkeypatch):
+    requests = []
+
+    def fake_get_json(url, **kwargs):
+        requests.append((url, kwargs))
+        return {"data": [{"paperId": "S2-1", "title": "Evidence Graphs"}]}
+
+    monkeypatch.setattr(semantic_scholar, "get_json", fake_get_json)
+
+    semantic_scholar.search_semantic_scholar("evidence graphs", max_results=5, api_key="secret")
+
+    assert requests[0][0].startswith(semantic_scholar.SEMANTIC_SCHOLAR_API + "?")
+    assert "/bulk?" not in requests[0][0]
+    assert "limit=5" in requests[0][0]
+    assert "sort=" not in requests[0][0]
+    assert requests[0][1]["headers"]["x-api-key"] == "secret"
+    assert "retries" not in requests[0][1]
 
 
 def test_openreview_collapses_review_notes_by_forum():
