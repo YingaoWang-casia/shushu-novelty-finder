@@ -2,12 +2,14 @@ name: CI
 
 on:
   push:
+    branches: ["main"]
   pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.9", "3.12"]
     steps:
@@ -20,6 +22,7 @@ jobs:
           python -m pip install --require-hashes -r requirements-dev.lock
           python -m pip install --no-deps --no-build-isolation -e .
       - name: Verify dependency lock is current
+        if: matrix.python-version == '3.9'
         run: |
           pip-compile pyproject.toml --extra dev --all-build-deps --allow-unsafe \
             --strip-extras --generate-hashes --output-file requirements-dev.lock
@@ -33,6 +36,7 @@ jobs:
       - run: shushu validate evals/pairwise-judgment.example.jsonl --schema pairwise-judgment
       - run: shushu release-check --readme README.md
       - run: shushu release-check --readme README_EN.md
+      - run: shushu release-check --readme README_ZH.md
       - run: for run in examples/runs/*-known-scoop; do shushu next --run "$run"; done
       - run: python -m build --no-isolation
       - run: python scripts/check_distribution.py dist
