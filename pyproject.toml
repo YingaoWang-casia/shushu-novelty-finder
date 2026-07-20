@@ -40,6 +40,7 @@ dev = [
 [project.scripts]
 shushu = "shushu_novelty.cli:main"
 shushu-codex-adapter = "shushu_novelty.evaluation.codex_adapter:main"
+blind-eval = "shushu_novelty.evaluation.rater_cli:workflow_main"
 blind-eval-lock = "shushu_novelty.evaluation.rater_cli:main"
 
 [tool.hatch.build.targets.wheel]

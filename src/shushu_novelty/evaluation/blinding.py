@@ -6,12 +6,16 @@ import hashlib
 import hmac
 import itertools
 import json
+import math
 import re
 import secrets
 import shutil
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
+from typing import Any
+
+from pydantic import ValidationError
 
 from shushu_novelty.errors import InputError
 from shushu_novelty.io import sha256_file, validate_jsonl, write_jsonl
@@ -71,6 +75,16 @@ of research experience. Before rating, obtain and record the coordinator's SHA-2
 `coordinator/manifest.json`; the key content remains withheld. Validate the completed JSONL before
 sending it to the coordinator.
 
+Create schema-shaped response drafts once, using your actual research experience:
+
+```bash
+blind-eval init . --experience-years <actual-years>
+```
+
+The drafts preserve every immutable assignment field and use JSON `null` for judgments that still
+need human input. Check progress at any time with `blind-eval status .`; it reports complete,
+incomplete, invalid, duplicate, and unexpected rows without changing either file.
+
 ## Scalar counting rules
 
 Use non-negative integer counts. A denominator of zero means the output contains no assessable
@@ -113,7 +127,7 @@ Name the completed files `blind-scalar-responses.jsonl` and
 `blind-pairwise-responses.jsonl`. Before sending them to the coordinator, run:
 
 ```bash
-blind-eval-lock . \
+blind-eval lock . \
   --scalar blind-scalar-responses.jsonl \
   --pairwise blind-pairwise-responses.jsonl \
   --manifest-sha256 <coordinator-manifest-commitment> \
@@ -132,6 +146,364 @@ class BlindPackageResult:
     scalar_assignments: int
     pairwise_assignments: int
     key_records: int
+
+
+@dataclass(frozen=True)
+class BlindDraftResult:
+    rater_id: str
+    scalar_responses: int
+    pairwise_responses: int
+    scalar_path: Path
+    pairwise_path: Path
+
+
+RELATION_TYPES = (
+    "ancestor",
+    "closest-prior",
+    "sibling",
+    "follow-up",
+    "benchmark",
+    "contrary-evidence",
+    "mechanism-transfer",
+)
+
+
+def _load_rater_pack(
+    rater_dir: Path,
+) -> tuple[Path, list[BlindOutputAssignment], list[BlindPairwiseAssignment]]:
+    root = rater_dir.resolve()
+    if not root.is_dir():
+        raise InputError(f"rater directory does not exist: {rater_dir}")
+    scalar = validate_jsonl(root / "scalar-assignments.jsonl", BlindOutputAssignment)
+    pairwise = validate_jsonl(root / "pairwise-assignments.jsonl", BlindPairwiseAssignment)
+    if len(scalar) != 240 or len(pairwise) != 360:
+        raise InputError("rater pack must contain exactly 240 scalar and 360 pairwise assignments")
+    if len({item.assignment_id for item in scalar}) != len(scalar):
+        raise InputError("scalar assignments contain duplicate assignment IDs")
+    if len({item.assignment_id for item in pairwise}) != len(pairwise):
+        raise InputError("pairwise assignments contain duplicate assignment IDs")
+    rater_ids = {item.rater_id for item in [*scalar, *pairwise]}
+    if rater_ids != {root.name}:
+        raise InputError("rater directory name differs from assignment rater ID")
+    output_by_key: dict[tuple[str, str], BlindOutputAssignment] = {}
+    for assignment in scalar:
+        portable = PurePosixPath(assignment.output_path)
+        if portable.is_absolute() or ".." in portable.parts:
+            raise InputError(f"scalar assignment output path is unsafe: {assignment.output_path}")
+        output = (root / assignment.output_path).resolve()
+        if root not in output.parents or not output.is_file():
+            raise InputError(f"scalar assignment output is missing: {assignment.output_path}")
+        if sha256_file(output) != assignment.output_sha256:
+            raise InputError(f"scalar assignment output hash differs: {assignment.assignment_id}")
+        key = (assignment.seed_id, assignment.output_id)
+        if key in output_by_key:
+            raise InputError("scalar assignments contain duplicate seed/output IDs")
+        output_by_key[key] = assignment
+    for assignment in pairwise:
+        left = output_by_key.get((assignment.seed_id, assignment.output_left))
+        right = output_by_key.get((assignment.seed_id, assignment.output_right))
+        if left is None or right is None:
+            raise InputError(
+                f"pairwise assignment references an unknown output: {assignment.assignment_id}"
+            )
+        if (
+            assignment.path_left != left.output_path
+            or assignment.sha256_left != left.output_sha256
+            or assignment.path_right != right.output_path
+            or assignment.sha256_right != right.output_sha256
+        ):
+            raise InputError(
+                f"pairwise assignment output binding differs: {assignment.assignment_id}"
+            )
+    return root, scalar, pairwise
+
+
+def _scalar_draft(
+    assignment: BlindOutputAssignment,
+    seed: BenchmarkSeed,
+    experience_years: float,
+) -> dict[str, Any]:
+    return {
+        "schema_version": "1.0",
+        "assignment_id": assignment.assignment_id,
+        "rater_id": assignment.rater_id,
+        "research_experience_years": experience_years,
+        "seed_id": assignment.seed_id,
+        "output_id": assignment.output_id,
+        "retrieval": {
+            "known_prior_total": len(seed.known_prior_ids),
+            "known_prior_retrieved_at_k": None,
+            "retrieved_records": None,
+            "duplicate_records": None,
+            "metadata_fields_total": None,
+            "metadata_fields_present": None,
+            "publication_labels_total": None,
+            "publication_labels_correct": None,
+        },
+        "evidence": {
+            "citations_total": None,
+            "citations_existing": None,
+            "claims_total": None,
+            "claims_entailed": None,
+            "unsupported_claims": None,
+            "strong_claims": None,
+            "full_text_verified_claims": None,
+        },
+        "lineage": {
+            "relations": [
+                {
+                    "relation": relation,
+                    "true_positive": None,
+                    "false_positive": None,
+                    "false_negative": None,
+                }
+                for relation in RELATION_TYPES
+            ],
+            "closest_prior_total": None,
+            "closest_prior_retrieved_at_5": None,
+            "saturated_contributions_predicted": None,
+            "saturated_contributions_correct": None,
+            "lineage_edges_total": None,
+            "unsupported_lineage_edges": None,
+        },
+        "idea": {
+            "problem_significance": None,
+            "novelty": None,
+            "method_specificity": None,
+            "feasibility": None,
+            "falsifiability": None,
+            "baseline_completeness": None,
+            "reviewer_defensibility": None,
+            "novelty_verdict": None,
+        },
+        "calibration": {
+            "confidence": None,
+            "prediction_correct": None,
+            "is_scoop_case": seed.case_type == "known-scoop",
+            "scoop_detected": None,
+            "kill_recommended": None,
+            "kill_correct": None,
+        },
+        "notes": "",
+    }
+
+
+def _pairwise_draft(
+    assignment: BlindPairwiseAssignment, experience_years: float
+) -> dict[str, Any]:
+    return {
+        "schema_version": "1.0",
+        "assignment_id": assignment.assignment_id,
+        "rater_id": assignment.rater_id,
+        "research_experience_years": experience_years,
+        "seed_id": assignment.seed_id,
+        "output_left": assignment.output_left,
+        "output_right": assignment.output_right,
+        "preference": None,
+        "rationale": None,
+    }
+
+
+def _jsonl_dicts(records: list[dict[str, Any]]) -> str:
+    return "".join(
+        json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
+        for record in records
+    )
+
+
+def initialize_rater_response_drafts(
+    rater_dir: Path, research_experience_years: float
+) -> BlindDraftResult:
+    """Create non-overwriting, assignment-bound response drafts for one blind rater pack."""
+    if not math.isfinite(research_experience_years) or research_experience_years < 0:
+        raise InputError("research experience years must be a finite non-negative number")
+    root, scalar_assignments, pairwise_assignments = _load_rater_pack(rater_dir)
+    seeds = validate_jsonl(root / "benchmark-seeds.jsonl", BenchmarkSeed)
+    seed_by_id = {seed.seed_id: seed for seed in seeds}
+    if len(seeds) != 60 or len(seed_by_id) != 60:
+        raise InputError("rater pack must contain exactly 60 unique benchmark seeds")
+    if any(item.seed_id not in seed_by_id for item in scalar_assignments):
+        raise InputError("scalar assignment references a missing benchmark seed")
+
+    scalar_path = root / "blind-scalar-responses.jsonl"
+    pairwise_path = root / "blind-pairwise-responses.jsonl"
+    existing = [path.name for path in (scalar_path, pairwise_path) if path.exists()]
+    if existing:
+        raise InputError(f"response draft already exists and will not be overwritten: {existing}")
+    scalar_text = _jsonl_dicts(
+        [
+            _scalar_draft(item, seed_by_id[item.seed_id], research_experience_years)
+            for item in scalar_assignments
+        ]
+    )
+    pairwise_text = _jsonl_dicts(
+        [_pairwise_draft(item, research_experience_years) for item in pairwise_assignments]
+    )
+    scalar_tmp = scalar_path.with_suffix(scalar_path.suffix + ".tmp")
+    pairwise_tmp = pairwise_path.with_suffix(pairwise_path.suffix + ".tmp")
+    scalar_installed = False
+    try:
+        scalar_tmp.write_text(scalar_text, encoding="utf-8")
+        pairwise_tmp.write_text(pairwise_text, encoding="utf-8")
+        scalar_tmp.replace(scalar_path)
+        scalar_installed = True
+        pairwise_tmp.replace(pairwise_path)
+    except OSError as exc:
+        scalar_tmp.unlink(missing_ok=True)
+        pairwise_tmp.unlink(missing_ok=True)
+        if scalar_installed:
+            scalar_path.unlink(missing_ok=True)
+        raise InputError(f"cannot create response drafts: {exc}") from exc
+    return BlindDraftResult(
+        rater_id=root.name,
+        scalar_responses=len(scalar_assignments),
+        pairwise_responses=len(pairwise_assignments),
+        scalar_path=scalar_path,
+        pairwise_path=pairwise_path,
+    )
+
+
+def _contains_null(value: Any) -> bool:
+    if value is None:
+        return True
+    if isinstance(value, dict):
+        return any(_contains_null(item) for item in value.values())
+    if isinstance(value, list):
+        return any(_contains_null(item) for item in value)
+    return False
+
+
+def _draft_file_status(
+    path: Path,
+    model: type[BlindScalarResponse] | type[BlindPairwiseResponse],
+    assignments: dict[str, BlindOutputAssignment | BlindPairwiseAssignment],
+    immutable_fields: tuple[str, ...],
+) -> dict[str, Any]:
+    if not path.is_file():
+        return {
+            "path": str(path),
+            "rows": 0,
+            "complete": 0,
+            "incomplete": 0,
+            "invalid": 0,
+            "duplicate_assignment_ids": [],
+            "unexpected_assignment_ids": [],
+            "missing_assignment_ids": sorted(assignments),
+            "errors": ["response draft does not exist"],
+        }
+    complete: set[str] = set()
+    seen: set[str] = set()
+    duplicates: set[str] = set()
+    unexpected: set[str] = set()
+    incomplete = 0
+    invalid = 0
+    errors: list[str] = []
+    rows = 0
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError as exc:
+        raise InputError(f"cannot read response draft {path}: {exc}") from exc
+    for line_no, line in enumerate(lines, 1):
+        if not line.strip():
+            continue
+        rows += 1
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError as exc:
+            invalid += 1
+            errors.append(f"line {line_no}: invalid JSON: {exc.msg}")
+            continue
+        if not isinstance(value, dict):
+            invalid += 1
+            errors.append(f"line {line_no}: expected a JSON object")
+            continue
+        assignment_id = value.get("assignment_id")
+        if not isinstance(assignment_id, str):
+            invalid += 1
+            errors.append(f"line {line_no}: assignment_id must be a string")
+            continue
+        if assignment_id in seen:
+            duplicates.add(assignment_id)
+        seen.add(assignment_id)
+        assignment = assignments.get(assignment_id)
+        if assignment is None:
+            unexpected.add(assignment_id)
+            invalid += 1
+            errors.append(f"line {line_no}: unexpected assignment_id")
+            continue
+        if any(
+            value.get(field) != getattr(assignment, field) for field in immutable_fields
+        ):
+            invalid += 1
+            errors.append(f"line {line_no}: immutable assignment fields differ")
+            continue
+        if _contains_null(value):
+            incomplete += 1
+            continue
+        try:
+            response = model.model_validate(value)
+        except ValidationError as exc:
+            invalid += 1
+            errors.append(f"line {line_no}: {exc.errors()[0]['msg']}")
+            continue
+        assignment = assignments.get(response.assignment_id)
+        if assignment is None:
+            invalid += 1
+            continue
+        if any(
+            getattr(response, field) != getattr(assignment, field)
+            for field in immutable_fields
+        ):
+            invalid += 1
+            errors.append(f"line {line_no}: immutable assignment fields differ")
+            continue
+        complete.add(response.assignment_id)
+    missing = set(assignments) - complete
+    return {
+        "path": str(path),
+        "rows": rows,
+        "complete": len(complete),
+        "incomplete": incomplete,
+        "invalid": invalid,
+        "duplicate_assignment_ids": sorted(duplicates),
+        "unexpected_assignment_ids": sorted(unexpected),
+        "missing_assignment_ids": sorted(missing),
+        "errors": errors[:20],
+    }
+
+
+def rater_response_draft_status(rater_dir: Path) -> dict[str, Any]:
+    """Report non-mutating completion status for the standard response drafts."""
+    root, scalar_assignments, pairwise_assignments = _load_rater_pack(rater_dir)
+    scalar_by_id = {item.assignment_id: item for item in scalar_assignments}
+    pairwise_by_id = {item.assignment_id: item for item in pairwise_assignments}
+    scalar = _draft_file_status(
+        root / "blind-scalar-responses.jsonl",
+        BlindScalarResponse,
+        scalar_by_id,
+        ("rater_id", "seed_id", "output_id"),
+    )
+    pairwise = _draft_file_status(
+        root / "blind-pairwise-responses.jsonl",
+        BlindPairwiseResponse,
+        pairwise_by_id,
+        ("rater_id", "seed_id", "output_left", "output_right"),
+    )
+    ready = (
+        scalar["rows"] == 240
+        and pairwise["rows"] == 360
+        and scalar["complete"] == 240
+        and pairwise["complete"] == 360
+        and scalar["incomplete"] == 0
+        and pairwise["incomplete"] == 0
+        and scalar["invalid"] == 0
+        and pairwise["invalid"] == 0
+        and not scalar["duplicate_assignment_ids"]
+        and not pairwise["duplicate_assignment_ids"]
+        and not scalar["unexpected_assignment_ids"]
+        and not pairwise["unexpected_assignment_ids"]
+    )
+    return {"rater_id": root.name, "ready_to_lock": ready, "scalar": scalar, "pairwise": pairwise}
 
 
 def _opaque_id(secret: bytes, *parts: str) -> str:

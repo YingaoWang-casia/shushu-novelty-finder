@@ -46,6 +46,7 @@ def inspect_archive(path: Path) -> dict[str, object]:
     if not any(name.endswith(("/LICENSE", "/licenses/LICENSE")) for name in normalized):
         raise SystemExit(f"license is missing from {path}")
     if path.suffix == ".whl" and not {
+        "blind-eval",
         "blind-eval-lock",
         "shushu",
         "shushu-codex-adapter",

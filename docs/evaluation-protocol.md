@@ -50,12 +50,15 @@ shushu benchmark unblind evals/blind-scalar-responses.jsonl \
 
 The generated `evals/blind-v1` package is ready for human rating. Its pre-rating coordinator
 manifest commitment is
-`a0d83026f39d54672d137e7ca7a03bc15fa3314d7b653e57bca8e539f11ba647`; it is also recorded in
+`9e34a730d2f2509e1e3a33bad4dd95dfaf355e68f37dd5d2667f3d9892f98312`; it is also recorded in
 `evals/blind-v1/MANIFEST-COMMITMENT.txt`. No response or human judgment is present yet.
-Each rater runs the identity-neutral `blind-eval-lock` command from their supplied guide before
-submission. It requires exact 240 scalar/360 pairwise coverage, rechecks copied-output hashes and
-immutable assignment fields, enforces one rater and one research-experience value, and writes an
-immutable `response-lock.json` binding both response hashes to the pre-rating manifest commitment.
+Each rater uses the identity-neutral `blind-eval init` command to create non-overwriting,
+assignment-bound response drafts, and `blind-eval status` for read-only progress checks. The draft
+uses `null` for every unfinished human judgment so it cannot silently pass final validation. Before
+submission, `blind-eval lock` requires exact 240 scalar/360 pairwise coverage, rechecks
+copied-output hashes and immutable assignment fields, enforces one rater and one
+research-experience value, and writes an immutable `response-lock.json` binding both response
+hashes to the pre-rating manifest commitment. The legacy `blind-eval-lock` alias remains available.
 
 Minimum human evidence is 480 scalar judgments (60 × 4 × 2) and 720 pairwise judgments
 (60 × 6 × 2). Extra raters are allowed, but every included human rater must cover the complete

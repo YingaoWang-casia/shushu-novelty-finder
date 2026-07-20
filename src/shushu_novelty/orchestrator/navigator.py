@@ -166,6 +166,12 @@ def validate_artifact(path: Path, phase: PhaseSpec) -> None:
 
 def next_action(run_dir: Path) -> dict[str, Any]:
     state = load_state(run_dir)
+    original_state = state.model_dump(mode="json")
+
+    def save_if_changed() -> None:
+        if state.model_dump(mode="json") != original_state:
+            save_state(run_dir, state)
+
     previous_hash = hashlib.sha256(
         f"{state.topic}\0{state.mode}\0{state.model or ''}\0{state.prompt_version or ''}".encode()
     ).hexdigest()
@@ -177,7 +183,7 @@ def next_action(run_dir: Path) -> dict[str, Any]:
             phase_state.input_hash = previous_hash
             phase_state.status = "ready"
             phase_state.error = None
-            save_state(run_dir, state)
+            save_if_changed()
             return {
                 "status": "ready",
                 "phase": phase.code,
@@ -190,7 +196,7 @@ def next_action(run_dir: Path) -> dict[str, Any]:
         except GateError as exc:
             phase_state.status = "failed"
             phase_state.error = str(exc)
-            save_state(run_dir, state)
+            save_if_changed()
             return {
                 "status": "failed",
                 "phase": phase.code,
@@ -207,7 +213,7 @@ def next_action(run_dir: Path) -> dict[str, Any]:
                         f"{phase.code} legacy artifact changed before input-hash migration: "
                         f"{artifact}"
                     )
-                    save_state(run_dir, state)
+                    save_if_changed()
                     return {
                         "status": "failed",
                         "phase": phase.code,
@@ -223,7 +229,7 @@ def next_action(run_dir: Path) -> dict[str, Any]:
                 phase_state.error = (
                     f"{phase.code} input hash no longer matches its validated upstream artifact"
                 )
-                save_state(run_dir, state)
+                save_if_changed()
                 return {
                     "status": "failed",
                     "phase": phase.code,
@@ -234,7 +240,7 @@ def next_action(run_dir: Path) -> dict[str, Any]:
             if phase_state.output_hash != current_hash:
                 phase_state.status = "failed"
                 phase_state.error = f"{phase.code} artifact changed after validation: {artifact}"
-                save_state(run_dir, state)
+                save_if_changed()
                 return {
                     "status": "failed",
                     "phase": phase.code,
@@ -248,7 +254,7 @@ def next_action(run_dir: Path) -> dict[str, Any]:
             elif phase_state.auxiliary_hashes != current_auxiliary:
                 phase_state.status = "failed"
                 phase_state.error = f"{phase.code} auxiliary artifact changed after validation"
-                save_state(run_dir, state)
+                save_if_changed()
                 return {
                     "status": "failed",
                     "phase": phase.code,
@@ -263,7 +269,7 @@ def next_action(run_dir: Path) -> dict[str, Any]:
         except GateError as exc:
             phase_state.status = "failed"
             phase_state.error = str(exc)
-            save_state(run_dir, state)
+            save_if_changed()
             return {
                 "status": "failed",
                 "phase": phase.code,
@@ -279,5 +285,5 @@ def next_action(run_dir: Path) -> dict[str, Any]:
         phase_state.completed_at = phase_state.completed_at or utc_now()
         phase_state.error = None
 
-    save_state(run_dir, state)
+    save_if_changed()
     return {"status": "complete", "run_id": state.run_id, "mode": state.mode}

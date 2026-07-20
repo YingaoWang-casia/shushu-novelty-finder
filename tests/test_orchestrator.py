@@ -1,5 +1,7 @@
 import hashlib
 import json
+import shutil
+from pathlib import Path
 
 from shushu_novelty.orchestrator.navigator import next_action
 from shushu_novelty.orchestrator.state import create_run, load_state, save_state
@@ -71,6 +73,30 @@ def test_invalid_existing_artifact_fails_gate_without_overwrite(tmp_path):
     assert action["status"] == "failed"
     assert action["phase"] == "P1"
     assert scope.read_text(encoding="utf-8") == before
+
+
+def test_repeated_failed_gate_does_not_rewrite_unchanged_state(tmp_path):
+    run_dir = create_run("RAG citation robustness", "full", tmp_path)
+    scope = run_dir / "intake" / "scope.json"
+    scope.write_text(json.dumps({"core_task": "RAG"}), encoding="utf-8")
+    assert next_action(run_dir)["status"] == "failed"
+    state_before = (run_dir / "run.json").read_bytes()
+
+    assert next_action(run_dir)["status"] == "failed"
+
+    assert (run_dir / "run.json").read_bytes() == state_before
+
+
+def test_complete_next_is_byte_idempotent(tmp_path):
+    source = Path("examples/runs/rag-known-scoop")
+    run_dir = tmp_path / "rag-known-scoop"
+    shutil.copytree(source, run_dir)
+    state_before = (run_dir / "run.json").read_bytes()
+
+    assert next_action(run_dir)["status"] == "complete"
+    assert next_action(run_dir)["status"] == "complete"
+
+    assert (run_dir / "run.json").read_bytes() == state_before
 
 
 def test_failed_phase_can_be_repaired_and_resumed_without_restarting(tmp_path):

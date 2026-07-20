@@ -13,6 +13,7 @@ from shushu_novelty.evaluation.blinding import (
     validate_unblinded_responses,
     verify_blind_package_manifest,
 )
+from shushu_novelty.evaluation.rater_cli import workflow_main
 from shushu_novelty.io import validate_jsonl, write_jsonl
 from shushu_novelty.schemas import BenchmarkRun, BenchmarkSeed, EvaluationJudgment
 from shushu_novelty.schemas.blind_evaluation import (
@@ -215,6 +216,124 @@ def test_rater_response_lock_validates_coverage_bindings_and_hashes(tmp_path):
             commitment,
             rater_root / "incomplete-lock.json",
         )
+
+
+def test_identity_neutral_rater_workflow_initializes_tracks_and_preserves_drafts(
+    tmp_path, capsys
+):
+    seeds = benchmark_seeds()
+    blind_dir = tmp_path / "blind"
+    create_blind_packages(
+        complete_matrix(tmp_path, seeds),
+        seeds,
+        tmp_path,
+        blind_dir,
+        ["rater-a", "rater-b"],
+        secret=b"test secret" * 4,
+    )
+    rater_root = blind_dir / "raters" / "rater-a"
+
+    assert workflow_main(
+        ["init", str(rater_root), "--experience-years", "4.5"]
+    ) == 0
+    initialized = json.loads(capsys.readouterr().out)
+    assert initialized["rater_id"] == "rater-a"
+    assert initialized["scalar_responses"] == 240
+    assert initialized["pairwise_responses"] == 360
+    scalar_path = rater_root / "blind-scalar-responses.jsonl"
+    pairwise_path = rater_root / "blind-pairwise-responses.jsonl"
+    first_scalar = json.loads(scalar_path.read_text(encoding="utf-8").splitlines()[0])
+    assert first_scalar["research_experience_years"] == 4.5
+    assert first_scalar["retrieval"]["known_prior_retrieved_at_k"] is None
+    assert first_scalar["lineage"]["relations"][0]["true_positive"] is None
+
+    assert workflow_main(["status", str(rater_root)]) == 0
+    status = json.loads(capsys.readouterr().out)
+    assert status["ready_to_lock"] is False
+    assert status["scalar"]["incomplete"] == 240
+    assert status["pairwise"]["incomplete"] == 360
+    scalar_digest = hashlib.sha256(scalar_path.read_bytes()).hexdigest()
+    pairwise_digest = hashlib.sha256(pairwise_path.read_bytes()).hexdigest()
+    assert workflow_main(
+        ["init", str(rater_root), "--experience-years", "8"]
+    ) != 0
+    assert "will not be overwritten" in capsys.readouterr().err
+    assert hashlib.sha256(scalar_path.read_bytes()).hexdigest() == scalar_digest
+    assert hashlib.sha256(pairwise_path.read_bytes()).hexdigest() == pairwise_digest
+
+    scalar, pairwise = complete_rater_responses(rater_root)
+    write_jsonl(scalar, scalar_path)
+    write_jsonl(pairwise, pairwise_path)
+    assert workflow_main(["status", str(rater_root)]) == 0
+    complete = json.loads(capsys.readouterr().out)
+    assert complete["ready_to_lock"] is True
+    assert complete["scalar"]["complete"] == 240
+    assert complete["pairwise"]["complete"] == 360
+    scalar_path.write_text(
+        scalar_path.read_text(encoding="utf-8") + "not-json\n", encoding="utf-8"
+    )
+    assert workflow_main(["status", str(rater_root)]) == 0
+    extra_invalid = json.loads(capsys.readouterr().out)
+    assert extra_invalid["ready_to_lock"] is False
+    assert extra_invalid["scalar"]["invalid"] == 1
+    write_jsonl(scalar, scalar_path)
+    commitment = hashlib.sha256(
+        (blind_dir / "coordinator" / "manifest.json").read_bytes()
+    ).hexdigest()
+    lock_path = rater_root / "response-lock.json"
+    assert workflow_main(
+        [
+            "lock",
+            str(rater_root),
+            "--scalar",
+            str(scalar_path),
+            "--pairwise",
+            str(pairwise_path),
+            "--manifest-sha256",
+            commitment,
+            "--output",
+            str(lock_path),
+        ]
+    ) == 0
+    locked = json.loads(capsys.readouterr().out)
+    assert locked["scalar_responses"] == 240
+    assert locked["pairwise_responses"] == 360
+    assert lock_path.is_file()
+
+    tampered = json.loads(scalar_path.read_text(encoding="utf-8").splitlines()[0])
+    tampered["output_id"] = "O-0000000000000000"
+    remaining = scalar_path.read_text(encoding="utf-8").splitlines()[1:]
+    scalar_path.write_text(
+        json.dumps(tampered) + "\n" + "\n".join(remaining) + "\n", encoding="utf-8"
+    )
+    assert workflow_main(["status", str(rater_root)]) == 0
+    tamper_status = json.loads(capsys.readouterr().out)
+    assert tamper_status["ready_to_lock"] is False
+    assert tamper_status["scalar"]["invalid"] == 1
+    assert "immutable assignment fields differ" in tamper_status["scalar"]["errors"][0]
+
+
+def test_rater_workflow_rejects_nonfinite_experience_and_corrupt_pack(tmp_path, capsys):
+    seeds = benchmark_seeds()
+    blind_dir = tmp_path / "blind"
+    create_blind_packages(
+        complete_matrix(tmp_path, seeds),
+        seeds,
+        tmp_path,
+        blind_dir,
+        ["rater-a", "rater-b"],
+        secret=b"test secret" * 4,
+    )
+    rater_root = blind_dir / "raters" / "rater-a"
+    assert workflow_main(
+        ["init", str(rater_root), "--experience-years", "nan"]
+    ) != 0
+    assert "finite non-negative" in capsys.readouterr().err
+
+    output = next((rater_root / "outputs").rglob("*.md"))
+    output.write_text(output.read_text(encoding="utf-8") + "tampered\n", encoding="utf-8")
+    assert workflow_main(["status", str(rater_root)]) != 0
+    assert "output hash differs" in capsys.readouterr().err
 
 
 def test_unblind_joins_system_identity_only_after_response_lock():

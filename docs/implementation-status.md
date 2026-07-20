@@ -75,8 +75,8 @@ Updated: 2026-07-20
 | 8 | Scooped ideas downgrade or abandon | Implemented and regression-tested |
 | 9 | At least 60 fixed eval seeds | Implemented |
 | 10 | Bare-model and old-version baselines | 240/240 real runs complete; matrix, execution manifest, and two-rater blind packs hash-verified |
-| 11 | Core code has automated tests | Implemented for current runtime (104 tests) |
-| 12 | CI runs on every PR | Workflow configured for push/PR; remote execution not verified here |
+| 11 | Core code has automated tests | Implemented for current runtime (108 tests) |
+| 12 | CI runs on every PR | Draft PR #1 triggered push/PR workflows; green release run pending the canonical-Python lock-check correction |
 | 13 | Reports expose failures and uncertainty | Implemented as a P9 manifest/report gate |
 | 14 | README claims are supported by public evals | Enforced: no comparative claim until a hashed public eval passes |
 

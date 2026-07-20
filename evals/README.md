@@ -78,10 +78,11 @@ runs (60 per system) and has SHA-256
 `bbfee19d4466f168b482593e38e0145b0cf2acb7bcd0cb54a6ad0b71e88cbbc2`. The completed runtime
 manifest and retained failure history are under `execution/codex-gpt-5.6-sol/`. Two human-rater
 packs are under `blind-v1/`; their coordinator-manifest commitment is
-`a0d83026f39d54672d137e7ca7a03bc15fa3314d7b653e57bca8e539f11ba647`. These are execution and
+`9e34a730d2f2509e1e3a33bad4dd95dfaf355e68f37dd5d2667f3d9892f98312`. These are execution and
 blinding artifacts, not comparative effectiveness evidence; human responses remain pending.
-Raters use the identity-neutral `blind-eval-lock` entry point supplied in each pack to verify exact
-coverage and assignment/output bindings and to commit their response hashes before unblinding.
+Raters use the identity-neutral `blind-eval` entry point supplied in each pack to initialize
+assignment-bound drafts, check progress, verify exact coverage and output bindings, and commit
+their response hashes before unblinding.
 
 Scoring also requires blind judgments for all six pairwise combinations of the four primary
 systems, for every seed and every human rater:
