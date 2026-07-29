@@ -1,5 +1,16 @@
 # v0.2 release checklist
 
+## Published engineering Alpha
+
+- [x] `v0.2.0a1` is published as a GitHub prerelease from main commit
+      `2cfa010c24d7bc72ff1686c0383584e71fe95763`;
+- [x] the three READMEs show the Alpha evidence boundary before product details;
+- [x] the tagged wheel and source distribution passed the distribution audit and expose SHA-256
+      digests in the release notes;
+- [x] the public wheel was downloaded from GitHub, installed in a clean Python 3.9 environment,
+      and passed `shushu --version` and `shushu check`;
+- [x] main-branch Python 3.9 and 3.12 CI passed on the Alpha release commit.
+
 ## Runtime and compatibility
 
 - [ ] version and changelog are final;

@@ -1,6 +1,6 @@
 # Engineering Upgrade Status
 
-Updated: 2026-07-20
+Updated: 2026-07-29
 
 ## Implemented
 
@@ -50,6 +50,9 @@ Updated: 2026-07-20
   controls, including PDFs and page-level evidence;
 - pytest, Ruff, and a single-per-PR GitHub Actions matrix for Python 3.9 and 3.12, with canonical
   lock regeneration restricted to Python 3.9 and Node 24 action runtimes.
+- public GitHub prerelease `v0.2.0a1`, with an immediately visible three-language evidence
+  boundary, audited wheel and sdist hashes, green main-branch CI, and a clean installation smoke
+  test performed against the wheel downloaded back from GitHub.
 
 ## Current limitations
 
@@ -87,13 +90,18 @@ Updated: 2026-07-20
 | 9 | At least 60 fixed eval seeds | Implemented |
 | 10 | Bare-model and old-version baselines | 240/240 real runs complete; matrix, execution manifest, and reduced two-rater blind packs hash-verified |
 | 11 | Core code has automated tests | Implemented for current runtime (117 tests) |
-| 12 | CI runs on every PR | Draft PR #1 passes Python 3.9 and 3.12 from one pull-request workflow |
+| 12 | CI runs on every PR | Merged PRs #1 and #2 and their main-branch commits pass Python 3.9 and 3.12 |
 | 13 | Reports expose failures and uncertainty | Implemented as a P9 manifest/report gate |
 | 14 | README claims are supported by public evals | Enforced: no comparative claim until a hashed public eval passes |
 
 The remaining comparative-release evidence is external: collect paired blind judgments from at
 least two research-experienced humans, publish the aggregate report, and only then update the
 guarded README claim block with the report SHA-256.
+
+The engineering Alpha is publicly available as
+[`v0.2.0a1`](https://github.com/YingaoWang-casia/shushu-novelty-finder/releases/tag/v0.2.0a1).
+Publishing this prerelease does not change the human-evidence requirement for stable comparative
+claims.
 
 The exact reviewer profile, paid-pilot procedure, current workload, and copy-ready recruitment
 brief are in [`rater-recruitment.md`](rater-recruitment.md).
