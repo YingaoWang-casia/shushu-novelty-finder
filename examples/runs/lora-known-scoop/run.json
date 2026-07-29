@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0",
+  "run_id": "example-lora-known-scoop",
+  "topic": "LoRA mechanism prior-art control",
+  "topic_slug": "lora-known-scoop",
+  "mode": "full",
+  "created_at": "2026-07-16T00:00:00+00:00",
+  "updated_at": "2026-07-20T02:59:50.406064+00:00",
+  "model": "documented-control",
+  "prompt_version": "v0.2-example-1",
+  "phases": {
+    "P0": {
+      "status": "complete",
+      "artifact": "intake/intake.json",
+      "input_hash": "97e36fa957cfb3198a305a61de5759429aa4e58301d3560ee46bee603b3bb597",
+      "output_hash": "b0e3f431e1a694749ab03fe9473a2a9be6fd275dcf4e0642ed472a6ac91ecb97",
+      "auxiliary_hashes": {},
+      "completed_at": "2026-07-16T03:52:16.357360+00:00",
+      "error": null
+    },
+    "P1": {
+      "status": "complete",
+      "artifact": "intake/scope.json",
+      "input_hash": "b0e3f431e1a694749ab03fe9473a2a9be6fd275dcf4e0642ed472a6ac91ecb97",
+      "output_hash": "63aea3bd055e556a3a2a34523750f3dda8438e7994a4bc00113bcb0251c6c1a7",
+      "auxiliary_hashes": {},
+      "completed_at": "2026-07-16T03:52:16.368213+00:00",
+      "error": null
+    },
+    "P2": {
+      "status": "complete",
+      "artifact": "retrieval/papers.jsonl",
+      "input_hash": "63aea3bd055e556a3a2a34523750f3dda8438e7994a4bc00113bcb0251c6c1a7",
+      "output_hash": "40e646d0eb70f17018c98be071fb4f8ba3785219ca369668fdb5bf0412ed194a",
+      "auxiliary_hashes": {
+        "retrieval/papers.jsonl.manifest.json": "bbe0620b9157eb4df22107cb4351f085da76d100e2d998bb5c8f5ab8d991eda5",
+        "retrieval/failures.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "completed_at": "2026-07-16T03:52:16.372483+00:00",
+      "error": null
+    },
+    "P3": {
+      "status": "complete",
+      "artifact": "papers/fulltext.jsonl",
+      "input_hash": "f3e0f9dfd2c1c7b096ef449f9c1c17625e9867268d8a3fa4665c25498fb54faf",
+      "output_hash": "7ce09cde0595fa34be8d6253642dd5ab6c76d0db264fe1f2ceee26a6dcedf42e",
+      "auxiliary_hashes": {
+        "papers/claims.jsonl": "9da8da706082063460faa0bf377087f207deae2a1a2079dd19a62d23fc472a29",
+        "papers/fulltext.failures.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "completed_at": "2026-07-16T03:52:16.378763+00:00",
+      "error": null
+    },
+    "P4": {
+      "status": "complete",
+      "artifact": "lineage/graph.json",
+      "input_hash": "46f0b6fb41061b0912915c24b0b413d272d6e667bc14fb7fe36e8e9abe5aca22",
+      "output_hash": "c2b044529bb471c62ba5393318950f85677f24ec8abddfbf64cb65b7e42103f7",
+      "auxiliary_hashes": {},
+      "completed_at": "2026-07-16T03:52:16.380215+00:00",
+      "error": null
+    },
+    "P5": {
+      "status": "complete",
+      "artifact": "gaps/gaps.jsonl",
+      "input_hash": "c2b044529bb471c62ba5393318950f85677f24ec8abddfbf64cb65b7e42103f7",
+      "output_hash": "afc3c330f2eae91f8246d34603c41ea7f80494cd52cf9c8dfb44c28cccf40f6e",
+      "auxiliary_hashes": {},
+      "completed_at": "2026-07-16T03:52:16.380640+00:00",
+      "error": null
+    },
+    "P6": {
+      "status": "complete",
+      "artifact": "ideas/ideas.jsonl",
+      "input_hash": "afc3c330f2eae91f8246d34603c41ea7f80494cd52cf9c8dfb44c28cccf40f6e",
+      "output_hash": "6193c530c7ea597322322531b36a2f75b5eeaefd781c358f892fc7019e51d4c3",
+      "auxiliary_hashes": {},
+      "completed_at": "2026-07-16T03:52:16.380976+00:00",
+      "error": null
+    },
+    "P7": {
+      "status": "complete",
+      "artifact": "collision/collisions.json",
+      "input_hash": "6193c530c7ea597322322531b36a2f75b5eeaefd781c358f892fc7019e51d4c3",
+      "output_hash": "2f90dae7e1a7cfcf9bf34d6e5393c03a4e1c06dd0b1050d7dea76cb736f5b368",
+      "auxiliary_hashes": {},
+      "completed_at": "2026-07-16T03:52:16.382417+00:00",
+      "error": null
+    },
+    "P8": {
+      "status": "complete",
+      "artifact": "audit/reviewer.json",
+      "input_hash": "2f90dae7e1a7cfcf9bf34d6e5393c03a4e1c06dd0b1050d7dea76cb736f5b368",
+      "output_hash": "480d26561067377fe7660d0003c61c8e94279000deaf04857151f2b3ee3eba05",
+      "auxiliary_hashes": {},
+      "completed_at": "2026-07-16T03:52:16.383402+00:00",
+      "error": null
+    },
+    "P9": {
+      "status": "complete",
+      "artifact": "report/manifest.json",
+      "input_hash": "480d26561067377fe7660d0003c61c8e94279000deaf04857151f2b3ee3eba05",
+      "output_hash": "0481bcfa3a5ab26a9aaa5878ab66716280789452bf2d31020d345f3c170b856d",
+      "auxiliary_hashes": {},
+      "completed_at": "2026-07-16T04:32:33.608445+00:00",
+      "error": null
+    }
+  }
+}

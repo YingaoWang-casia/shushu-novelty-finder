@@ -1,0 +1,72 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "shushu-novelty-finder"
+version = "0.2.0a1"
+description = "Lineage-first research novelty auditing workflow"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Shushu Novelty Finder contributors" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+  "pydantic>=2.7,<3",
+  "pypdf>=5,<7",
+]
+
+[project.urls]
+Homepage = "https://github.com/YingaoWang-casia/shushu-novelty-finder"
+Issues = "https://github.com/YingaoWang-casia/shushu-novelty-finder/issues"
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2,<2",
+  "pip>=25,<27",
+  "pip-tools>=7.5,<8",
+  "pytest>=8.0,<9",
+  "ruff>=0.5,<1",
+]
+
+[project.scripts]
+shushu = "shushu_novelty.cli:main"
+shushu-codex-adapter = "shushu_novelty.evaluation.codex_adapter:main"
+blind-eval = "shushu_novelty.evaluation.rater_cli:workflow_main"
+blind-eval-lock = "shushu_novelty.evaluation.rater_cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/shushu_novelty"]
+
+[tool.hatch.build]
+exclude = [
+  "/evals/results/",
+  "/evals/execution/",
+  "/evals/blind-*/",
+  "/evals/completed-run-matrix.jsonl",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = [
+  # Keep runtime-evaluated Pydantic annotations compatible with Python 3.9.
+  "UP006",
+  "UP035",
+  "UP045",
+]

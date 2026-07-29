@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "query": "retrieval augmented generation evaluation",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "11328b62f66c27b841eb9df3d9dd8652b0b7f48c09acdb2b5b757d8fb7fac6ec",
+  "records_count": 10,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "6221633af75cf03d60c6523e23e61be42b43c2b1ffc8181bdd9cf97d32abf4d8",
+  "failure_count": 2,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 5
+  },
+  "created_at": "2026-07-16T05:37:46.355261+00:00"
+}

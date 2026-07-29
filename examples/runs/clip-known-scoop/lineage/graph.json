@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "nodes": [
+    {
+      "paper_id": "P-arxiv:2103.00020",
+      "method_family": "established mechanism family",
+      "assumptions": [
+        "the linked arXiv record is the evidence boundary"
+      ],
+      "contributions": [
+        "Contrastively learns transferable image-text representations at web scale."
+      ]
+    },
+    {
+      "paper_id": "P-arxiv:2102.05918",
+      "method_family": "established mechanism family",
+      "assumptions": [
+        "the linked arXiv record is the evidence boundary"
+      ],
+      "contributions": [
+        "Scales image-text representation learning with noisy alt-text supervision."
+      ]
+    },
+    {
+      "paper_id": "P-arxiv:2010.00747",
+      "method_family": "established mechanism family",
+      "assumptions": [
+        "the linked arXiv record is the evidence boundary"
+      ],
+      "contributions": [
+        "Uses paired medical images and text for contrastive representation learning."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "E-clip-known-scoop-1",
+      "source_paper_id": "P-arxiv:2102.05918",
+      "target_paper_id": "P-arxiv:2103.00020",
+      "relation": "closest-prior",
+      "rationale": "Mechanism-level neighbor used for the prior-art control.",
+      "evidence_claim_ids": [
+        "C-clip-known-scoop-lineage"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "edge_id": "E-clip-known-scoop-2",
+      "source_paper_id": "P-arxiv:2010.00747",
+      "target_paper_id": "P-arxiv:2103.00020",
+      "relation": "sibling",
+      "rationale": "Mechanism-level neighbor used for the prior-art control.",
+      "evidence_claim_ids": [
+        "C-clip-known-scoop-lineage"
+      ],
+      "confidence": 0.75
+    }
+  ],
+  "saturation": [
+    {
+      "saturation_id": "S-clip-known-scoop",
+      "contribution": "The submitted mechanism as written",
+      "status": "blocked",
+      "paper_ids": [
+        "P-arxiv:2103.00020",
+        "P-arxiv:2102.05918",
+        "P-arxiv:2010.00747"
+      ],
+      "evidence_claim_ids": [
+        "C-clip-known-scoop-lineage"
+      ],
+      "blocked_idea_space": [
+        "Contrastively pretrain image and text encoders on web-scale image-caption pairs for zero-shot recognition."
+      ],
+      "open_idea_space": [
+        "A new falsifiable assumption or evaluation claim."
+      ]
+    }
+  ]
+}

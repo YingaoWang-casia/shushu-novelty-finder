@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "adapters": [
+    {
+      "system": "bare",
+      "command": ["your-model-cli", "--profile", "bare"],
+      "model": "replace-with-model-and-version",
+      "timeout_seconds": 300
+    },
+    {
+      "system": "self-reflection",
+      "command": ["your-model-cli", "--profile", "self-reflection"],
+      "model": "replace-with-model-and-version",
+      "timeout_seconds": 300
+    },
+    {
+      "system": "shushu-v0.1",
+      "command": ["your-model-cli", "--profile", "shushu-v0.1"],
+      "model": "replace-with-model-and-version",
+      "timeout_seconds": 300
+    },
+    {
+      "system": "shushu-v0.2",
+      "command": ["your-model-cli", "--profile", "shushu-v0.2"],
+      "model": "replace-with-model-and-version",
+      "timeout_seconds": 300
+    }
+  ]
+}

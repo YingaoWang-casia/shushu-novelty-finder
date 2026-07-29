@@ -66,6 +66,133 @@
 
 ## ⚡ 快速开始
 
+### 工程化 CLI（v0.2 alpha）
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install --require-hashes -r requirements-dev.lock
+.venv/bin/python -m pip install --no-deps --no-build-isolation -e .
+.venv/bin/shushu check
+```
+
+`requirements-dev.lock` 固定并校验开发与构建依赖；依赖声明变化后，用
+`.venv/bin/pip-compile pyproject.toml --extra dev --all-build-deps --allow-unsafe --strip-extras --generate-hashes --output-file requirements-dev.lock`
+重新生成，不要手工编辑锁文件。
+
+启动一个可恢复的完整运行：
+
+```bash
+run_dir=$(.venv/bin/shushu run "RAG citation robustness" --mode full)
+.venv/bin/shushu next --run "$run_dir"
+```
+
+统一检索入口支持 arXiv、OpenAlex、Semantic Scholar 和 OpenReview。OpenAlex 的免费
+`OPENALEX_API_KEY` 仍是可重复或生产检索的推荐方式；未配置时，连接器会尝试官方当前
+提供的小额匿名 demo 额度，并把额度耗尽等失败完整落盘。Semantic Scholar 可选
+`SEMANTICSCHOLAR_API_KEY`，匿名调用自动使用较低开销的 bulk 检索。有 key 时保留 relevance 检索。多源检索会并发执行、
+跨源去重，并把部分失败持久化为 JSONL：
+
+```bash
+.venv/bin/shushu search "RAG evaluation" \
+  --source arxiv \
+  --source openalex \
+  --source semantic-scholar \
+  --source openreview \
+  --output retrieval/papers.jsonl \
+  --failure-log retrieval/failures.jsonl
+
+# 校验 hash 后离线重放；search 在文件输出时默认生成 .manifest.json
+.venv/bin/shushu replay retrieval/papers.jsonl.manifest.json \
+  --output retrieval/replayed-papers.jsonl
+```
+
+导出版本化数据契约：
+
+```bash
+.venv/bin/shushu schema paper --output paper.schema.json
+```
+
+获取 PDF 或 HTML 全文并交叉验证 Claim-Evidence Ledger：
+
+```bash
+.venv/bin/shushu fulltext retrieval/papers.jsonl \
+  --cache-dir .shushu/fulltext \
+  --output papers/fulltext.jsonl
+
+.venv/bin/shushu ledger examples/evidence-ledger/claims.jsonl \
+  --papers examples/evidence-ledger/papers.jsonl \
+  --fulltext examples/evidence-ledger/fulltext.jsonl
+
+.venv/bin/shushu lineage examples/lineage-mini/graph.json \
+  --papers examples/lineage-mini/papers.jsonl \
+  --claims examples/lineage-mini/claims.jsonl
+
+.venv/bin/shushu benchmark validate evals/benchmark-v1.jsonl
+.venv/bin/shushu benchmark plan evals/benchmark-v1.jsonl \
+  --output evals/run-matrix.jsonl
+
+# 使用锁定模型、wrapper 和 prompt hash 的真实 Codex adapter；每个 run 自动 checkpoint
+.venv/bin/shushu benchmark execute evals/run-matrix.jsonl \
+  --benchmark-seeds evals/benchmark-v1.jsonl \
+  --adapters evals/adapters.codex-gpt-5.6-sol.json \
+  --results-root . \
+  --output evals/executed-run-matrix.jsonl
+
+# 240 个输出完成后，生成 60-seed 全覆盖、12-seed 共同评审的减负盲包
+.venv/bin/shushu benchmark blind-pack evals/completed-run-matrix.jsonl \
+  --benchmark-seeds evals/benchmark-v1.jsonl \
+  --results-root . \
+  --rater rater-a --rater rater-b \
+  --rating-design balanced-overlap \
+  --shared-seeds 12 \
+  --output-dir evals/blind-balanced-v1
+
+# 两人分别 lock 后，由协调者验证清单、key、响应哈希并安全汇总；不要手工拼 JSONL
+.venv/bin/shushu benchmark collect-responses \
+  evals/blind-balanced-v1/raters/rater-a \
+  --rater-dir evals/blind-balanced-v1/raters/rater-b \
+  --blind-manifest-sha256 \
+    552dfbd1ef0517bd632ea0540beca3505674229ddaf856f5b2f82073e63a6c40 \
+  --blind-manifest evals/blind-balanced-v1/coordinator/manifest.json \
+  --blind-key evals/blind-balanced-v1/coordinator/blind-key.jsonl \
+  --output evals/blind-scalar-responses.jsonl \
+  --pairwise-output evals/blind-pairwise-responses.jsonl
+
+# 完成双人盲评后聚合指标；缺少集体 60-seed 覆盖、共同子集或包内完整评分会失败
+.venv/bin/shushu benchmark score evals/judgments.jsonl \
+  --benchmark-seeds evals/benchmark-v1.jsonl \
+  --run-matrix evals/completed-run-matrix.jsonl \
+  --execution-manifest evals/execution/codex-gpt-5.6-sol/manifest.json \
+  --results-root . \
+  --pairwise evals/pairwise-judgments.jsonl \
+  --blind-scalar evals/blind-scalar-responses.jsonl \
+  --blind-pairwise evals/blind-pairwise-responses.jsonl \
+  --blind-key evals/blind-balanced-v1/coordinator/blind-key.jsonl \
+  --blind-manifest evals/blind-balanced-v1/coordinator/manifest.json \
+  --output evals/public-results.json
+```
+
+### 效果声明状态
+
+<!-- EFFECTIVENESS_CLAIMS_START -->
+当前没有公开的比较效果声明。60-seed × 4-system 的 240 次运行及双人匿名评审包已经
+完成并做哈希绑定；减负协议由两人各评 36 个种子、共同评 12 个种子，并集覆盖全部
+60 个种子。但两名科研评审者的盲评和公开聚合结果尚未完成；在此之前，LLM judge
+结果不能用来证明新版优于 baseline。
+<!-- EFFECTIVENESS_CLAIMS_END -->
+
+这一区域受 release gate 约束。评测协议见 [`evals/README.md`](evals/README.md)，失败模式见
+[`docs/failure-cases.md`](docs/failure-cases.md)；迁移说明、版本变化和发布清单分别见
+[`docs/migration-v0.2.md`](docs/migration-v0.2.md)、[`CHANGELOG.md`](CHANGELOG.md) 与
+[`docs/release-checklist.md`](docs/release-checklist.md)。
+两名科研评审者的筛选、付费 pilot、工作量披露和招募文案见
+[`docs/rater-recruitment.md`](docs/rater-recruitment.md)。
+
+架构与当前实施状态见 [`docs/architecture.md`](docs/architecture.md) 和
+[`docs/implementation-status.md`](docs/implementation-status.md)。
+
+### Codex Skill
+
 安装完成后，你可以直接在 Codex 里这样说：
 
 ```text
@@ -225,6 +352,12 @@ Paper-readiness Verdict
 ```
 
 完整示例：[`examples/idea-generation-mode.md`](examples/idea-generation-mode.md)
+
+三个使用真实 canonical paper 的端到端 prior-art control（RAG、LoRA、CLIP）见
+[`examples/real-end-to-end-cases.md`](examples/real-end-to-end-cases.md)。这些案例验证
+`downgrade/abandon` 路径，不构成比较效果证据。
+对应的完整 P0–P9 运行树（含真实 PDF、page hash 和全部 manifest）保存在
+[`examples/runs/`](examples/runs/README.md)。
 
 ---
 

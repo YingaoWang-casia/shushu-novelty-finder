@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "query": "temporal graph anomaly detection",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "23cf3726cccf312c8d1c59a3bd2d91c9b9bf9e33347de25ce5ec74d1236b0041",
+  "records_count": 10,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "ce16b9618ed2bb223f0b64cc1ce6febb67c1690e0669c47626185f6b634b46ca",
+  "failure_count": 2,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 5
+  },
+  "created_at": "2026-07-16T05:39:18.729829+00:00"
+}

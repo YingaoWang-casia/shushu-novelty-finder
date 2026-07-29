@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "run_id": "example-clip-known-scoop",
+  "mode": "full",
+  "report_path": "report/report.md",
+  "report_sha256": "5fffe2b451759ad4062371f5b98235820a4f975a659b0779a3370fe1cbed5b8e",
+  "input_artifact_hashes": {
+    "intake/scope.json": "9d467c016ce64fd188ddbb60e85f523955ebfd5712d2321124ef6eacd14b0b03",
+    "retrieval/papers.jsonl": "f375595193fb74140e0855a1fc5d084e84922d37c9df6cea07e35d16b9a22854",
+    "papers/fulltext.jsonl": "9d360ad083e4b820824b46a70e4de976d417278a1802be0664d61dc537e57156",
+    "papers/claims.jsonl": "ae9be332daac65f674d15fb9eeaa029da367b9b89e8b8b3de6257f801d14235c",
+    "lineage/graph.json": "497cdf5817c2631d031cb451f95809a7cab02938a5d615ff0f13aadbe77e27b8",
+    "gaps/gaps.jsonl": "c4317a3b94714c7a6622266906dee76b6262b430196b44b4cfc0cd6e2c6c4359",
+    "ideas/ideas.jsonl": "56e41daae49b7eff8a82738cadc78472b0b0a6f98c7658f1740bd8d4d732c1da",
+    "collision/collisions.json": "f77edad50f4a0cafffab59ee40cbc21a7e0528b092e501f2b3f1b50effc932a2",
+    "audit/reviewer.json": "68356b85ee127e903a50480ed3645ada227c18329cc34f261405c581d0178cac"
+  },
+  "claim_ids": [
+    "C-clip-known-scoop-1",
+    "C-clip-known-scoop-2",
+    "C-clip-known-scoop-3",
+    "C-clip-known-scoop-lineage"
+  ],
+  "failure_logs": [
+    "retrieval/failures.jsonl",
+    "papers/fulltext.failures.jsonl"
+  ],
+  "failure_log_hashes": {
+    "retrieval/failures.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "papers/fulltext.failures.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "uncertainty_sections": [
+    "Uncertainty Budget"
+  ],
+  "known_limitations": [
+    "This control does not enumerate every vision-language objective."
+  ],
+  "effectiveness_claims": [],
+  "public_evaluation_path": null,
+  "public_evaluation_sha256": null
+}

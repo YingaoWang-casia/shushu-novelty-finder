@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "query": "cybersecurity agent evaluation realistic benchmarks",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "42b7384a903cff80bc6143cf872056606cfde7d0f62b8bcd1be186044f8adbf7",
+  "records_count": 15,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "5ec35d2fc082f1b9e287b90521ea76bc3784bd66eab71623181e6be9f29433a8",
+  "failure_count": 1,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 5,
+    "semantic-scholar": 5
+  },
+  "created_at": "2026-07-16T05:39:50.891504+00:00"
+}

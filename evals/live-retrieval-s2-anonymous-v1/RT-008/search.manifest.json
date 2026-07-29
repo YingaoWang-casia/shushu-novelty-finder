@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "query": "speech foundation models low resource languages",
+  "sources": [
+    "semantic-scholar"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "782118fa9f727bc9b6e3ab76411dd10abe338d43c6c55fdb59471727b63cac60",
+  "records_count": 5,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "failure_count": 0,
+  "source_record_counts": {
+    "semantic-scholar": 5
+  },
+  "created_at": "2026-07-20T06:44:19.514267+00:00"
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "query": "accent robust speech recognition code switching",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "96c08dc4a0bd8c27f19f9c09d77c839a451635c333205f80814125ab210e8282",
+  "records_count": 10,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "1683aec85cc0c495ea329cb67d92541ed022d840124914a56daf4701760f6c0c",
+  "failure_count": 2,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 5
+  },
+  "created_at": "2026-07-16T05:38:35.475257+00:00"
+}

@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "nodes": [
+    {
+      "paper_id": "P-arxiv:2005.11401",
+      "method_family": "established mechanism family",
+      "assumptions": [
+        "the linked arXiv record is the evidence boundary"
+      ],
+      "contributions": [
+        "Combines parametric sequence generation with dense non-parametric retrieval."
+      ]
+    },
+    {
+      "paper_id": "P-arxiv:2002.08909",
+      "method_family": "established mechanism family",
+      "assumptions": [
+        "the linked arXiv record is the evidence boundary"
+      ],
+      "contributions": [
+        "Pretrains a language model with a latent retrieval component."
+      ]
+    },
+    {
+      "paper_id": "P-arxiv:2004.04906",
+      "method_family": "established mechanism family",
+      "assumptions": [
+        "the linked arXiv record is the evidence boundary"
+      ],
+      "contributions": [
+        "Introduces dense dual-encoder passage retrieval for open-domain QA."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "E-rag-known-scoop-1",
+      "source_paper_id": "P-arxiv:2002.08909",
+      "target_paper_id": "P-arxiv:2005.11401",
+      "relation": "closest-prior",
+      "rationale": "Mechanism-level neighbor used for the prior-art control.",
+      "evidence_claim_ids": [
+        "C-rag-known-scoop-lineage"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "edge_id": "E-rag-known-scoop-2",
+      "source_paper_id": "P-arxiv:2004.04906",
+      "target_paper_id": "P-arxiv:2005.11401",
+      "relation": "sibling",
+      "rationale": "Mechanism-level neighbor used for the prior-art control.",
+      "evidence_claim_ids": [
+        "C-rag-known-scoop-lineage"
+      ],
+      "confidence": 0.75
+    }
+  ],
+  "saturation": [
+    {
+      "saturation_id": "S-rag-known-scoop",
+      "contribution": "The submitted mechanism as written",
+      "status": "blocked",
+      "paper_ids": [
+        "P-arxiv:2005.11401",
+        "P-arxiv:2002.08909",
+        "P-arxiv:2004.04906"
+      ],
+      "evidence_claim_ids": [
+        "C-rag-known-scoop-lineage"
+      ],
+      "blocked_idea_space": [
+        "Condition a sequence generator on passages retrieved from a dense Wikipedia index and jointly train retrieval and generation."
+      ],
+      "open_idea_space": [
+        "A new falsifiable assumption or evaluation claim."
+      ]
+    }
+  ]
+}

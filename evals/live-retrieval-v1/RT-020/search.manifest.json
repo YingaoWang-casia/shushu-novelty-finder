@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "query": "cross modal biosignal representation learning",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "ea440894288be6f114b2f94e29f6768ac87dc0522a2293f6844105261b966d53",
+  "records_count": 13,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "9f0bf6ce60ed08f622a27bfdcd487b0c498707c19c8187cbf88177ad5b763888",
+  "failure_count": 1,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 5,
+    "semantic-scholar": 5
+  },
+  "created_at": "2026-07-16T05:40:07.337138+00:00"
+}

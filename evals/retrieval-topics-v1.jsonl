@@ -1,0 +1,20 @@
+{"schema_version":"1.0","topic_id":"RT-001","query":"retrieval augmented generation evaluation","domain":"llm-rag"}
+{"schema_version":"1.0","topic_id":"RT-002","query":"citation faithfulness metrics long form generation","domain":"llm-rag"}
+{"schema_version":"1.0","topic_id":"RT-003","query":"adaptive retrieval policies language models","domain":"llm-rag"}
+{"schema_version":"1.0","topic_id":"RT-004","query":"physical consistency text to video generation","domain":"cv-multimodal"}
+{"schema_version":"1.0","topic_id":"RT-005","query":"open vocabulary image segmentation","domain":"cv-multimodal"}
+{"schema_version":"1.0","topic_id":"RT-006","query":"multimodal hallucination detection","domain":"cv-multimodal"}
+{"schema_version":"1.0","topic_id":"RT-007","query":"accent robust speech recognition code switching","domain":"speech"}
+{"schema_version":"1.0","topic_id":"RT-008","query":"speech foundation models low resource languages","domain":"speech"}
+{"schema_version":"1.0","topic_id":"RT-009","query":"long horizon web agents memory","domain":"agents"}
+{"schema_version":"1.0","topic_id":"RT-010","query":"scientific research agent benchmarks","domain":"agents"}
+{"schema_version":"1.0","topic_id":"RT-011","query":"distributed inference long context language models","domain":"systems"}
+{"schema_version":"1.0","topic_id":"RT-012","query":"mixture of experts serving cache management","domain":"systems"}
+{"schema_version":"1.0","topic_id":"RT-013","query":"temporal graph anomaly detection","domain":"data-mining"}
+{"schema_version":"1.0","topic_id":"RT-014","query":"trustworthy recommender systems feedback loops","domain":"data-mining"}
+{"schema_version":"1.0","topic_id":"RT-015","query":"prompt injection defenses tool using agents","domain":"security"}
+{"schema_version":"1.0","topic_id":"RT-016","query":"machine unlearning attacks defenses","domain":"security"}
+{"schema_version":"1.0","topic_id":"RT-017","query":"cybersecurity agent evaluation realistic benchmarks","domain":"security"}
+{"schema_version":"1.0","topic_id":"RT-018","query":"reaction prediction distribution shift machine learning","domain":"scientific-ml"}
+{"schema_version":"1.0","topic_id":"RT-019","query":"neural operators climate downscaling","domain":"scientific-ml"}
+{"schema_version":"1.0","topic_id":"RT-020","query":"cross modal biosignal representation learning","domain":"scientific-ml"}

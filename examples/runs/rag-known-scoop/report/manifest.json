@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "run_id": "example-rag-known-scoop",
+  "mode": "full",
+  "report_path": "report/report.md",
+  "report_sha256": "1978537615605cc6b020b69bfae3d8f869efdc4fbe21c46fe1b9d82f689583da",
+  "input_artifact_hashes": {
+    "intake/scope.json": "deccff9aa3fdbcd5ad796677788a08470c3e0d6480bf8d1ce2a2a16c80a6db72",
+    "retrieval/papers.jsonl": "50d3e55eae1f8995558a19f2d50a7a13cc6e8ab276d557761eb1381ddc0f2cf6",
+    "papers/fulltext.jsonl": "b33b9d73f6a59495c0af0728104259354e246aad3e33414aa3febadc76c08922",
+    "papers/claims.jsonl": "f2668ddceafee306762f19d91d807d15b8922aa351f7f51a4df864500885ca26",
+    "lineage/graph.json": "b9d6a5570f7c15d42b7c91f3fbdd16034a7fd9ffb4cdce2c57c8b062173ae266",
+    "gaps/gaps.jsonl": "94fc84950f7e0424f7bfd5fb3e03da40fca69efd99cf7642aabf75ee7e48c7d1",
+    "ideas/ideas.jsonl": "4a5828325d6b1f97fab2d8f1bbdbb95115ac9c20d71c3382577d8c92b36b3ebc",
+    "collision/collisions.json": "9e6b71b6cb8d7caa016377cc78f9e51b5263d1715fdc102c952c0142be078631",
+    "audit/reviewer.json": "f6e2195ec75b8cfaa37cd07f1ee558c9ec821c18313dbf60d8e2b7e1ab9a7889"
+  },
+  "claim_ids": [
+    "C-rag-known-scoop-1",
+    "C-rag-known-scoop-2",
+    "C-rag-known-scoop-3",
+    "C-rag-known-scoop-lineage"
+  ],
+  "failure_logs": [
+    "retrieval/failures.jsonl",
+    "papers/fulltext.failures.jsonl"
+  ],
+  "failure_log_hashes": {
+    "retrieval/failures.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "papers/fulltext.failures.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "uncertainty_sections": [
+    "Uncertainty Budget"
+  ],
+  "known_limitations": [
+    "This three-paper control is not a systematic review."
+  ],
+  "effectiveness_claims": [],
+  "public_evaluation_path": null,
+  "public_evaluation_sha256": null
+}

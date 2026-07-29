@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "query": "long horizon web agents memory",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "cefb13284ea725023e9ee374afe0ef756b69a51d18da3fe40079893ac9c0fff8",
+  "records_count": 10,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "48097d1e4b41e87e1ab8042eab0cd11e32492543104c13a8922b0446bf997d07",
+  "failure_count": 2,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 5
+  },
+  "created_at": "2026-07-16T05:38:51.601217+00:00"
+}

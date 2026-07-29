@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+/runs/
+/tmp/
+
+# Pre-unblinding benchmark artifacts. Publishing any one of these alongside a rater pack can map
+# opaque output hashes back to system identities. Add them deliberately only after every human
+# response is locked and the coordinator has ended the blind period.
+evals/results/
+evals/execution/
+evals/blind-*/
+evals/completed-run-matrix.jsonl

@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "nodes": [
+    {
+      "paper_id": "P-arxiv:2106.09685",
+      "method_family": "established mechanism family",
+      "assumptions": [
+        "the linked arXiv record is the evidence boundary"
+      ],
+      "contributions": [
+        "Freezes pretrained weights and injects trainable low-rank decompositions."
+      ]
+    },
+    {
+      "paper_id": "P-arxiv:1902.00751",
+      "method_family": "established mechanism family",
+      "assumptions": [
+        "the linked arXiv record is the evidence boundary"
+      ],
+      "contributions": [
+        "Studies adapter modules for parameter-efficient transfer."
+      ]
+    },
+    {
+      "paper_id": "P-arxiv:2101.00190",
+      "method_family": "established mechanism family",
+      "assumptions": [
+        "the linked arXiv record is the evidence boundary"
+      ],
+      "contributions": [
+        "Optimizes continuous prefixes while keeping language-model parameters frozen."
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "E-lora-known-scoop-1",
+      "source_paper_id": "P-arxiv:1902.00751",
+      "target_paper_id": "P-arxiv:2106.09685",
+      "relation": "closest-prior",
+      "rationale": "Mechanism-level neighbor used for the prior-art control.",
+      "evidence_claim_ids": [
+        "C-lora-known-scoop-lineage"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "edge_id": "E-lora-known-scoop-2",
+      "source_paper_id": "P-arxiv:2101.00190",
+      "target_paper_id": "P-arxiv:2106.09685",
+      "relation": "sibling",
+      "rationale": "Mechanism-level neighbor used for the prior-art control.",
+      "evidence_claim_ids": [
+        "C-lora-known-scoop-lineage"
+      ],
+      "confidence": 0.75
+    }
+  ],
+  "saturation": [
+    {
+      "saturation_id": "S-lora-known-scoop",
+      "contribution": "The submitted mechanism as written",
+      "status": "blocked",
+      "paper_ids": [
+        "P-arxiv:2106.09685",
+        "P-arxiv:1902.00751",
+        "P-arxiv:2101.00190"
+      ],
+      "evidence_claim_ids": [
+        "C-lora-known-scoop-lineage"
+      ],
+      "blocked_idea_space": [
+        "Freeze a pretrained Transformer and inject learned low-rank matrices into its attention projections."
+      ],
+      "open_idea_space": [
+        "A new falsifiable assumption or evaluation claim."
+      ]
+    }
+  ]
+}

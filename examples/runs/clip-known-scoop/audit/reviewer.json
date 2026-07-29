@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "audits": [
+    {
+      "schema_version": "1.0",
+      "review_id": "R-clip-known-scoop",
+      "idea_id": "I-clip-known-scoop",
+      "collision_audit_id": "A-clip-known-scoop",
+      "reviewer_context_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "strongest_reason_for": "The candidate is technically concrete and testable.",
+      "strongest_reason_against": "Its central mechanism is direct prior art.",
+      "supporting_claim_ids": [
+        "C-clip-known-scoop-1",
+        "C-clip-known-scoop-lineage"
+      ],
+      "objections": [
+        {
+          "category": "novelty",
+          "severity": "fatal",
+          "objection": "The novelty-bearing mechanism already exists in the closest paper.",
+          "evidence_claim_ids": [
+            "C-clip-known-scoop-1"
+          ],
+          "response": "Abandon the unchanged candidate.",
+          "status": "open"
+        },
+        {
+          "category": "evidence",
+          "severity": "medium",
+          "objection": "Three papers do not constitute a systematic review.",
+          "evidence_claim_ids": [
+            "C-clip-known-scoop-lineage"
+          ],
+          "response": "The report labels the evidence boundary and uncertainty.",
+          "status": "mitigated"
+        },
+        {
+          "category": "evaluation",
+          "severity": "medium",
+          "objection": "No experiment can rescue an identical mechanism claim.",
+          "evidence_claim_ids": [
+            "C-clip-known-scoop-1"
+          ],
+          "response": "Require a structurally different, falsifiable thesis before experiments.",
+          "status": "resolved"
+        }
+      ],
+      "kill_triggers": [
+        "Full task-and-mechanism overlap with the closest paper."
+      ],
+      "initial_decision": "abandon",
+      "revision": null,
+      "final_decision": "abandon",
+      "rationale": "Fatal novelty overlap leaves no defensible unchanged thesis."
+    }
+  ]
+}

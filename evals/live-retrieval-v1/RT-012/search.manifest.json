@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "query": "mixture of experts serving cache management",
+  "sources": [
+    "arxiv",
+    "openalex",
+    "semantic-scholar",
+    "openreview"
+  ],
+  "max_results_per_source": 5,
+  "arxiv_start": 0,
+  "arxiv_sort_by": "relevance",
+  "arxiv_sort_order": "descending",
+  "records_path": "papers.jsonl",
+  "records_sha256": "72167993fc1bd9c1a8814d8b22acbf853069de5e1722f5f856143893a1938b34",
+  "records_count": 14,
+  "failure_log_path": "failures.jsonl",
+  "failure_log_sha256": "f9586a229cae7077db5ce4dde1aec90b77663074e87dea93088e03e4432d46d8",
+  "failure_count": 1,
+  "source_record_counts": {
+    "arxiv": 5,
+    "openreview": 5,
+    "semantic-scholar": 4
+  },
+  "created_at": "2026-07-16T05:39:11.107072+00:00"
+}

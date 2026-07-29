@@ -1,0 +1,10 @@
+{
+  "core_task": "RAG mechanism prior-art control",
+  "inclusion_criteria": [
+    "direct and neighboring mechanism papers"
+  ],
+  "exclusion_criteria": [
+    "comparative effectiveness claims"
+  ],
+  "time_window": "canonical prior-art control"
+}

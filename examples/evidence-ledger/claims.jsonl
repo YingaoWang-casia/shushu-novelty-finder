@@ -1,0 +1,1 @@
+{"schema_version":"1.0","claim_id":"C-001","claim":"The example page contains evidence text.","origin":"author-statement","strength":"strong","evidence":[{"paper_id":"P-example:001","role":"support","verification":"full-text","section":"Results","locator":"page:1","passage_hash":"ef57bb58ebc09beadcc1fac4a12779cf4e13f01e7c304d7c95009c50bcd9be80","confidence":0.9}]}
