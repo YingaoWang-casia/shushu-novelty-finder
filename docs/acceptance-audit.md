@@ -1,6 +1,6 @@
 # Engineering acceptance audit
 
-Audit date: 2026-07-20
+Audit date: 2026-07-29
 
 This document separates implemented gates from evidence that requires external model runs, API
 credentials, GitHub, or human reviewers. Missing external evidence is not replaced with synthetic
@@ -48,6 +48,19 @@ results.
   passed clean Python 3.9 and 3.12 jobs; only Python 3.9 regenerates the canonical lock,
   `fail-fast` is disabled, feature branches run one pull-request workflow, and the Node 24
   `actions/checkout@v7` and `actions/setup-python@v7` runtimes emit no deprecation annotation;
+- PR [#1](https://github.com/YingaoWang-casia/shushu-novelty-finder/pull/1) and the
+  disclosure-only PR [#2](https://github.com/YingaoWang-casia/shushu-novelty-finder/pull/2) are
+  merged. Main-branch
+  [CI run 30429084950](https://github.com/YingaoWang-casia/shushu-novelty-finder/actions/runs/30429084950)
+  passed Python 3.9 and 3.12 on merge commit
+  `2cfa010c24d7bc72ff1686c0383584e71fe95763`;
+- GitHub prerelease
+  [`v0.2.0a1`](https://github.com/YingaoWang-casia/shushu-novelty-finder/releases/tag/v0.2.0a1)
+  is published from that merge commit with audited wheel and sdist assets. Their SHA-256 values are
+  `b007e94afb7420b48a50dc33c1b76ed3da213e88971719cec2d287a15915f198` and
+  `a759eebc2128d71d9f59e848c529476fdccedfdbb4a293a1095d8e0780a4f030`;
+- the wheel was downloaded back from the public GitHub release, installed into a new Python 3.9
+  virtual environment, and returned `shushu 0.2.0a1` plus `status: ok` from `shushu check`;
 
 ## Fourteen acceptance criteria
 
@@ -64,7 +77,7 @@ results.
 | 9 | At least 60 fixed eval seeds | Pass | Versioned 60-seed JSONL suite. |
 | 10 | Bare and old-version baselines | Pass (execution); human scoring pending | All 240 real runs completed on the same model, with four 60-run systems, immutable prompt/adapter/output provenance, exact-matrix merge, a completed execution manifest, and two generated balanced-overlap opaque rater packs. |
 | 11 | Core code has automated tests | Pass | 117 tests across schemas, retrieval/replay, evidence, orchestration, lineage, gaps, ideas, collision, review, reports, adapters, blinding and evaluation. |
-| 12 | CI runs on every PR | Pass | Draft PR #1 passes both Python 3.9 and 3.12 jobs from a single pull-request workflow. |
+| 12 | CI runs on every PR | Pass | PRs #1 and #2, plus their resulting main-branch merge commits, passed Python 3.9 and 3.12 jobs. |
 | 13 | Reports expose failure and uncertainty | Pass | P9 requires disclosure and hashes the report body, mode-required inputs and every declared failure log. |
 | 14 | README effectiveness claims have public eval support | Safety gate passes; comparative evidence pending | All three READMEs disclose no comparative claim and pass the release gate. Adding one requires a hashed, publishable, human-primary 60-seed report. |
 
