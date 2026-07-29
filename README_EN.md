@@ -24,6 +24,15 @@ Understand the closest paper lineage first, then grow realistic paper ideas from
 
 ---
 
+> [!IMPORTANT]
+> **Alpha release status (v0.2.0a1):** the engineering runtime is public and the main branch
+> passes Python 3.9 / 3.12 CI, but this is not a stable claim that the system outperforms its
+> baselines. The fixed 60-seed × 4-system execution is complete; blind ratings by two real
+> research-experienced reviewers, agreement statistics, and a publishable aggregate report are
+> still pending. Until that evidence is public, treat this as a reproducible engineering alpha
+> and do not interpret automated metrics or examples as comparative-effectiveness results. See
+> the [engineering acceptance audit](docs/acceptance-audit.md) for the exact status.
+
 ## ✨ What it does
 
 Many answers to “help me find a paper idea” sound active, but actual paper writing often gets stuck on questions like:

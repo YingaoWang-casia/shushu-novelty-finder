@@ -8,6 +8,11 @@
 - [v0.2 迁移说明](docs/migration-v0.2.md)
 - [版本变化](CHANGELOG.md)
 
+> [!IMPORTANT]
+> **Alpha 发布状态（v0.2.0a1）**：工程化运行时已经公开并通过 Python 3.9 / 3.12
+> CI，但这不代表新版已被证明优于 baseline。两名真实科研评审者的盲评、一致性统计
+> 和可发布聚合报告仍待完成；在此之前，请勿把自动指标或示例输出当作比较效果结论。
+
 ## 效果声明状态
 
 <!-- EFFECTIVENESS_CLAIMS_START -->

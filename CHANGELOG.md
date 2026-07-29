@@ -5,6 +5,12 @@ not imply completed comparative effectiveness evidence.
 
 ## [Unreleased]
 
+No changes yet.
+
+## [0.2.0a1] - 2026-07-29
+
+### Added
+
 - Completed the fixed 60-seed, four-system Codex benchmark: 240 hash-verified outputs, a completed
   execution manifest, retained failure provenance, and two hash-bound opaque human-rater packs.
 - Benchmark execution now preserves the diagnostic stderr tail and circuit-breaks a queue after
@@ -30,10 +36,6 @@ not imply completed comparative effectiveness evidence.
 - Completed human-primary ratings remain the only external evidence gate for stable comparative
   claims.
 
-## [0.2.0a1] - 2026-07-16
-
-### Added
-
 - Installable Python 3.9+ `src/` package and `shushu` CLI.
 - Resumable, hash-bound P0–P9 lineage-first workflow with strict schemas and fail-closed gates.
 - arXiv, OpenAlex, Semantic Scholar, and OpenReview retrieval with retry, durable failures,
@@ -53,10 +55,10 @@ not imply completed comparative effectiveness evidence.
 
 ### Known limitations
 
-- OpenAlex live access requires `OPENALEX_API_KEY`; reliable Semantic Scholar benchmarking may
-  require `SEMANTICSCHOLAR_API_KEY`.
-- There are no public comparative effectiveness claims until all 240 model runs and two-person
-  blind human evaluation are complete and the aggregate artifacts pass the release gate.
+- OpenAlex's bounded anonymous path supports smoke and evaluation runs, but its free caller key is
+  still recommended for repeatable or production use; a Semantic Scholar key remains optional.
+- There are no public comparative-effectiveness claims until the pending two-person blind human
+  evaluation is complete and the aggregate artifacts pass the release gate.
 
 [Unreleased]: https://github.com/YingaoWang-casia/shushu-novelty-finder/compare/v0.2.0a1...HEAD
 [0.2.0a1]: https://github.com/YingaoWang-casia/shushu-novelty-finder/releases/tag/v0.2.0a1
